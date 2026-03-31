@@ -301,7 +301,7 @@ def calculate_transformer_factor_series(
         all_probs_list = []
         all_rets_list = []
 
-        for m in models:
+        for name, m in models:
             probs_per_model = []
             rets_per_model = []
             m.eval()
