@@ -18,19 +18,39 @@ from risk_manager import RiskManager
 logger = logging.getLogger(__name__)
 
 
+from config import CommissionConfig,SlippageConfig  # 在文件顶部导入
+
 def calculate_transaction_cost(
-    price: float, shares: int, direction: str, code: str,
-    commission_rate: float = 0.00025,
-    min_commission: float = 5.0,
-    stamp_duty_rate: float = 0.0005,
-    transfer_fee_rate: float = 0.00001,
+    price: float,
+    shares: int,
+    direction: str,
+    code: str,
+    commission_rate: Optional[float] = None,
+    min_commission: Optional[float] = None,
+    stamp_duty_rate: Optional[float] = None,
+    transfer_fee_rate: Optional[float] = None,
 ) -> float:
-    """计算交易成本（佣金 + 印花税 + 过户费）"""
+    """
+    计算交易成本（佣金 + 印花税 + 过户费）
+    未传入的费率参数使用 config.py 中的全局配置。
+    """
+    # 使用全局配置作为默认值
+    if commission_rate is None:
+        commission_rate = CommissionConfig.commission_rate
+    if min_commission is None:
+        min_commission = CommissionConfig.min_commission
+    if stamp_duty_rate is None:
+        stamp_duty_rate = CommissionConfig.stamp_duty_rate
+    if transfer_fee_rate is None:
+        transfer_fee_rate = CommissionConfig.transfer_fee_rate
+
     amount = price * shares
     commission = max(amount * commission_rate, min_commission)
     stamp_duty = amount * stamp_duty_rate if direction == 'sell' else 0.0
     transfer_fee = amount * transfer_fee_rate if direction == 'sell' else 0.0
+
     return commission + stamp_duty + transfer_fee
+
 
 
 def calculate_multi_timeframe_score(df: pd.DataFrame, weights: Optional[Dict[str, float]] = None) -> pd.DataFrame:
@@ -108,7 +128,8 @@ def run_backtest_loop(
 
     current_weights = weights.copy()
     last_weight_update = 60
-
+    buy_slippage_rate = SlippageConfig.buy_slippage_rate
+    sell_slippage_rate = SlippageConfig.sell_slippage_rate
     for i in range(60, len(df)):
         date = df.index[i]
         price = df['Close'].iloc[i]
@@ -186,7 +207,7 @@ def run_backtest_loop(
             except (ValueError, ZeroDivisionError):
                 continue
 
-            buy_price_raw = price * 1.0015
+            buy_price_raw = price * buy_slippage_rate
             buy_commission = calculate_transaction_cost(buy_price_raw, shares, 'buy', stock_code)
             actual_buy_cost = buy_price_raw * shares + buy_commission
             buy_date = date
@@ -242,7 +263,7 @@ def run_backtest_loop(
                 if price <= df['limit_down'].iloc[i]:
                     continue
 
-                sell_price_raw = price * 0.9985
+                sell_price_raw = price * sell_slippage_rate
                 sell_commission_total = calculate_transaction_cost(sell_price_raw, shares, 'sell', stock_code)
                 actual_sell_proceeds = sell_price_raw * shares - sell_commission_total
                 net_ret = (actual_sell_proceeds - actual_buy_cost) / actual_buy_cost

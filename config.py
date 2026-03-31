@@ -173,7 +173,41 @@ class PathConfig:
             wechat_webhook=_env("WECHAT_WEBHOOK", ""),
             wechat_upload_url=_env("WECHAT_UPLOAD_URL", ""),
         )
+# 示意，不是完整文件，你按你现有结构补充
 
+from dataclasses import dataclass
+# ---- 交易成本 & 滑点 ----
+COMMISSION_RATE=0.00025
+MIN_COMMISSION=5.0
+STAMP_DUTY_RATE=0.0005
+TRANSFER_FEE_RATE=0.00001
+BUY_SLIPPAGE_RATE=0.0015
+SELL_SLIPPAGE_RATE=0.0015
+@dataclass
+class CommissionConfig:
+    commission_rate: float
+    min_commission: float
+    stamp_duty_rate: float
+    transfer_fee_rate: float
+    @classmethod
+    def from_env(cls) -> "CommissionConfig":
+        return cls(
+            commission_rate=_env_float("COMMISSION_RATE", 0.00025),
+            min_commission=_env_float("MIN_COMMISSION", 5.0),
+            stamp_duty_rate=_env_float("STAMP_DUTY_RATE", 0.0005),
+            transfer_fee_rate=_env_float("TRANSFER_FEE_RATE", 0.00001),
+        )
+
+@dataclass
+class SlippageConfig:
+    buy_slippage_rate: float
+    sell_slippage_rate: float
+    @classmethod
+    def from_env(cls) -> "SlippageConfig":
+        return cls(
+            buy_slippage_rate=_env_float("COMMISSION_RATE", 0.0015),
+            sell_slippage_rate=_env_float("MIN_COMMISSION", 0.9985)
+        )
 
 @dataclass
 class AppConfig:
@@ -182,6 +216,9 @@ class AppConfig:
     risk: RiskConfig = field(default_factory=RiskConfig)
     backtest: BacktestConfig = field(default_factory=BacktestConfig)
     paths: PathConfig = field(default_factory=PathConfig)
+    # 新增
+    commission:CommissionConfig= field(default_factory=CommissionConfig)
+    slippage: SlippageConfig = field(default_factory=SlippageConfig)
 
     @classmethod
     def from_env(cls) -> "AppConfig":
@@ -190,6 +227,8 @@ class AppConfig:
             risk=RiskConfig.from_env(),
             backtest=BacktestConfig.from_env(),
             paths=PathConfig.from_env(),
+            commission=CommissionConfig.from_env(),
+            slippage=SlippageConfig.from_env(),
         )
 
     def ensure_dirs(self):
@@ -237,3 +276,5 @@ def get_settings() -> AppConfig:
         _settings = AppConfig.from_env()
         _settings.ensure_dirs()
     return _settings
+
+
