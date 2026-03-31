@@ -1,0 +1,447 @@
+# -*- coding: utf-8 -*-
+"""
+回测入口脚本
+执行 Walk-Forward 回测、参数优化、风控过滤、报告输出、可视化
+"""
+import os
+import json
+import logging
+import traceback
+import time
+from multiprocessing import Pool, cpu_count
+from tqdm import tqdm
+
+import pandas as pd
+import numpy as np
+
+from config import get_settings, STOCK_CODES
+from data import (
+    download_market_data, download_stocks_data,
+    check_and_clean_cache, load_pickle_cache,
+    calculate_orthogonal_factors,
+)
+from data.types import NON_FACTOR_COLS
+from backtest.engine import run_backtest_loop, calculate_multi_timeframe_score
+from backtest.optimizer import optimize_strategy, walk_forward_split, calculate_dynamic_weights
+from backtest.evaluator import calculate_comprehensive_stats
+from backtest.visualizer import visualize_backtest_with_split
+from backtest.report import print_stock_backtest_report
+from risk_manager import RiskManager
+
+# ==================== 多进程全局变量 ====================
+_worker_market_data = None
+_worker_stocks_data = None
+
+
+def init_worker(m_data, s_data):
+    global _worker_market_data, _worker_stocks_data
+    _worker_market_data = m_data
+    _worker_stocks_data = s_data
+    # 初始化 Transformer 设备
+    try:
+        import torch
+        from model.predictor import _load_ensemble_models
+        _load_ensemble_models(torch.device("cuda" if torch.cuda.is_available() else "cpu"))
+    except Exception:
+        pass
+
+
+def _build_equity_curve(df: pd.DataFrame, trades_df: pd.DataFrame) -> pd.Series:
+    """
+    从交易记录构建日频资金曲线
+    非持仓日资金不变，持仓日按个股涨跌幅变化
+    """
+    if trades_df is None or len(trades_df) == 0:
+        return pd.Series(100000.0, index=df.index)
+
+    initial_cash = 100000.0
+    equity = pd.Series(initial_cash, index=df.index)
+
+    stock_daily_ret = df['Close'].pct_change()
+    position_status = pd.Series(0, index=df.index)
+
+    for t in trades_df.itertuples():
+        try:
+            holding_dates = df.loc[t.buy_date: t.sell_date].index
+            position_status.loc[holding_dates] = 1
+        except KeyError:
+            pass
+
+    # 持仓日：资金跟随涨跌
+    holding_mask = position_status == 1
+    daily_change = stock_daily_ret.fillna(0)
+    equity[holding_mask] = equity[holding_mask] * (1 + daily_change[holding_mask])
+
+    return equity
+
+
+def _build_benchmark_returns(market_data, df: pd.DataFrame) -> pd.Series:
+    """
+    构建与 df 对齐的基准日收益率（大盘涨跌幅）
+    如果无法对齐返回 None
+    """
+    if market_data is None:
+        return None
+    try:
+        bench = market_data['Close'].reindex(df.index).pct_change()
+        bench = bench.fillna(0)
+        if len(bench) == len(df):
+            return bench
+    except Exception:
+        pass
+    return None
+
+
+def process_single_stock(args):
+    """
+    子进程处理单只股票的完整流程：
+    1. 因子计算
+    2. Walk-Forward 划分
+    3. 多折优化 + 测试
+    4. 风控评估
+    5. 打印报告
+    6. 决定保留/丢弃
+    """
+    t_start = time.time()
+
+    try:
+        stock_name, stock_data, stock_code = args
+        settings = get_settings()
+        risk_mgr = RiskManager(settings.risk)
+
+        df = stock_data.copy()
+        if len(df) < 150:
+            return stock_code, None, None, None, None, None, None
+
+        # 1. 因子计算
+        df = calculate_orthogonal_factors(df, stock_code, allow_save_cache=True)
+
+        # 2. Walk-Forward 划分
+        splits = walk_forward_split(
+            df,
+            train_size=settings.backtest.train_ratio,
+            test_size=settings.backtest.test_ratio,
+            n_splits=settings.backtest.n_splits,
+            gap_days=settings.backtest.gap_days,
+        )
+        if not splits:
+            return stock_code, None, None, None, None, None, None
+
+        validated_splits = []
+        for s in splits:
+            if s[3] <= len(df):
+                validated_splits.append(s)
+        if not validated_splits:
+            return stock_code, None, None, None, None, None, None
+
+        # 3. 多折优化和测试
+        all_trades = []
+        best_params_list = []
+        best_weights_list = []
+        total_commissions = 0.0
+
+        for train_start, train_end, test_start, test_end in validated_splits:
+            train_df = df.iloc[train_start:train_end]
+            test_df = df.iloc[test_start:test_end]
+
+            if len(train_df) < 100 or len(test_df) < 20:
+                continue
+
+            try:
+                best_params_map, best_weights = optimize_strategy(
+                    train_df, stock_code, _worker_market_data, _worker_stocks_data,
+                )
+            except Exception as e:
+                print(f" [优化失败] {stock_name}: {e}")
+                continue
+
+            if not best_weights:
+                factor_cols = [c for c in train_df.columns if c not in NON_FACTOR_COLS]
+                best_weights = {c: 1.0 / len(factor_cols) for c in factor_cols}
+
+            test_df = calculate_multi_timeframe_score(test_df, weights=best_weights)
+
+            trades_df, stats, _ = run_backtest_loop(
+                test_df, stock_code, _worker_market_data,
+                best_weights, best_params_map, stocks_data=_worker_stocks_data,
+            )
+
+            if trades_df is None or len(trades_df) == 0:
+                continue
+
+            # 累加手续费（如果有记录）
+            if 'commission' in trades_df.columns:
+                total_commissions += trades_df['commission'].sum()
+
+            all_trades.append(trades_df)
+            best_params_list.append(best_params_map)
+            best_weights_list.append(best_weights)
+
+        if not all_trades:
+            return stock_code, None, None, None, None, None, None
+
+        combined_trades = pd.concat(all_trades, ignore_index=True)
+
+        # 4. 构建资金曲线和基准
+        # 用最后一个 split 的测试集区间来构建 equity curve
+        last_split = validated_splits[-1]
+        test_df_last = df.iloc[last_split[2]:last_split[3]]
+
+        equity_curve = _build_equity_curve(test_df_last, combined_trades)
+        benchmark_returns = _build_benchmark_returns(_worker_market_data, test_df_last)
+
+        # 5. 计算完整统计
+        full_stats = calculate_comprehensive_stats(
+            trades_df=combined_trades,
+            equity_curve=equity_curve,
+            benchmark_returns=benchmark_returns,
+            initial_cash=100000.0,
+            commissions=total_commissions,
+        )
+
+        # 6. 风控评估
+        risk_result = risk_mgr.evaluate_soft_targets(full_stats)
+
+        # 7. 打印报告
+        t_elapsed = time.time() - t_start
+        print_stock_backtest_report(
+            stock_name=stock_name,
+            stock_code=stock_code,
+            start_date=test_df_last.index[0] if len(test_df_last) > 0 else df.index[0],
+            end_date=test_df_last.index[-1] if len(test_df_last) > 0 else df.index[-1],
+            elapsed_seconds=t_elapsed,
+            stats=full_stats,
+            risk_result=risk_result,
+        )
+
+        # 8. 根据风控结论决定保留/丢弃
+        if risk_result["discard"]:
+            print(f" [DISCARD] {stock_name} - 核心风控指标未通过，策略丢弃")
+            return stock_code, None, None, None, None, None, None
+
+        # 额外筛选：收益和交易次数
+        if (full_stats.get('total_return', 0) <= 0
+                or full_stats.get('win_rate', 0) < settings.risk.min_win_rate
+                or full_stats.get('total_trades', 0) < settings.risk.min_trades
+                or full_stats.get('total_trades', 0) > settings.risk.max_trades):
+            print(f" [FILTER] {stock_name} - 额外筛选未通过")
+            return stock_code, None, None, None, None, None, None
+
+        print(f" [KEEP] {stock_name} - 通过全部检查")
+
+        strategy_dict = {
+            'name': stock_name,
+            'params': best_params_list[0],
+            'weights': best_weights_list[0],
+        }
+
+        # 最终权重计算
+        final_weights = best_weights_list[-1] if best_weights_list else {}
+        df = calculate_multi_timeframe_score(df, weights=final_weights)
+
+        metadata = {
+            'processed_len': len(df),
+            'validated_splits': validated_splits,
+            'test_start_idx': validated_splits[-1][2] if validated_splits else int(len(df) * 0.7),
+        }
+
+        return stock_code, strategy_dict, full_stats, df, combined_trades, validated_splits, metadata
+
+    except Exception as e:
+        print(f" [错误] 处理异常: {e}")
+        traceback.print_exc()
+        return args[2], None, None, None, None, None, None
+
+
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] %(message)s')
+
+    settings = get_settings()
+    print("\n" + "=" * 80)
+    print("增强版策略回测系统 V3 (含风控+完整报告)")
+    print("=" * 80)
+
+    # 1. 大盘数据
+    print("\n[1/3] 检查大盘数据...")
+    if check_and_clean_cache(settings.paths.market_cache_file):
+        market_data = load_pickle_cache(settings.paths.market_cache_file)['market_data']
+    else:
+        market_data = download_market_data()
+    if market_data is None:
+        exit()
+
+    # 2. 个股数据
+    print("\n[2/3] 检查个股数据...")
+    if check_and_clean_cache(settings.paths.stock_cache_file):
+        stocks_data = load_pickle_cache(settings.paths.stock_cache_file)['stocks_data']
+    else:
+        stocks_data = download_stocks_data(STOCK_CODES)
+    if not stocks_data:
+        exit()
+
+    # 3. 并行回测
+    print("\n[3/3] 开始策略优化与回测...")
+    stock_list = [
+        (name, data, STOCK_CODES.get(name))
+        for name, data in stocks_data.items()
+        if STOCK_CODES.get(name)
+    ]
+
+    use_processes = 1  # GPU推理建议单进程
+    with Pool(processes=use_processes, initializer=init_worker, initargs=(market_data, stocks_data)) as pool:
+        raw_results = list(tqdm(pool.imap(process_single_stock, stock_list), total=len(stock_list), desc="进度"))
+
+    # 4. 结果汇总
+    results = [r for r in raw_results if len(r) == 7 and r[1] is not None]
+    all_strategies = {}
+    all_stats = {}
+
+    for code, strat, stat, df, trades, splits, metadata in results:
+        if strat:
+            all_strategies[code] = strat
+        if stat:
+            all_stats[strat['name']] = stat
+
+    # ===================== 汇总表格 =====================
+    print("\n" + "=" * 80)
+    print("测试集汇总报告")
+    print("=" * 80)
+
+    sorted_stats = sorted(all_stats.items(), key=lambda x: x[1].get('total_return', 0), reverse=True)
+
+    header = (
+        f"{'名称':<10} {'收益%':>8} {'胜率%':>7} {'交易':>5} "
+        f"{'夏普':>7} {'最大回撤%':>10} {'利润因子':>8} "
+        f"{'Sortino':>8} {'Calmar':>8} {'SQN':>6} {'Kelly':>6}"
+    )
+    print(header)
+    print("-" * len(header))
+
+    for name, s in sorted_stats:
+        print(
+            f"{name:<10} "
+            f"{s.get('total_return', 0):>8.2f} "
+            f"{s.get('win_rate', 0):>7.1f} "
+            f"{s.get('total_trades', 0):>5} "
+            f"{s.get('sharpe_ratio', 0):>7.2f} "
+            f"{s.get('max_drawdown', 0):>10.2f} "
+            f"{s.get('profit_factor', 0):>8.2f} "
+            f"{s.get('sortino_ratio', 0):>8.2f} "
+            f"{s.get('calmar_ratio', 0):>8.2f} "
+            f"{s.get('sqn', 0):>6.2f} "
+            f"{s.get('kelly_criterion', 0):>6.3f}"
+        )
+
+    # ===================== 组合回测 =====================
+    print("\n" + "=" * 80)
+    print("【组合回测】等权组合测试集总收益")
+    print("=" * 80)
+
+    all_dates = sorted(
+        set().union(*[set(df.index) for _, _, _, df, _, _, _ in results if df is not None])
+    )
+    portfolio = pd.DataFrame(index=all_dates)
+    portfolio['return'] = 0.0
+
+    n_valid = len(results)
+    if n_valid == 0:
+        print("警告: 没有有效策略，无法计算组合收益")
+    else:
+        for code, strat, stat, df, trades, splits, metadata in results:
+            if strat is None or df is None or trades is None:
+                continue
+
+            stock_daily_ret = df['Close'].pct_change()
+            position_status = pd.Series(0, index=df.index)
+
+            for t in trades.itertuples():
+                try:
+                    holding_dates = df.loc[t.buy_date: t.sell_date].index
+                    position_status.loc[holding_dates] = 1
+                except KeyError:
+                    pass
+
+            strategy_daily_ret = position_status * stock_daily_ret
+            portfolio['return'] += strategy_daily_ret / n_valid
+
+        portfolio['cum_ret'] = (1 + portfolio['return'].fillna(0)).cumprod()
+        total_ret = (portfolio['cum_ret'].iloc[-1] - 1) * 100
+        print(f"组合总收益: {total_ret:.2f}%")
+
+        # 组合风险指标
+        port_daily = portfolio['return'].fillna(0)
+        port_trades = []
+        in_trade = False
+        buy_val = 1.0
+        for date, ret in port_daily.items():
+            if ret != 0 and not in_trade:
+                in_trade = True
+                buy_val = 1.0
+            if in_trade:
+                buy_val *= (1 + ret)
+            if ret == 0 and in_trade:
+                port_trades.append({'net_return': buy_val - 1})
+                in_trade = False
+        if in_trade:
+            port_trades.append({'net_return': buy_val - 1})
+
+        if port_trades:
+            port_stats = calculate_comprehensive_stats(pd.DataFrame(port_trades))
+            print(
+                f"组合夏普: {port_stats.get('sharpe_ratio', 0):.2f} | "
+                f"最大回撤: {port_stats.get('max_drawdown', 0):.2f}% | "
+                f"利润因子: {port_stats.get('profit_factor', 0):.2f} | "
+                f"Sortino: {port_stats.get('sortino_ratio', 0):.2f} | "
+                f"Calmar: {port_stats.get('calmar_ratio', 0):.2f} | "
+                f"SQN: {port_stats.get('sqn', 0):.2f}"
+            )
+
+    # ===================== 保存策略参数 =====================
+    with open(settings.paths.strategy_file, 'w', encoding='utf-8') as f:
+        json.dump(all_strategies, f, ensure_ascii=False, indent=4)
+    print(f"\n✓ 策略参数已写入: {settings.paths.strategy_file}")
+    print(f"  保留策略数: {len(all_strategies)} / 总股票数: {len(stock_list)}")
+
+    # ===================== 可视化 =====================
+    print("\n" + "=" * 80)
+    print("开始生成可视化图表...")
+    print("=" * 80)
+
+    viz_dir = os.path.join(settings.paths.result_dir, 'backtest_charts')
+    os.makedirs(viz_dir, exist_ok=True)
+
+    for code, strat, stat, df, trades, splits, metadata in results:
+        if strat is None or trades is None or len(trades) == 0:
+            continue
+
+        stock_name = strat['name']
+        chart_path = os.path.join(viz_dir, f'{stock_name}_{code}_backtest.png')
+
+        try:
+            actual_len = len(df)
+            split_idx = int(actual_len * 0.7)
+
+            if metadata and 'test_start_idx' in metadata:
+                idx_from_meta = metadata['test_start_idx']
+                if 0 < idx_from_meta < actual_len:
+                    split_idx = idx_from_meta
+            elif splits and len(splits) > 0:
+                test_start = splits[-1][2]
+                if 0 < test_start < actual_len:
+                    split_idx = test_start
+
+            split_idx = max(1, min(split_idx, actual_len - 1))
+
+            visualize_backtest_with_split(
+                df=df, trades_df=trades, stock_name=stock_name,
+                split_idx=split_idx, market_data=market_data,
+                save_path=chart_path, strat=strat,
+            )
+            print(f" ✓ {stock_name} 图表已保存")
+        except Exception as e:
+            print(f" ✗ {stock_name} 图表生成失败: {e}")
+            traceback.print_exc()
+
+    print("\n" + "=" * 80)
+    print(f"所有可视化图表生成完成！目录: {viz_dir}")
+    print("=" * 80)
