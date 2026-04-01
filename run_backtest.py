@@ -27,6 +27,7 @@ from backtest.evaluator import calculate_comprehensive_stats
 from backtest.visualizer import visualize_backtest_with_split
 from backtest.report import print_stock_backtest_report
 from risk_manager import RiskManager
+from utils.stock_filter import filter_codes_by_name, should_intercept_stock
 
 # ==================== 多进程全局变量 ====================
 _worker_market_data = None
@@ -106,6 +107,13 @@ def process_single_stock(args):
 
     try:
         stock_name, stock_data, stock_code = args
+        # >>> 新增：统一拦截
+        skip, reason = should_intercept_stock(stock_code, stock_name, stock_data)
+        if skip:
+            print(f"[拦截-回测] 跳过 {stock_name} ({stock_code}): {reason}")
+            return stock_code, None, None, None, None, None, None
+        # <<< 新增结束
+
         settings = get_settings()
         risk_mgr = RiskManager(settings.risk)
 
@@ -303,10 +311,15 @@ if __name__ == "__main__":
 
     # 3. 并行回测
     print("\n[3/3] 开始策略优化与回测...")
+
+    # >>> 新增：股票池级 ST/退市 拦截
+    name_to_code_map = {name: STOCK_CODES.get(name) for name in stocks_data.keys() if STOCK_CODES.get(name)}
+    clean_map = filter_codes_by_name(name_to_code_map)
+    # <<< 新增结束
+
     stock_list = [
-        (name, data, STOCK_CODES.get(name))
-        for name, data in stocks_data.items()
-        if STOCK_CODES.get(name)
+        (name, stocks_data[name], code)
+        for name, code in clean_map.items()
     ]
 
     # use_processes = 1  # GPU推理建议单进程
