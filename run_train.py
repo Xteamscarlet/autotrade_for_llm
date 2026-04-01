@@ -9,7 +9,6 @@ import logging
 import argparse
 import time
 
-import pandas as pd
 import requests
 
 from config import get_settings
@@ -128,7 +127,7 @@ def main():
     import torch
     if torch.cuda.is_available():
         gpu_name = torch.cuda.get_device_name(0)
-        gpu_mem = torch.cuda.get_device_properties(0).total_mem / 1024**3
+        gpu_mem = torch.cuda.get_device_properties(0).total_memory / 1024**3
         print(f"\n✓ GPU: {gpu_name} ({gpu_mem:.1f} GB)")
     else:
         print("\n⚠️ 未检测到 GPU，将使用 CPU 训练（速度较慢）")
