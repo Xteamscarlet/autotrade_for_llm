@@ -21,6 +21,41 @@ logger = logging.getLogger(__name__)
 
 from config import CommissionConfig,SlippageConfig  # 在文件顶部导入
 
+from data.indicators import get_market_regime  # 你原项目已有的
+
+def build_regime_param_array(
+    df: pd.DataFrame,
+    market_data: pd.DataFrame | None,
+    regime_fixed: str | None,
+    params: dict[str, dict],
+) -> pd.DataFrame:
+    """
+    给 df 新增列：
+      - curr_regime: str（按 index 动态判断，或使用 regime_fixed）
+      - param_dict:  逐行保存当天的参数字典（对象）
+    注意：Series 里存 dict 会有一些开销，但回测本身很快；如果你在意可以改成只存需要的标量字段。
+    """
+    df = df.copy()
+    dates = pd.to_datetime(df.index)
+
+    # 1. 动态 regime
+    if regime_fixed is not None:
+        df["curr_regime"] = regime_fixed
+    elif market_data is not None:
+        # 这里用 .map 是为了尽量向量化；如果 get_market_regime 本身很慢，
+        # 可以考虑先把 market_data 离散化到日级别再做 join
+        df["curr_regime"] = dates.map(lambda d: get_market_regime(market_data, d))
+    else:
+        df["curr_regime"] = "neutral"
+
+    # 2. 按 regime 取参数（和你逐行逻辑一致：regime -> neutral -> 整个 params）
+    df["param_dict"] = df["curr_regime"].apply(
+        lambda r: params.get(r, params.get("neutral", params))
+    )
+
+    return df
+
+
 def calculate_transaction_cost(
     price: float,
     shares: int,
@@ -684,25 +719,17 @@ def run_backtest_loop_vectorized(
 
 
 def run_backtest_loop_compatible(
-        df: pd.DataFrame,
-        stock_code: str,
-        market_data: Optional[pd.DataFrame],
-        weights: Dict[str, float],
-        params: Dict[str, Dict],
-        regime: Optional[str] = None,
-        stocks_data: Optional[Dict] = None,
-        initial_capital: float = 100000.0,
-        use_vectorized_backtest: bool = False,
+    df: pd.DataFrame,
+    stock_code: str,
+    market_data: Optional[pd.DataFrame],
+    weights: Dict[str, float],
+    params: Dict[str, Dict],
+    regime: Optional[str] = None,
+    stocks_data: Optional[Dict] = None,
+    initial_capital: float = 100000.0,
+    use_vectorized_backtest: bool = False,
 ) -> Tuple[Optional[pd.DataFrame], Optional[Dict], pd.DataFrame]:
-    """
-    回测引擎统一入口（向后兼容）：
-    - use_vectorized_backtest=False -> 走老的逐行回测（默认）
-    - use_vectorized_backtest=True  -> 走新的向量化回测
-
-    参数签名与原 run_backtest_loop 完全一致，调用方无需修改。
-    """
     if not use_vectorized_backtest:
-        # 走老逻辑（你原有的 run_backtest_loop）
         return run_backtest_loop(
             df=df,
             stock_code=stock_code,
@@ -714,15 +741,29 @@ def run_backtest_loop_compatible(
             initial_capital=initial_capital,
         )
 
-    # ========== 走向量化回测，需要做参数适配 ==========
     logger.info("使用向量化回测引擎...")
 
-    # 1. 准备策略实例
-    # 注意：这里需要你根据实际需求创建策略实例
-    # 示例：假设你有一个 TransformerStrategy
-    strategy_instances = []
+    # ---------------- 新增：按 regime 把参数“注入到每一行” ----------------
+    df = build_regime_param_array(df, market_data, regime, params)
+    # 现在 df 里有：
+    #   - "curr_regime"
+    #   - "param_dict"  (逐行 dict，和逐行回测的 p 完全一致)
 
-    # 2. 准备风控配置
+    # --------- 原来的 weights 也可以保持你动态更新逻辑（可选） ----------
+    # 如果你希望和逐行一样“每 60 日滚动更新 current_weights”，
+    # 可以在向量化引擎里做“分段常量权重”的窗口化；目前先用输入的 weights 即可。
+
+    # --------- 策略实例：不再写死 TransformerStrategy ----------
+    # 方案 A：最简单，直接复用你现有的因子 + weights 生成 target_position_ratio
+    from strategies.base import BaseStrategy
+    default_strategy = BaseStrategy()
+    # 策略参数从哪来？你已经把 params 按 regime 放到 df["param_dict"] 里了，
+    # 如果策略需要“某个 regime 下的参数”，可以在向量化函数里直接用 df["param_dict"]
+    # 或者在这里挑一个默认策略参数 dict（比如 neutral）：
+    default_strategy.params = params.get("neutral", params)
+    strategy_instances = [default_strategy]
+
+    # --------- 风控/成本配置保持不变 ----------
     risk_cfg = None
     try:
         from config import get_settings
@@ -730,34 +771,24 @@ def run_backtest_loop_compatible(
     except Exception as e:
         logger.warning(f"无法获取风控配置: {e}")
 
-    # 3. 获取佣金/滑点配置
     commission_cfg = _get_commission_cfg()
     slippage_cfg = _get_slippage_cfg()
 
-    # 4. 如果没有策略实例，使用默认信号生成
-    if not strategy_instances:
-        # 创建一个默认策略实例（基于因子得分）
-        from strategies.base import BaseStrategy
-        default_strategy = BaseStrategy()
-        default_strategy.params = params.get('neutral', {})
-        strategy_instances.append(default_strategy)
-
-    # 5. 调用向量化回测引擎
+    # --------- 调用向量化引擎 ----------
     try:
         result_df = run_backtest_loop_vectorized(
-            df=df,
+            df=df,                           # 这里已经包含 curr_regime / param_dict
             strategy_instances=strategy_instances,
             risk_cfg=risk_cfg,
             commission_cfg=commission_cfg,
             slippage_cfg=slippage_cfg,
             initial_cash=initial_capital,
-            slippage_bps=0.0,  # 如果需要，可以从配置中读取
+            slippage_bps=0.0,
             min_trade_value=0.0,
             use_vectorized_signals=True,
         )
     except Exception as e:
         logger.error(f"向量化回测失败，回退到逐行回测: {e}")
-        # 失败时回退到老逻辑
         return run_backtest_loop(
             df=df,
             stock_code=stock_code,
@@ -769,43 +800,37 @@ def run_backtest_loop_compatible(
             initial_capital=initial_capital,
         )
 
-    # 6. 从 result_df 中提取交易记录和统计指标
-    # 注意：result_df 包含了完整的权益曲线，但需要构造 trades_df 和 stats
-
-    # 简化版本：返回 None 作为 trades_df（你可以后续完善）
+    # --------- 原有的统计/输出逻辑保持不变 ----------
     trades_df = None
 
-    # 计算基本统计指标
     stats = {
-        'initial_capital': initial_capital,
-        'final_equity': float(result_df['equity_curve'].iloc[-1]) if len(result_df) > 0 else initial_capital,
-        'total_return': 0.0,
-        'max_drawdown': 0.0,
-        'sharpe_ratio': 0.0,
+        "initial_capital": initial_capital,
+        "final_equity": float(result_df["equity_curve"].iloc[-1]) if len(result_df) > 0 else initial_capital,
+        "total_return": 0.0,
+        "max_drawdown": 0.0,
+        "sharpe_ratio": 0.0,
     }
 
-    if len(result_df) > 0 and 'equity_curve' in result_df.columns:
-        equity = result_df['equity_curve']
-        stats['final_equity'] = float(equity.iloc[-1])
-        stats['total_return'] = (equity.iloc[-1] / initial_capital - 1.0) * 100
+    if len(result_df) > 0 and "equity_curve" in result_df.columns:
+        equity = result_df["equity_curve"]
+        stats["final_equity"] = float(equity.iloc[-1])
+        stats["total_return"] = (equity.iloc[-1] / initial_capital - 1.0) * 100
 
-        # 计算最大回撤
         running_max = equity.expanding().max()
         drawdown = (equity - running_max) / running_max
-        stats['max_drawdown'] = float(drawdown.min()) * 100
+        stats["max_drawdown"] = float(drawdown.min()) * 100
 
-        # 计算 Sharpe Ratio（简化版本，假设无风险利率为 0）
-        if 'Close' in result_df.columns:
-            returns = result_df['Close'].pct_change().dropna()
+        # 简化版 Sharpe（用 Close 的日收益率）
+        if "Close" in result_df.columns:
+            returns = result_df["Close"].pct_change().dropna()
             if len(returns) > 0 and returns.std() > 0:
-                stats['sharpe_ratio'] = float(returns.mean() / returns.std() * np.sqrt(252))
+                stats["sharpe_ratio"] = float(returns.mean() / returns.std() * np.sqrt(252))
 
-    # 如果需要详细的交易记录，可以从 result_df 中解析
-    # 例如：找出 backtest_trade_shares 非零的日期，构造 trades_df
-    if 'backtest_trade_shares' in result_df.columns:
-        trade_mask = result_df['backtest_trade_shares'] != 0
+    # 后续可以从 result_df 里还原交易记录（backtest_trade_shares 非零的日期）
+    if "backtest_trade_shares" in result_df.columns:
+        trade_mask = result_df["backtest_trade_shares"] != 0
         if trade_mask.any():
-            # 这里可以构造 trades_df，暂时返回 None
+            # TODO: 构造 trades_df（可选）
             pass
 
     return trades_df, stats, result_df
