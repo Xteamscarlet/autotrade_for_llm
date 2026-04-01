@@ -8,6 +8,7 @@ import os
 import time
 import logging
 from typing import Optional, List, Dict
+from utils.stock_filter import should_intercept_stock
 
 import numpy as np
 import pandas as pd
@@ -134,6 +135,7 @@ def predict_stocks(target_codes: List[str], models: Optional[List] = None) -> pd
     Returns:
         预测结果 DataFrame，按 expected_score 降序排列
     """
+
     settings = get_settings()
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -175,7 +177,13 @@ def predict_stocks(target_codes: List[str], models: Optional[List] = None) -> pd
             temp['Turnover Rate'] = df['换手率']
 
             temp = _prepare_features(temp)
-
+            # >>> 新增：ST/退市/停牌 统一拦截
+            # 注意：此处在线拉取无法获取股票名称，传空字符串主要拦截停牌和空数据
+            skip, reason = should_intercept_stock(target_code, "", temp)
+            if skip:
+                logger.warning(f"[拦截-预测] 跳过 {target_code}: {reason}")
+                continue
+            # <<< 新增结束
             if len(temp) < settings.model.lookback_days:
                 continue
 

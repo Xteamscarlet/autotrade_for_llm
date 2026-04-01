@@ -208,6 +208,43 @@ class SlippageConfig:
             buy_slippage_rate=_env_float("COMMISSION_RATE", 0.0015),
             sell_slippage_rate=_env_float("MIN_COMMISSION", 0.9985)
         )
+from enum import Enum
+
+class RebalanceFreq(str, Enum):
+    WEEKLY = "weekly"      # 每周
+    BIWEEKLY = "biweekly"  # 每两周
+
+def _env_rebalance_freq(key: str, default: str = "weekly") -> RebalanceFreq:
+    val = _env(key, default).lower()
+    # 兼容中文写法（可选）
+    mapping = {
+        "weekly": RebalanceFreq.WEEKLY,
+        "biweekly": RebalanceFreq.BIWEEKLY,
+        "week": RebalanceFreq.WEEKLY,
+        "biweek": RebalanceFreq.BIWEEKLY,
+        "双周": RebalanceFreq.BIWEEKLY,
+        "两周": RebalanceFreq.BIWEEKLY,
+        "周": RebalanceFreq.WEEKLY,
+        "每周": RebalanceFreq.WEEKLY,
+    }
+    return mapping.get(val, RebalanceFreq(default))
+
+@dataclass
+class SchedulerConfig:
+    """调度与频率配置"""
+    rebalance_freq: RebalanceFreq = RebalanceFreq.WEEKLY
+    rebalance_anchor_weekday: int = 0  # 0=周一；1=周二 ... 6=周日
+    # 可选：基准日（若希望双周以某个周一为锚点）
+    rebalance_anchor_date: str = ""     # 格式 YYYY-MM-DD；为空则自动用本周的 rebalance_anchor_weekday
+
+    @classmethod
+    def from_env(cls) -> "SchedulerConfig":
+        return cls(
+            rebalance_freq=_env_rebalance_freq("REBALANCE_FREQ", "weekly"),
+            rebalance_anchor_weekday=_env_int("REBALANCE_ANCHOR_WEEKDAY", 0),
+            rebalance_anchor_date=_env("REBALANCE_ANCHOR_DATE", ""),
+        )
+
 
 @dataclass
 class AppConfig:
@@ -219,6 +256,7 @@ class AppConfig:
     # 新增
     commission:CommissionConfig= field(default_factory=CommissionConfig)
     slippage: SlippageConfig = field(default_factory=SlippageConfig)
+    scheduler: SchedulerConfig = field(default_factory=SchedulerConfig)  # 新增
 
     @classmethod
     def from_env(cls) -> "AppConfig":
@@ -229,6 +267,7 @@ class AppConfig:
             paths=PathConfig.from_env(),
             commission=CommissionConfig.from_env(),
             slippage=SlippageConfig.from_env(),
+            scheduler=SchedulerConfig.from_env(),  # 新增这一行
         )
 
     def ensure_dirs(self):
@@ -239,30 +278,49 @@ class AppConfig:
 
 # ==================== 股票代码配置 ====================
 STOCK_CODES = {
-    '赛力斯': '601127',
-    '歌尔股份': '002241',
+    # 消费
+    '贵州茅台': '600519',
+    '美的集团': '000333',
+
+    # 新能源
+    '国轩高科': '002074',     # 动力电池（替代宁德时代）
+    '隆基绿能': '601012',     # 光伏组件龙头
+    '赛力斯':   '601127',     # 新能源车（华为合作，弹性标的）
+    '比亚迪':   '002594',     # 新能源车整车龙头（与赛力斯互补）
+
+    # AI / 科技
     '科大讯飞': '002230',
     '海康威视': '002415',
-    '东山精密': '002384',
-    '湖南黄金': '002155',
-    '四川黄金': '001337',
+
+    # 金融（替代东方财富）
+    '中信证券': '600030',     # 券商龙头
+
+    # 通信/算力（替代中际旭创）
+    '光迅科技': '002281',     # 光模块/光通信龙头
+
+    # 医药（替代迈瑞医疗）
+    '恒瑞医药': '600276',     # 创新药龙头
+
+    # 黄金 / 有色 / 资源
     '山东黄金': '600547',
-    '钒钛股份': '000629',
-    '华新建材': '600801',
+    '紫金矿业': '601899',     # 铜+金资源龙头
+
+    # 电力/公用事业（防御）
+    '长江电力': '600900',     # 水电龙头
     '东方电气': '600875',
-    '三变科技': '002112',
-    '鲁抗医药': '600789',
-    '彩虹集团': '003023',
-    '剑桥科技': '603083',
-    '北化股份': '002246',
-    '硕贝德': '300322',
-    '京东方A': '000725',
-    '北大荒': '600598',
-    '通富微电': '002156',
-    '贵州茅台': '600519',
-    '高澜股份': '300499',
-    '东方日升': '300118',
-    '中国巨石': '600176',
+
+    # 电子/消费电子
+    '歌尔股份': '002241',
+    '东山精密': '002384',
+
+    # 军工
+    '中航沈飞': '600760',
+
+    # 农业
+    '北大荒':   '600598',
+
+    # 建材/新材料
+    '北新建材': '000786',
 }
 
 # 全局配置单例（延迟初始化）
@@ -276,5 +334,4 @@ def get_settings() -> AppConfig:
         _settings = AppConfig.from_env()
         _settings.ensure_dirs()
     return _settings
-
 

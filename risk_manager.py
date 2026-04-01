@@ -3,8 +3,12 @@
 双层风控管理器
 - 硬限制：回测前参数合法性校验，违反则直接阻断
 - 软目标：回测后全局风险评估，不达标则策略被标记为 discard
+- 新增：向量化风控（apply_vectorized_risk_controls）
 """
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Any
+import numpy as np
+import pandas as pd
+
 from config import get_settings, RiskConfig
 
 
@@ -15,18 +19,15 @@ class RiskManager:
         self.config = config or get_settings().risk
 
     # ==================== 硬限制检查 ====================
-
     @staticmethod
     def check_hard_limits(params: dict, regime: str = "neutral") -> bool:
         """回测前硬限制检查
-
         检查项：
         1. 止损不能太宽（<-15%）
         2. 买入阈值不能太低（<0.4）
         3. 买入阈值必须大于卖出阈值
         4. 持仓天数合理（1-60天）
         5. 移动止损参数逻辑合理
-
         Raises:
             ValueError: 参数不合法时抛出
         """
@@ -58,18 +59,18 @@ class RiskManager:
 
         if tp1 <= 0 or tp2 <= 0:
             raise ValueError(f"移动止损触发利润必须为正: level1={tp1}, level2={tp2}")
+
         if td1 <= 0 or td2 <= 0:
             raise ValueError(f"移动止损回撤幅度必须为正: level1={td1}, level2={td2}")
+
         if tp2 <= tp1:
             raise ValueError(f"Level2触发利润({tp2})应大于Level1({tp1})")
 
         return True
 
     # ==================== 软目标评估 ====================
-
     def evaluate_soft_targets(self, stats: dict) -> dict:
         """回测后软目标评估
-
         Returns:
             dict: {
                 'passed': bool,
@@ -151,8 +152,10 @@ class RiskManager:
             violations.append(f"total_trades({nt}) > {self.config.max_trades} (过度交易)")
 
         passed = len(violations) == 0
+
         # 核心指标不通过 → discard
         critical_failed = not dd_ok or not pf_ok
+
         discard = critical_failed
 
         return {
@@ -163,7 +166,6 @@ class RiskManager:
         }
 
     # ==================== 组合层面风控 ====================
-
     @staticmethod
     def check_portfolio_risk(
         current_positions: List[dict],
@@ -173,14 +175,12 @@ class RiskManager:
         max_same_sector_ratio: float = 0.4,
     ) -> Tuple[List[dict], List[str]]:
         """组合层面风控过滤
-
         Args:
             current_positions: 当前持仓列表 [{'code': str, 'ratio': float, 'sector': str}]
             new_candidates: 新买入候选列表 [{'code': str, 'ratio': float, 'sector': str, 'score': float}]
             max_total_ratio: 最大总仓位比例
             max_single_ratio: 单只最大仓位比例
             max_same_sector_ratio: 同板块最大仓位比例
-
         Returns:
             (filtered_candidates, warnings): 过滤后的候选和警告信息
         """
@@ -188,15 +188,14 @@ class RiskManager:
 
         # 当前总仓位
         current_total = sum(p.get("ratio", 0) for p in current_positions)
-        remaining_ratio = max_total_ratio - current_total
 
+        remaining_ratio = max_total_ratio - current_total
         if remaining_ratio <= 0:
             warnings.append(f"总仓位已满({current_total:.1%})，拒绝所有新买入")
             return [], warnings
 
         # 按得分排序
         sorted_candidates = sorted(new_candidates, key=lambda x: x.get("score", 0), reverse=True)
-
         filtered = []
         used_ratio = 0
         sector_exposure = {}
@@ -220,6 +219,7 @@ class RiskManager:
                 if available <= 0.01:
                     warnings.append(f"剩余仓位不足，跳过 {cand['code']}")
                     break
+
                 warnings.append(f"{cand['code']} 仓位被截断至{available:.1%}")
                 cand_ratio = available
 
@@ -240,3 +240,315 @@ class RiskManager:
             sector_exposure[sector] = sector_exposure.get(sector, 0) + cand_ratio
 
         return filtered, warnings
+
+    # ==================== 向量化风控（新增） ====================
+
+    # - 市场状态动态缩放
+    def _apply_market_regime_scaling(
+        self,
+        target_ratio: np.ndarray,
+        regime: np.ndarray,
+        regime_scaling: Optional[Dict[str, float]],
+    ) -> np.ndarray:
+        """
+        根据 market_regime 列对 target_ratio 进行动态缩放。
+        - 若 regime_scaling 为 None，直接返回原 target_ratio。
+        - 若某 regime 不在 regime_scaling 中，保持原值。
+        - 支持常见的 regime 枚举（示例：bull/bear/sideways）。
+        """
+        if regime_scaling is None:
+            return target_ratio
+
+        # 复制一份，避免原地改输入（调用侧会直接赋值回 df 的列）
+        out = target_ratio.copy()
+
+        # 遍历所有 regime 分段，使用布尔掩码进行向量化乘法
+        for reg_label, scale_factor in regime_scaling.items():
+            mask = regime == reg_label
+            if not np.any(mask):
+                continue
+
+            # 限制 scale_factor 合理范围（负数会被 clamp 到 0）
+            scale_factor_clamped = max(scale_factor, 0.0)
+            out[mask] = out[mask] * scale_factor_clamped
+
+        # 确保仍在 [0, 1] 范围（由于浮点误差可能略超边界）
+        np.clip(out, 0.0, 1.0, out=out)
+        return out
+
+    # - 涨跌停不可交易过滤
+    def _apply_limit_price_filter(
+        self,
+        df: pd.DataFrame,
+        target_ratio: np.ndarray,
+        signal_action: np.ndarray,
+        # 控制开关（可外传参数；此处直接从 self.config 可见性不好，先写死）
+        limit_up_col: str = "limit_up",
+        limit_down_col: str = "limit_down",
+    ) -> Tuple[np.ndarray, np.ndarray]:
+        """
+        涨跌停日禁止交易（视为不可成交），适用于 A 股场景。
+        - 如果 df 中没有 limit_up/limit_down 列，则跳过过滤。
+        - 涨停日：禁止买入（只清零买入信号对应的目标仓位；不影响已持仓）。
+        - 跌停日：禁止卖出（只清零卖出信号对应的目标仓位；不影响已持仓）。
+        说明：
+          - 买入/卖出由 signal_action 决定；对于已持仓，target_ratio 不为 0。
+          - 这里仅把“不可成交”那天的“方向性目标调整”清零，后续引擎会自动保持当前仓位。
+        """
+        has_limit_up = limit_up_col in df.columns
+        has_limit_down = limit_down_col in df.columns
+
+        if not (has_limit_up or has_limit_down):
+            return target_ratio, signal_action
+
+        # 读取为 Numpy 数组加速（缺失列已在上面排除）
+        if has_limit_up:
+            limit_up_arr = df[limit_up_col].to_numpy(dtype=bool)
+        else:
+            limit_up_arr = np.zeros(len(df), dtype=bool)
+
+        if has_limit_down:
+            limit_down_arr = df[limit_down_col].to_numpy(dtype=bool)
+        else:
+            limit_down_arr = np.zeros(len(df), dtype=bool)
+
+        # 涨停日：禁止买入（signal_action == 1 且 limit_up）
+        mask_limit_up_block = (signal_action == 1) & limit_up_arr
+        target_ratio[mask_limit_up_block] = 0.0
+        signal_action[mask_limit_up_block] = 0
+
+        # 跌停日：禁止卖出（signal_action == -1 且 limit_down）
+        mask_limit_down_block = (signal_action == -1) & limit_down_arr
+        target_ratio[mask_limit_down_block] = 0.0
+        signal_action[mask_limit_down_block] = 0
+
+        # 注意：若当日既涨停又跌停（极端异常），上面会把买卖都清零（保守策略）
+        return target_ratio, signal_action
+
+    # - 向量化风控主入口
+    def apply_vectorized_risk_controls(
+        self,
+        df: pd.DataFrame,
+        # 可选：市场状态标签列名（默认：market_regime）
+        regime_col: str = "market_regime",
+        # 可选：涨跌停标签列名（默认：limit_up / limit_down）
+        limit_up_col: str = "limit_up",
+        limit_down_col: str = "limit_down",
+        # 可选：市场状态对应的仓位缩放系数（默认示例；可从外部传入）
+        regime_scaling: Optional[Dict[str, float]] = None,
+    ) -> pd.DataFrame:
+        """
+        向量化风控：在进入底层回测引擎前，对策略生成的“目标仓位序列”进行过滤/缩放。
+        - 输入 df 必须包含：
+            * target_position_ratio：建议仓位（0~1）
+            * signal_action：1 买 / -1 卖 / 0 持有
+        - 可选列（有则生效，无则跳过）：
+            * market_regime：市场状态标签（例如：bull/bear/sideways/neutral 等）
+            * limit_up/limit_down：当日是否涨停/跌停（布尔值或可转换为布尔）
+        - 基础逻辑：
+            1) 单股最大仓位上限（使用 RiskConfig.max_position_ratio）；
+            2) 市场状态动态缩放（如熊市目标仓位乘以 0.3）；
+            3) 涨跌停日不可交易过滤（禁止对应方向的订单）。
+        - 所有操作尽量向量化（numpy/pandas），避免 Python for 循环。
+        - 就地修改 df['target_position_ratio']、df['signal_action']（如需要），并返回 df 以便链式调用。
+
+        Args:
+            df: 策略输出的 DataFrame（包含 target_position_ratio、signal_action 等）
+            regime_col: 市场状态列名（默认 "market_regime"）
+            limit_up_col: 涨停标志列名（默认 "limit_up"）
+            limit_down_col: 跌停标志列名（默认 "limit_down"）
+            regime_scaling: 市场状态 -> 仓位缩放系数；若为 None，则不启用市场状态缩放
+
+        Returns:
+            pd.DataFrame: 经过风控调整后的 df（target_position_ratio 与 signal_action 可能被修改）
+        """
+        # ---- 前置校验 ----
+        if not isinstance(df, pd.DataFrame):
+            raise TypeError("apply_vectorized_risk_controls 要求输入为 pd.DataFrame")
+
+        required_cols = ["target_position_ratio", "signal_action"]
+        missing_cols = [c for c in required_cols if c not in df.columns]
+        if missing_cols:
+            raise KeyError(f"DataFrame 缺少必要列: {missing_cols}")
+
+        # 复制目标列（避免直接改原列，最后再统一写回；这里为了简化，直接就地修改并返回 df）
+        # 若你想完全不可变，可先 df = df.copy() 再操作。
+        target_ratio = df["target_position_ratio"].to_numpy(dtype=np.float64)
+        signal_action = df["signal_action"].to_numpy(dtype=np.int8)
+
+        # ---- 1) 单股最大仓位 cap（来自 RiskConfig.max_position_ratio） ----
+        max_pos_ratio = getattr(self.config, "max_position_ratio", None)
+        if max_pos_ratio is not None:
+            # 确保在 [0, 1] 范围（配置异常保护）
+            max_pos_ratio_clamped = min(max(max_pos_ratio, 0.0), 1.0)
+            np.clip(target_ratio, 0.0, max_pos_ratio_clamped, out=target_ratio)
+
+        # ---- 2) 市场状态动态缩放 ----
+        if regime_scaling is not None:
+            if regime_col in df.columns:
+                regime_arr = df[regime_col].to_numpy(dtype=str)
+                target_ratio = self._apply_market_regime_scaling(
+                    target_ratio,
+                    regime_arr,
+                    regime_scaling=regime_scaling,
+                )
+            else:
+                # 没有市场状态列，但 regime_scaling 不为 None 时只打一条日志提示
+                import warnings
+                warnings.warn(
+                    f"启用了 regime_scaling，但 df 中缺少 '{regime_col}' 列，跳过市场状态缩放。",
+                    RuntimeWarning,
+                )
+
+        # ---- 3) 涨跌停不可交易过滤 ----
+        # 若 df 中有 limit_up/limit_down 列，则应用过滤；否则跳过。
+        target_ratio, signal_action = self._apply_limit_price_filter(
+            df,
+            target_ratio,
+            signal_action,
+            limit_up_col=limit_up_col,
+            limit_down_col=limit_down_col,
+        )
+
+        # ---- 4) 最终安全 clip：保证在 [0, 1] 区间，并清理极小误差 ----
+        np.clip(target_ratio, 0.0, 1.0, out=target_ratio)
+        # 把 signal_action 限制在 {-1, 0, 1}
+        # 方法：先设 0/1/-1 的合法掩码，其余位置置为 0（保守）
+        valid_action_mask = (signal_action == -1) | (signal_action == 0) | (signal_action == 1)
+        signal_action[~valid_action_mask] = 0
+
+        # ---- 5) 写回 df 列（返回同一份 df） ----
+        df["target_position_ratio"] = target_ratio
+        df["signal_action"] = signal_action
+
+        return df
+
+
+
+
+def apply_vectorized_risk_controls(
+    df: pd.DataFrame,
+    risk_cfg: Optional[Any] = None,  # 类型为 RiskConfig，避免循环导入写 Any
+    *,
+    # 可选的覆写参数（若为 None 则使用 risk_cfg 字段）
+    bear_position_cap: Optional[float] = None,
+    bull_position_cap: Optional[float] = None,
+    neutral_position_cap: Optional[float] = None,
+) -> pd.DataFrame:
+    """
+    向量化风控过滤器（步骤二）：
+    - 基于 target_position_ratio 与 market_regime（如有）做仓位上限压缩。
+    - 对涨停/跌停日禁止开新仓（将 signal_action 中的买入清零），通常也同步把 target_position_ratio 归零。
+    - 可在进入 Numba 状态机之前调用，避免在循环里做复杂判断。
+
+    契约：
+    - 输入 df 至少包含：
+      - target_position_ratio（0~1 的目标仓位）
+      - close/open/high/low（用于涨跌停判断，列名需与 DATA 模块一致）
+      - （可选）market_regime: str 列（取值 "bull"/"bear"/"neutral"）
+    - 输出 df：在输入 df 的副本上修改以下列并返回：
+      - target_position_ratio（按市场状态上限压缩）
+      - signal_action（买入信号按涨跌停/不可交易条件清零）
+
+    注意：
+    - 保持无状态：所有决策仅基于当前行数据，可安全向量化。
+    """
+    out = df.copy()
+
+    # ---------------------------
+    # 1) 确保必要列存在并初始化（防御性编程）
+    # ---------------------------
+    for col in ("signal_action", "target_position_ratio"):
+        if col not in out.columns:
+            out[col] = 0.0  # int 信号也兼容 float 初始化，下面会按需重设 dtype
+
+    # 保证 signal_action 的数值类型统一（避免 bool/object 问题）
+    if not np.issubdtype(out["signal_action"].dtype, np.integer):
+        out["signal_action"] = pd.to_numeric(out["signal_action"], errors="coerce").fillna(0).astype(np.int8)
+
+    # ---------------------------
+    # 2) 市场状态 → 仓位上限压缩
+    # ---------------------------
+    regime_cap_map: Dict[str, float] = {}
+
+    # 尝试从 risk_cfg 读取 cap 参数（保持与你原有风控配置兼容）
+    if risk_cfg is not None:
+        bear_cap = getattr(risk_cfg, "bear_position_cap", None)
+        bull_cap = getattr(risk_cfg, "bull_position_cap", None)
+        neutral_cap = getattr(risk_cfg, "neutral_position_cap", None)
+        if bear_cap is not None:
+            regime_cap_map["bear"] = float(bear_cap)
+        if bull_cap is not None:
+            regime_cap_map["bull"] = float(bull_cap)
+        if neutral_cap is not None:
+            regime_cap_map["neutral"] = float(neutral_cap)
+
+    # 允许参数级别覆写（优先级高于 risk_cfg）
+    if bear_position_cap is not None:
+        regime_cap_map["bear"] = float(bear_position_cap)
+    if bull_position_cap is not None:
+        regime_cap_map["bull"] = float(bull_position_cap)
+    if neutral_position_cap is not None:
+        regime_cap_map["neutral"] = float(neutral_position_cap)
+
+    # 兜底默认值：若无配置则允许满仓
+    regime_cap_map.setdefault("bear", 0.3)      # 熊市默认最多 30% 仓位
+    regime_cap_map.setdefault("bull", 1.0)      # 牛市默认最多 100%
+    regime_cap_map.setdefault("neutral", 0.8)  # 中性默认 80%
+
+    # 如果 df 中包含 market_regime 列，就做压缩
+    if "market_regime" in out.columns:
+        reg = out["market_regime"].astype(str).str.strip().str.lower()
+        caps = reg.map(regime_cap_map).astype(float)         # Series[float]
+        out["target_position_ratio"] = np.minimum(
+            out["target_position_ratio"].astype(float),
+            caps,
+        )
+    else:
+        # 无 market_regime 列时，使用中性上限（保守但安全）
+        neutral_cap = regime_cap_map.get("neutral", 0.8)
+        out["target_position_ratio"] = np.minimum(
+            out["target_position_ratio"].astype(float),
+            float(neutral_cap),
+        )
+
+    # ---------------------------
+    # 3) 涨跌停过滤（禁止开新仓）
+    # ---------------------------
+    # 尽量兼容多种列名（根据你 data 模块的命名习惯调整）
+    close_col = "close" if "close" in out.columns else "Close"
+    open_col = "open" if "open" in out.columns else "Open"
+    high_col = "high" if "high" in out.columns else "High"
+    low_col = "low" if "low" in out.columns else "Low"
+
+    # 若缺少关键列，跳过涨跌停判断
+    if all(c in out.columns for c in (close_col, open_col, high_col, low_col)):
+        c = out[close_col].astype(float)
+        o = out[open_col].astype(float)
+        h = out[high_col].astype(float)
+        l = out[low_col].astype(float)
+
+        # 简单涨停/跌停判定（不含复权复杂度）：
+        # - 涨停：close ≈ high 且 close > open
+        # - 跌停：close ≈ low 且 close < open
+        # 使用容差 eps 避免浮点误差
+        eps = 1e-6
+        limit_up = (np.abs(c - h) <= c.abs() * eps + 1e-8) & (c > o)
+        limit_down = (np.abs(c - l) <= c.abs() * eps + 1e-8) & (c < o)
+
+        # 将涨停/跌停日的“买入”信号清零（signal_action=1 → 0）
+        buy_mask = out["signal_action"] == 1
+        suppress_mask = buy_mask & (limit_up | limit_down)
+
+        # 将买入信号置 0（卖出保持不变）
+        out.loc[suppress_mask, "signal_action"] = 0
+
+        # 同步将 target_position_ratio 清零，避免 Numba 引擎错误开仓
+        out.loc[suppress_mask, "target_position_ratio"] = 0.0
+
+    # ---------------------------
+    # 4) 确保边界：target_position_ratio 在 [0, 1]
+    # ---------------------------
+    out["target_position_ratio"] = np.clip(out["target_position_ratio"].astype(float), 0.0, 1.0)
+
+    return out

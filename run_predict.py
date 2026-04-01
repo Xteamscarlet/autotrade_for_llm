@@ -8,6 +8,7 @@ import json
 import logging
 import argparse
 import time
+from utils.stock_filter import filter_codes_by_name
 
 from config import get_settings
 
@@ -50,6 +51,11 @@ def main():
         # 使用默认列表
         from config import STOCK_CODES
         target_codes = list(STOCK_CODES.values())
+        # >>> 新增：预测入口股票池拦截
+        name_to_code_map = {n: c for n, c in STOCK_CODES.items() if c in target_codes}
+        clean_map = filter_codes_by_name(name_to_code_map)
+        target_codes = list(clean_map.values())
+        # <<< 新增结束
         print(f"✓ 使用默认股票池: {len(target_codes)} 只")
 
     print(f"  目标股票数: {len(target_codes)}")
