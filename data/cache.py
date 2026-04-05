@@ -77,15 +77,30 @@ def check_and_clean_cache(cache_file: str) -> bool:
         return False
 
 
-def load_pickle_cache(cache_file: str) -> Optional[dict]:
-    """加载pickle缓存"""
-    if not os.path.exists(cache_file):
-        return None
+def load_pickle_cache(cache_path):
     try:
-        with open(cache_file, 'rb') as f:
-            return pickle.load(f)
+        with open(cache_path, 'rb') as f:
+            data = pickle.load(f)
+        # 数据完整性检查
+        if data is None or len(data) == 0:
+            raise ValueError("缓存数据为空或加载失败")
+        return data
     except Exception as e:
-        raise CacheIOError(f"读取失败: {e}", cache_path=cache_file)
+        logging.warning(f"加载缓存失败: {e}, 将重新下载数据...")
+        return None
+
+def validate_data_integrity(df, code="", name=""):
+    """数据完整性检查"""
+    if df is None or len(df) == 0:
+        return False, "数据为空"
+    if len(df) < 10:
+        return False, f"数据行数不足: {len(df)} < {10}"
+    # 检查缺失值比例
+    nan_ratio = df.isna().sum().sum() / (len(df) * len(df.columns))
+    if nan_ratio > 0.2:
+        return False, f"缺失值比例过高: {nan_ratio:.1%}"
+    return True, "OK"
+
 
 
 def save_pickle_cache(cache_file: str, data: dict):

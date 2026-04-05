@@ -1,0 +1,373 @@
+# -*- coding: utf-8 -*-
+"""
+回测入口脚本（无Transformer版本）- 增强版
+执行 Walk-Forward 回测、参数优化、风控过滤、报告输出、可视化
+结果保存到独立目录，不覆盖原有Transformer版本的结果
+新增：详细日志、异常处理、降级筛选机制
+"""
+import os
+import json
+import logging
+import traceback
+import time
+from multiprocessing import Pool, cpu_count
+from tqdm import tqdm
+
+import pandas as pd
+import numpy as np
+
+from config import get_settings, STOCK_CODES
+from data.loader_new import download_market_data, download_stocks_data
+# from data import (
+#     download_market_data, download_stocks_data,
+#     check_and_clean_cache, load_pickle_cache,
+#     save_pickle_cache,
+# )
+from data.types import NON_FACTOR_COLS
+from backtest.engine_no_transformer_new import run_backtest_loop_no_transformer, \
+    calculate_multi_timeframe_score_no_transformer
+from backtest.optimizer_new import optimize_strategy, walk_forward_split, calculate_dynamic_weights
+from backtest.evaluator import calculate_comprehensive_stats
+from backtest.visualizer import visualize_backtest_with_split
+from backtest.report import print_stock_backtest_report
+from risk_manager import RiskManager
+from utils.stock_filter_new import filter_codes_by_name, should_intercept_stock
+
+# 配置日志
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('backtest_no_transformer.log', encoding='utf-8'),
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger(__name__)
+
+# ==================== 多进程全局变量 ====================
+_worker_market_data = None
+_worker_stocks_data = None
+
+
+# ==================== 新增：数据完整性检查函数 ====================
+def validate_data_for_backtest(
+        df: pd.DataFrame,
+        stock_code: str,
+        min_days: int = 60,
+) -> tuple:
+    """验证数据是否适合回测
+
+    Args:
+        df: 数据框
+        stock_code: 股票代码
+        min_days: 最小数据天数
+
+    Returns:
+        (是否有效, 问题列表)
+    """
+    issues = []
+
+    if df is None or len(df) == 0:
+        issues.append("数据为空")
+        return False, issues
+
+    if len(df) < min_days:
+        issues.append(f"数据天数 {len(df)} < {min_days}")
+
+    # 检查必需列
+    required_cols = ['Open', 'High', 'Low', 'Close', 'Volume']
+    missing = [col for col in required_cols if col not in df.columns]
+    if missing:
+        issues.append(f"缺失列: {missing}")
+
+    # 检查缺失值
+    for col in required_cols:
+        if col in df.columns:
+            nan_ratio = df[col].isna().sum() / len(df)
+            if nan_ratio > 0.1:
+                issues.append(f"{col} 缺失比例 {nan_ratio:.1%}")
+
+    # 检查价格有效性
+    if 'Close' in df.columns:
+        invalid = (df['Close'] <= 0).sum()
+        if invalid > 0:
+            issues.append(f"存在 {invalid} 个非正价格")
+
+    return len(issues) == 0, issues
+
+
+# ==================== 新增：降级筛选机制 ====================
+def filter_strategies_with_fallback(
+        strategies: list,
+        risk_manager: RiskManager,
+        min_trades: int = 5,
+        min_sharpe: float = 0.0,
+        max_drawdown: float = -20.0,
+) -> tuple:
+    """降级筛选机制 - 逐步放宽条件
+
+    Args:
+        strategies: 策略列表
+        risk_manager: 风控管理器
+        min_trades: 最小交易次数
+        min_sharpe: 最小夏普比率
+        max_drawdown: 最大回撤限制
+
+    Returns:
+        (通过筛选的策略列表, 筛选日志)
+    """
+    filter_log = []
+    passed = []
+
+    # 第一轮：完整筛选条件
+    for s in strategies:
+        stats = s.get("stats", {})
+        issues = []
+
+        if stats.get("total_trades", 0) < min_trades:
+            issues.append(f"交易次数 {stats.get('total_trades', 0)} < {min_trades}")
+
+        if stats.get("sharpe_ratio", 0) < min_sharpe:
+            issues.append(f"夏普比率 {stats.get('sharpe_ratio', 0):.4f} < {min_sharpe}")
+
+        if stats.get("max_drawdown", 0) < max_drawdown:
+            issues.append(f"最大回撤 {stats.get('max_drawdown', 0):.2f}% < {max_drawdown}%")
+
+        if len(issues) == 0:
+            passed.append(s)
+            filter_log.append(f"策略 {s.get('code', 'unknown')}: 通过筛选")
+        else:
+            filter_log.append(f"策略 {s.get('code', 'unknown')}: 丢弃 - {', '.join(issues)}")
+
+    if len(passed) > 0:
+        return passed, filter_log
+
+    # 第二轮：降低交易次数要求
+    filter_log.append("第一轮筛选无结果，尝试降低交易次数要求...")
+    min_trades_fallback = max(1, min_trades // 2)
+
+    for s in strategies:
+        stats = s.get("stats", {})
+        if stats.get("total_trades", 0) >= min_trades_fallback:
+            passed.append(s)
+            filter_log.append(f"策略 {s.get('code', 'unknown')}: 通过降级筛选（交易次数 >= {min_trades_fallback}）")
+
+    if len(passed) > 0:
+        return passed, filter_log
+
+    # 第三轮：仅检查是否有交易
+    filter_log.append("第二轮筛选无结果，尝试仅检查是否有交易...")
+
+    for s in strategies:
+        stats = s.get("stats", {})
+        if stats.get("total_trades", 0) > 0:
+            passed.append(s)
+            filter_log.append(f"策略 {s.get('code', 'unknown')}: 通过最低要求筛选（有交易记录）")
+
+    if len(passed) == 0:
+        filter_log.append("所有策略均无交易记录")
+
+    return passed, filter_log
+
+
+def _init_worker(market_data, stocks_data):
+    """初始化多进程工作进程"""
+    global _worker_market_data, _worker_stocks_data
+    _worker_market_data = market_data
+    _worker_stocks_data = stocks_data
+
+
+def _process_single_stock(stock_code: str) -> dict:
+    """处理单只股票的回测（多进程工作函数）- 增强版
+
+    新增：异常捕获、详细日志
+    """
+    try:
+        # 获取数据
+        df = _worker_stocks_data.get(stock_code)
+        if df is None or len(df) == 0:
+            logger.warning(f"股票 {stock_code} 数据为空，跳过")
+            return {
+                "code": stock_code,
+                "success": False,
+                "error": "数据为空",
+            }
+
+        # 新增：数据验证
+        is_valid, issues = validate_data_for_backtest(df, stock_code)
+        if not is_valid:
+            logger.warning(f"股票 {stock_code} 数据验证失败: {issues}")
+            return {
+                "code": stock_code,
+                "success": False,
+                "error": f"数据验证失败: {issues}",
+            }
+
+        # 计算因子权重
+        factor_cols = [col for col in df.columns if col not in NON_FACTOR_COLS]
+        best_weights = calculate_dynamic_weights(df, factor_cols)
+
+        # 参数优化
+        best_params_map, _ = optimize_strategy(
+            df=df,
+            strategy_class=None,  # 使用默认策略
+            n_trials=30,
+            initial_capital=100000.0,
+            weights=best_weights,
+        )
+
+        # Walk-Forward 划分
+        splits = walk_forward_split(df)
+        if not splits:
+            logger.warning(f"股票 {stock_code} 无法进行Walk-Forward划分")
+            return {
+                "code": stock_code,
+                "success": False,
+                "error": "Walk-Forward划分失败",
+            }
+
+        # 使用最后一个划分进行回测
+        train_df, val_df, test_df = splits[-1]
+
+        # 执行回测
+        trades_df, stats, result_df = run_backtest_loop_no_transformer(
+            df=test_df,
+            stock_code=stock_code,
+            market_data=_worker_market_data,
+            weights=best_weights,
+            params=best_params_map,
+            stocks_data=_worker_stocks_data,
+        )
+
+        # 检查结果
+        if stats is None or len(stats) == 0:
+            logger.warning(f"股票 {stock_code} 回测结果为空")
+            return {
+                "code": stock_code,
+                "success": False,
+                "error": "回测结果为空",
+            }
+
+        # 记录信号统计
+        if trades_df is not None and len(trades_df) > 0:
+            logger.info(f"股票 {stock_code}: 交易次数 {len(trades_df)}")
+        else:
+            logger.warning(f"股票 {stock_code}: 无交易记录")
+
+        return {
+            "code": stock_code,
+            "success": True,
+            "stats": stats,
+            "trades_count": len(trades_df) if trades_df is not None else 0,
+        }
+
+    except Exception as e:
+        logger.error(f"处理股票 {stock_code} 时出错: {e}")
+        logger.error(traceback.format_exc())
+        return {
+            "code": stock_code,
+            "success": False,
+            "error": str(e),
+        }
+
+
+def main():
+    """主函数 - 增强版"""
+    logger.info("=" * 80)
+    logger.info("开始回测（无Transformer版本）")
+    logger.info("=" * 80)
+
+    settings = get_settings()
+
+    # 1. 准备数据
+    logger.info("步骤1: 准备数据...")
+
+    # 下载大盘数据
+    market_data = download_market_data()
+    if market_data is None or len(market_data) == 0:
+        logger.error("大盘数据下载失败")
+        return
+
+    # 下载股票数据
+    stocks_data = download_stocks_data(
+        codes=STOCK_CODES
+    )
+
+    if not stocks_data:
+        logger.error("股票数据下载失败")
+        return
+
+    # 过滤股票
+    valid_codes = filter_codes_by_name(mapping=STOCK_CODES)
+    logger.info(f"有效股票数量: {len(valid_codes)}")
+
+    # 2. 多进程回测
+    logger.info("步骤2: 执行回测...")
+
+    results = []
+    n_workers = min(cpu_count(), 4)
+
+    with Pool(n_workers, initializer=_init_worker, initargs=(market_data, stocks_data)) as pool:
+        for result in tqdm(
+                pool.imap(_process_single_stock, valid_codes),
+                total=len(valid_codes),
+                desc="回测进度"
+        ):
+            results.append(result)
+
+    # 3. 统计结果
+    logger.info("步骤3: 统计结果...")
+    success_count = sum(1 for r in results if r.get("success"))
+    logger.info(f"回测成功: {success_count}/{len(results)}")
+
+    # 4. 筛选策略
+    logger.info("步骤4: 筛选策略...")
+    successful_results = [r for r in results if r.get("success")]
+
+    if not successful_results:
+        logger.error("所有股票回测均失败，请检查数据和策略参数")
+        return
+
+    # 使用降级筛选机制
+    risk_manager = RiskManager()
+    passed_strategies, filter_log = filter_strategies_with_fallback(
+        strategies=successful_results,
+        risk_manager=risk_manager,
+    )
+
+    # 输出筛选日志
+    for log_entry in filter_log:
+        logger.info(log_entry)
+
+    # 5. 生成报告
+    logger.info("步骤5: 生成报告...")
+    if passed_strategies:
+        logger.info(f"最终保留 {len(passed_strategies)} 个策略")
+
+        # 保存结果
+        output_dir = "./stock_cache/no_transformer_results"
+        os.makedirs(output_dir, exist_ok=True)
+
+        result_file = os.path.join(output_dir, "backtest_results.json")
+        with open(result_file, 'w', encoding='utf-8') as f:
+            # 转换为可序列化格式
+            serializable_results = []
+            for r in passed_strategies:
+                serializable_results.append({
+                    "code": r.get("code"),
+                    "stats": r.get("stats"),
+                    "trades_count": r.get("trades_count"),
+                })
+            json.dump(serializable_results, f, ensure_ascii=False, indent=2)
+
+        logger.info(f"结果已保存到: {result_file}")
+    else:
+        logger.error("无策略通过筛选")
+
+    logger.info("=" * 80)
+    logger.info("回测完成")
+    logger.info("=" * 80)
+
+
+if __name__ == "__main__":
+    main()

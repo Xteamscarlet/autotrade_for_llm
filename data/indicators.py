@@ -10,6 +10,7 @@ import numpy as np
 import pandas as pd
 import talib as ta
 
+from data.indicators_no_transformer import safe_sma
 from data.types import FEATURES, BASE_OHLCV_COLS, TRADITIONAL_FACTOR_COLS, NON_FACTOR_COLS, AI_FACTOR_COLS
 
 logger = logging.getLogger(__name__)
@@ -45,9 +46,9 @@ def calculate_all_indicators(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
 
     # 均线
-    df['MA5'] = ta.SMA(df['Close'], timeperiod=5)
-    df['MA10'] = ta.SMA(df['Close'], timeperiod=10)
-    df['MA20'] = ta.SMA(df['Close'], timeperiod=20)
+    df['MA5'] = safe_sma(df['Close'], timeperiod=5)
+    df['MA10'] = safe_sma(df['Close'], timeperiod=10)
+    df['MA20'] = safe_sma(df['Close'], timeperiod=20)
 
     # MACD
     df['MACD'], df['MACD_Signal'], df['MACD_Hist'] = ta.MACD(

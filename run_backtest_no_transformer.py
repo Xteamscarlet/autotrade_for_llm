@@ -1,9 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-回测入口脚本（无Transformer版本）
-执行 Walk-Forward 回测、参数优化、风控过滤、报告输出、可视化
-结果保存到独立目录，不覆盖原有Transformer版本的结果
-"""
 import os
 import json
 import logging
@@ -11,14 +5,14 @@ import traceback
 import time
 from multiprocessing import Pool, cpu_count
 from tqdm import tqdm
-
 import pandas as pd
 import numpy as np
-
 from config import get_settings, STOCK_CODES
 from data import (
-    download_market_data, download_stocks_data,
-    check_and_clean_cache, load_pickle_cache,
+    download_market_data,
+    download_stocks_data,
+    check_and_clean_cache,
+    load_pickle_cache,
     save_pickle_cache,
 )
 from data.types import NON_FACTOR_COLS
@@ -43,7 +37,7 @@ def init_worker(m_data, s_data):
 
 
 def _build_equity_curve(df: pd.DataFrame, trades_df: pd.DataFrame, initial_cash: float = 100000.0):
-    """构建资金曲线"""
+    """构建资金曲线 - 修改版：确保资金不会为负"""
     if trades_df is None or len(trades_df) == 0:
         return None
 
@@ -51,7 +45,16 @@ def _build_equity_curve(df: pd.DataFrame, trades_df: pd.DataFrame, initial_cash:
     equity_curve = {df.index[0]: equity}
 
     for t in trades_df.itertuples():
-        equity = equity * (1 + t.net_return)
+        # 确保不会出现负资金
+        if equity <= 0:
+            break
+
+        # 计算新权益，确保不会为负
+        new_equity = equity * (1 + t.net_return)
+        if new_equity < 0:
+            new_equity = 0  # 爆仓处理
+
+        equity = new_equity
         equity_curve[t.sell_date] = equity
 
     return pd.Series(equity_curve).sort_index()
@@ -72,8 +75,7 @@ def _build_benchmark_returns(market_data: pd.DataFrame, df: pd.DataFrame):
 
 
 def process_single_stock_no_transformer(args):
-    """
-    子进程处理单只股票的完整流程（无Transformer版本）：
+    """ 子进程处理单只股票的完整流程（无Transformer版本）：
     1. 因子计算（仅传统因子）
     2. Walk-Forward 划分
     3. 多折优化 + 测试
@@ -82,10 +84,8 @@ def process_single_stock_no_transformer(args):
     6. 决定保留/丢弃
     """
     t_start = time.time()
-
     try:
         stock_name, stock_data, stock_code = args
-
         # 统一拦截
         skip, reason = should_intercept_stock(stock_code, stock_name, stock_data)
         if skip:
@@ -94,7 +94,6 @@ def process_single_stock_no_transformer(args):
 
         settings = get_settings()
         risk_mgr = RiskManager(settings.risk)
-
         df = stock_data.copy()
         if len(df) < 150:
             return stock_code, None, None, None, None, None, None
@@ -104,7 +103,8 @@ def process_single_stock_no_transformer(args):
         df = calculate_orthogonal_factors_no_transformer(df, stock_code=stock_code)
 
         # Walk-Forward 划分
-        splits = walk_forward_split(df, n_splits=settings.backtest.n_splits, train_ratio=settings.backtest.train_ratio, val_ratio=settings.backtest.val_ratio)
+        splits = walk_forward_split(df, n_splits=settings.backtest.n_splits, train_ratio=settings.backtest.train_ratio,
+                                    val_ratio=settings.backtest.val_ratio)
         if not splits:
             return stock_code, None, None, None, None, None, None
 
@@ -117,13 +117,13 @@ def process_single_stock_no_transformer(args):
         # 获取因子列（排除Transformer因子）
         base_cols = set(NON_FACTOR_COLS)
         transformer_cols = ['transformer_prob', 'transformer_pred_ret', 'transformer_conf']
-        factor_cols = [col for col in df.columns
-                       if col not in base_cols and col not in transformer_cols]
+        factor_cols = [col for col in df.columns if col not in base_cols and col not in transformer_cols]
 
         # ✅ 修改：使用6个变量解包
         for train_start, train_end, val_start, val_end, test_start, test_end in splits:
             train_df = df.iloc[train_start:train_end]
-            val_df = df.iloc[val_start:val_end]  # 新增验证集
+            val_df = df.iloc[val_start:val_end]
+            # 新增验证集
             test_df = df.iloc[test_start:test_end]
 
             if len(train_df) < 100 or len(test_df) < 20:
@@ -133,7 +133,6 @@ def process_single_stock_no_transformer(args):
             best_params_map, best_weights = optimize_strategy_no_transformer(
                 train_df, factor_cols, settings.backtest.n_optuna_trials
             )
-
             if not best_params_map:
                 continue
 
@@ -154,7 +153,6 @@ def process_single_stock_no_transformer(args):
             trades_df, stats, _ = run_backtest_loop_no_transformer(
                 test_df, stock_code, _worker_market_data, best_weights, best_params_map, stocks_data=_worker_stocks_data
             )
-
             if trades_df is None or len(trades_df) == 0:
                 continue
 
@@ -172,10 +170,9 @@ def process_single_stock_no_transformer(args):
 
         combined_trades = pd.concat(all_trades, ignore_index=True)
 
-        # 构建资金曲线和基准
+        # 构建资金曲线和基准 - 使用修改后的函数
         last_split = validated_splits[-1]
         test_df_last = df.iloc[last_split[2]:last_split[3]]
-
         equity_curve = _build_equity_curve(test_df_last, combined_trades)
         benchmark_returns = _build_benchmark_returns(_worker_market_data, test_df_last)
 
@@ -209,9 +206,9 @@ def process_single_stock_no_transformer(args):
             return stock_code, None, None, None, None, None, None
 
         # 额外筛选：收益和交易次数
-        if (full_stats.get('total_return', 0) <= 0
-                or full_stats.get('win_rate', 0) < settings.risk.min_win_rate
-                or full_stats.get('total_trades', 0) < 3):
+        if (full_stats.get('total_return', 0) <= 0 or full_stats.get('win_rate',
+                                                                     0) < settings.risk.min_win_rate or full_stats.get(
+                'total_trades', 0) < 3):
             print(f" [DISCARD] {stock_name} - 收益/胜率/交易次数不达标")
             return stock_code, None, None, None, None, None, None
 
@@ -223,12 +220,10 @@ def process_single_stock_no_transformer(args):
             'weights': best_weights_list[-1] if best_weights_list else {},
             'stats': full_stats,
         }
-
         metadata = {
             'test_start_idx': last_split[2],
             'n_splits': len(validated_splits),
         }
-
         print(f" [KEEP] {stock_name} - 策略通过所有检查")
         return stock_code, strategy, full_stats, df, combined_trades, validated_splits, metadata
 
@@ -240,7 +235,6 @@ def process_single_stock_no_transformer(args):
 
 def optimize_strategy_no_transformer(df: pd.DataFrame, factor_cols: list, n_trials: int = 50):
     """参数优化（无Transformer版本）
-
     与原版本的区别：
     1. 不优化 transformer_weight
     2. 不优化 transformer_buy_threshold
@@ -248,7 +242,6 @@ def optimize_strategy_no_transformer(df: pd.DataFrame, factor_cols: list, n_tria
     """
     import optuna
     from data.types import ALL_REGIMES
-
     optuna.logging.set_verbosity(optuna.logging.WARNING)
 
     # 计算动态权重
@@ -275,20 +268,16 @@ def optimize_strategy_no_transformer(df: pd.DataFrame, factor_cols: list, n_tria
         trades_df, stats, _ = run_backtest_loop_no_transformer(
             test_df, 'test', None, weights, {'neutral': params}
         )
-
         if trades_df is None or len(trades_df) < 3:
             return -100.0, -100.0, -100.0
 
         ret = stats['total_return']
         mdd = full_stats.get('max_drawdown', 0) if (full_stats := calculate_comprehensive_stats(trades_df)) else 0
         sharpe = full_stats.get('sharpe_ratio', 0) if full_stats else 0
-
         penalty = -1.0 if mdd < -20 else 0
-
         return float(ret), float(-mdd + penalty), float(sharpe)
 
     best_params_map = {}
-
     for regime in ALL_REGIMES:
         study = optuna.create_study(
             directions=["maximize", "maximize", "maximize"],
@@ -312,7 +301,6 @@ def optimize_strategy_no_transformer(df: pd.DataFrame, factor_cols: list, n_tria
                 'trailing_drawdown_level2': 0.04,
                 'take_profit_multiplier': 3.0,
             }
-
     return best_params_map, weights
 
 
@@ -321,7 +309,6 @@ def main():
     print("=" * 80)
     print("增强版策略回测系统 V3 (无Transformer版本)")
     print("=" * 80)
-
     settings = get_settings()
 
     # ========== 结果保存到独立目录 ==========
@@ -335,10 +322,8 @@ def main():
 
     # 1. 检查大盘数据
     print("\n[1/3] 检查大盘数据...")
-
     # ========== 修改1：使用独立的缓存路径 ==========
     market_cache_file = "./stock_cache/no_transformer_market_data.pkl"
-
     try:
         if not check_and_clean_cache(market_cache_file):
             market_data = download_market_data()
@@ -353,12 +338,11 @@ def main():
         else:
             print("错误: 没有可用的大盘数据")
             return
+
     # ========== 修改2：使用独立的缓存路径 ==========
     print("\n[2/3] 检查个股数据...")
-
     # ========== 统一使用 check_and_clean_cache ==========
     stocks_cache_file = "./stock_cache/no_transformer_stocks_data.pkl"
-
     if not check_and_clean_cache(stocks_cache_file):
         print("下载股票数据...")
         stocks_data = download_stocks_data(STOCK_CODES)
@@ -371,26 +355,24 @@ def main():
     if not stocks_data:
         print("错误: 无法获取个股数据")
         return
-
     print(f"stocks_data 类型: {type(stocks_data)}")
     print(f"stocks_data 长度: {len(stocks_data)}")
     print(f"stocks_data 键示例: {list(stocks_data.keys())[:3]}")
 
     # 3. 验证数据结构
     print(f"\n数据验证:")
-    print(f"  类型: {type(stocks_data)}")
-    print(f"  长度: {len(stocks_data) if stocks_data else 0}")
-
+    print(f" 类型: {type(stocks_data)}")
+    print(f" 长度: {len(stocks_data) if stocks_data else 0}")
     if stocks_data and len(stocks_data) > 0:
-        print(f"  前3个键: {list(stocks_data.keys())[:3]}")
+        print(f" 前3个键: {list(stocks_data.keys())[:3]}")
 
-        # 检查是否是错误的结构
-        first_key = list(stocks_data.keys())[0]
-        if first_key in ['stocks_data', 'last_date']:
-            print("\n检测到错误的数据结构，正在修复...")
-            if isinstance(stocks_data, dict) and 'stocks_data' in stocks_data:
-                stocks_data = stocks_data['stocks_data']
-                print(f"修复后键示例: {list(stocks_data.keys())[:3]}")
+    # 检查是否是错误的结构
+    first_key = list(stocks_data.keys())[0]
+    if first_key in ['stocks_data', 'last_date']:
+        print("\n检测到错误的数据结构，正在修复...")
+        if isinstance(stocks_data, dict) and 'stocks_data' in stocks_data:
+            stocks_data = stocks_data['stocks_data']
+        print(f"修复后键示例: {list(stocks_data.keys())[:3]}")
 
     if not stocks_data or len(stocks_data) == 0:
         print("\n错误: 无法获取有效的股票数据")
@@ -417,9 +399,9 @@ def main():
             print(f"警告: 股票 {name} ({code}) 在列表中但缺少数据")
 
     print(f"\n匹配结果:")
-    print(f"  过滤后股票数: {len(valid_stocks)}")
-    print(f"  成功匹配数: {matched}")
-    print(f"  最终有效股票数: {len(args_list)}")
+    print(f" 过滤后股票数: {len(valid_stocks)}")
+    print(f" 成功匹配数: {matched}")
+    print(f" 最终有效股票数: {len(args_list)}")
 
     if len(args_list) == 0:
         print("\n❌ 错误: 没有有效的股票数据")
@@ -429,7 +411,6 @@ def main():
     print(f"\n[3/3] 开始回测 {len(args_list)} 只股票...")
     results = []
     n_workers = min(cpu_count(), 4)
-
     with Pool(n_workers, initializer=init_worker, initargs=(market_data, stocks_data)) as pool:
         for result in tqdm(pool.imap(process_single_stock_no_transformer, args_list), total=len(args_list)):
             if result[1] is not None:
@@ -441,7 +422,6 @@ def main():
     print("=" * 80)
     print(f"{'名称':<12} {'收益%':>10} {'胜率%':>8} {'交易':>6} {'夏普':>8} {'最大回撤%':>10} {'利润因子':>8}")
     print("-" * 80)
-
     for code, strat, stat, df, trades, splits, metadata in results:
         if stat is None:
             continue
@@ -460,7 +440,6 @@ def main():
     print("\n" + "=" * 80)
     print("【组合回测】等权组合测试集总收益（无Transformer版本）")
     print("=" * 80)
-
     n_valid = len(results)
     if n_valid == 0:
         print("警告: 没有有效策略，无法计算组合收益")
@@ -470,21 +449,17 @@ def main():
         )
         portfolio = pd.DataFrame(index=all_dates)
         portfolio['return'] = 0.0
-
         for code, strat, stat, df, trades, splits, metadata in results:
             if strat is None or df is None or trades is None:
                 continue
-
             stock_daily_ret = df['Close'].pct_change()
             position_status = pd.Series(0, index=df.index)
-
             for t in trades.itertuples():
                 try:
                     holding_dates = df.loc[t.buy_date: t.sell_date].index
                     position_status.loc[holding_dates] = 1
                 except KeyError:
                     pass
-
             strategy_daily_ret = position_status * stock_daily_ret
             portfolio['return'] += strategy_daily_ret / n_valid
 
@@ -502,32 +477,25 @@ def main():
             'weights': {k: float(v) for k, v in s['weights'].items()} if s['weights'] else {},
             'stats': s['stats'],
         }
-        for _, s, _, _, _, _, _ in results
-        if s is not None
+        for _, s, _, _, _, _, _ in results if s is not None
     ]
-
     with open(output_file, 'w', encoding='utf-8') as f:
         json.dump(strategies_to_save, f, ensure_ascii=False, indent=2, default=str)
-
     print(f"\n✓ 策略参数已写入: {output_file}")
-    print(f"  保留策略数: {len(strategies_to_save)} / 总股票数: {len(args_list)}")
+    print(f" 保留策略数: {len(strategies_to_save)} / 总股票数: {len(args_list)}")
 
     # 7. 生成可视化图表
     print("\n" + "=" * 80)
     print("开始生成可视化图表...")
     print("=" * 80)
-
     for code, strat, stat, df, trades, splits, metadata in results:
         if strat is None or trades is None or len(trades) == 0:
             continue
-
         stock_name = strat['name']
         chart_path = os.path.join(viz_dir, f'{stock_name}_{code}_backtest_no_transformer.png')
-
         try:
             actual_len = len(df)
             split_idx = int(actual_len * 0.7)
-
             if metadata and 'test_start_idx' in metadata:
                 idx_from_meta = metadata['test_start_idx']
                 if 0 < idx_from_meta < actual_len:
@@ -536,13 +504,16 @@ def main():
                 test_start = splits[-1][2]
                 if 0 < test_start < actual_len:
                     split_idx = test_start
-
             split_idx = max(1, min(split_idx, actual_len - 1))
 
             visualize_backtest_with_split(
-                df=df, trades_df=trades, stock_name=stock_name,
-                split_idx=split_idx, market_data=market_data,
-                save_path=chart_path, strat=strat,
+                df=df,
+                trades_df=trades,
+                stock_name=stock_name,
+                split_idx=split_idx,
+                market_data=market_data,
+                save_path=chart_path,
+                strat=strat,
             )
             print(f" ✓ {stock_name} 图表已保存")
         except Exception as e:

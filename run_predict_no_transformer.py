@@ -17,6 +17,7 @@ import talib as ta
 from tqdm import tqdm
 
 from config import get_settings, STOCK_CODES
+from data.indicators_no_transformer import safe_sma
 from data.types import NON_FACTOR_COLS
 from utils.stock_filter import filter_codes_by_name, should_intercept_stock
 
@@ -44,9 +45,9 @@ def calculate_traditional_factors(df: pd.DataFrame) -> pd.DataFrame:
     temp = df.copy()
 
     # 均线
-    temp['MA5'] = ta.SMA(temp['Close'], timeperiod=5)
-    temp['MA10'] = ta.SMA(temp['Close'], timeperiod=10)
-    temp['MA20'] = ta.SMA(temp['Close'], timeperiod=20)
+    temp['MA5'] = safe_sma(temp['Close'], timeperiod=5)
+    temp['MA10'] = safe_sma(temp['Close'], timeperiod=10)
+    temp['MA20'] = safe_sma(temp['Close'], timeperiod=20)
 
     # MACD
     temp['MACD'], temp['MACD_Signal'], temp['MACD_Hist'] = ta.MACD(

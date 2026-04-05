@@ -30,9 +30,9 @@ def calculate_all_indicators(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
 
     # 均线
-    df['MA5'] = ta.SMA(df['Close'], timeperiod=5)
-    df['MA10'] = ta.SMA(df['Close'], timeperiod=10)
-    df['MA20'] = ta.SMA(df['Close'], timeperiod=20)
+    df['MA5'] = safe_sma(df['Close'], timeperiod=5)
+    df['MA10'] = safe_sma(df['Close'], timeperiod=10)
+    df['MA20'] = safe_sma(df['Close'], timeperiod=20)
 
     # MACD
     df['MACD'], df['MACD_Signal'], df['MACD_Hist'] = ta.MACD(
@@ -64,6 +64,34 @@ def calculate_all_indicators(df: pd.DataFrame) -> pd.DataFrame:
     df['CCI'] = ta.CCI(df['High'], df['Low'], df['Close'], timeperiod=20)
 
     return df
+
+
+def safe_sma(series, period):
+    """安全的简单移动平均计算"""
+    if len(series) < period:
+        logger.warning(f"数据长度 {len(series)} 不足以计算 {period} 日移动平均")
+        return pd.Series(np.nan, index=series.index)
+
+    if series.isna().all():
+        logger.warning("输入序列全为NaN")
+        return pd.Series(np.nan, index=series.index)
+
+    result = safe_sma(series.values, timeperiod=period)
+    return pd.Series(result, index=series.index)
+
+
+def check_indicator_result(result, indicator_name, code=""):
+    """检查指标计算结果是否有效"""
+    if result is None:
+        logger.warning(f"[{code}] {indicator_name} 计算返回None")
+        return False
+
+    nan_ratio = pd.isna(result).sum() / len(result)
+    if nan_ratio > 0.5:
+        logger.warning(f"[{code}] {indicator_name} NaN比例过高: {nan_ratio:.1%}")
+        return False
+
+    return True
 
 
 def calculate_orthogonal_factors_no_transformer(

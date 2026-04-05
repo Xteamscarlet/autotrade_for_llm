@@ -260,3 +260,193 @@ def run_backtest_loop_no_transformer(
         'total_return': ((trades_df['net_return'] + 1).prod() - 1) * 100,
     }
     return trades_df, stats, df
+
+# 在 engine.py 文件顶部导入新模块
+import pandas as pd
+from typing import List, Dict, Any, Optional
+from .account import CashAccount
+from .statistics import StrategyStatistics
+# ... 其他原有导入 ...
+
+class BacktestEngine:
+    """
+    修改后的回测引擎，使用 CashAccount 管理资金，并维护资金曲线。
+    """
+    def __init__(self, initial_capital: float, symbol: str, strategy_name: str, max_leverage: float = 1.0):
+        # 初始化账户
+        self.account = CashAccount(initial_capital)
+        self.initial_capital = initial_capital
+        self.symbol = symbol
+        self.strategy_name = strategy_name
+        self.max_leverage = max_leverage  # 杠杆限制
+        # 用于存储每笔交易的信号强度，用于后续分析
+        self.signal_strengths = []
+        # 用于存储模型预测收益（如果有）
+        self.model_pred_returns = []
+
+    def run_backtest(
+        self,
+        data: pd.DataFrame,
+        signals: pd.Series,
+        atr: pd.Series,
+        transformer_pred_ret: Optional[pd.Series] = None,
+        **kwargs
+    ) -> Dict[str, Any]:
+        """
+        运行回测主循环。
+        :param data: 包含OHLCV的股票数据。
+        :param signals: 交易信号Series，值为1（买入）、-1（卖出）、0（持有）。
+        :param atr: ATR指标Series，用于仓位管理。
+        :param transformer_pred_ret: 模型预测的收益率Series，用于信号强度调整。
+        """
+        # 重置账户（为了多次运行）
+        self.account = CashAccount(self.initial_capital)
+        self.signal_strengths = []
+        self.model_pred_returns = []
+
+        # 确保信号和数据索引对齐
+        signals = signals.reindex(data.index).fillna(0)
+        atr = atr.reindex(data.index)
+
+        # 主循环
+        position = 0  # 当前持仓股数
+        for date, row in data.iterrows():
+            # 1. 更新持仓市值（每日收盘价）
+            if position > 0:
+                self.account.update_position_value(position * row['close'])
+
+            # 2. 处理交易信号
+            signal = signals.loc[date]
+            if signal == 0 and position == 0:
+                continue  # 无信号且无持仓，跳过
+
+            # 买入信号
+            if signal == 1 and position == 0:
+                # 计算仓位比例 (原逻辑，但增加了杠杆检查)
+                daily_vol = atr.loc[date] / row['close']
+                position_ratio = 0.1 / (daily_vol * np.sqrt(252) + 1e-6)  # 原始逻辑，目标年化波动率10%
+                position_ratio = min(max(position_ratio, 0.1), 1.0)  # 限制在10%到100%之间
+
+                # 应用杠杆限制
+                position_ratio = min(position_ratio, self.max_leverage)
+
+                # 计算购买股数
+                max_shares_by_cash = int(self.account.cash / row['close'])  # 根据当前现金计算最大可买股数
+                desired_shares = int(self.account.total_equity * position_ratio / row['close'])
+
+                shares_to_buy = min(desired_shares, max_shares_by_cash)
+                if shares_to_buy <= 0:
+                    continue  # 现金不足一股，无法买入
+
+                # 计算交易成本（你需要实现或引入成本计算函数）
+                commission = self._calculate_commission(shares_to_buy * row['close'], 'buy')
+
+                # 执行买入
+                if self.account.buy(self.symbol, row['close'], shares_to_buy, commission, date):
+                    position += shares_to_buy
+                    # 记录信号强度
+                    strength = 1.0  # 默认
+                    if transformer_pred_ret is not None and date in transformer_pred_ret.index:
+                        pred_ret = transformer_pred_ret.loc[date]
+                        self.model_pred_returns.append(pred_ret)
+                        # 原逻辑：根据预测收益调整信号强度
+                        strength = max(0.5, min(1.5, 1 + pred_ret / 0.05))
+                    self.signal_strengths.append(strength)
+
+            # 卖出信号
+            elif signal == -1 and position > 0:
+                shares_to_sell = position
+                commission = self._calculate_commission(shares_to_sell * row['close'], 'sell')
+                self.account.sell(self.symbol, row['close'], shares_to_sell, commission, date)
+                position = 0
+
+        # 回测结束，如果还持仓，按最后一天收盘价清仓（模拟）
+        if position > 0:
+            last_date = data.index[-1]
+            last_close = data.iloc[-1]['close']
+            commission = self._calculate_commission(position * last_close, 'sell')
+            self.account.sell(self.symbol, last_close, position, commission, last_date)
+            position = 0
+
+        # 生成统计结果
+        equity_curve = self.account.get_equity_curve_series()
+        stats_calc = StrategyStatistics(equity_curve)
+
+        # 获取基础统计
+        total_return = stats_calc.get_total_return()
+        ann_return = stats_calc.get_annualized_return()
+        ann_vol = stats_calc.get_annualized_volatility()
+        sharpe = stats_calc.get_sharpe_ratio()
+        max_dd, avg_dd, max_dd_duration = stats_calc.get_drawdown_stats()
+        calmar = stats_calc.get_calmar_ratio()
+        sortino = stats_calc.get_sortino_ratio()
+
+        # 计算需要交易列表的指标
+        profit_factor, win_rate, total_trades = self._calculate_trade_stats(self.account.transaction_history)
+
+        results = {
+            'strategy': self.strategy_name,
+            'symbol': self.symbol,
+            'initial_capital': self.initial_capital,
+            'final_equity': equity_curve.iloc[-1],
+            'total_return': total_return,
+            'annualized_return': ann_return,
+            'annualized_volatility': ann_vol,
+            'sharpe_ratio': sharpe,
+            'sortino_ratio': sortino,
+            'calmar_ratio': calmar,
+            'max_drawdown': max_dd,
+            'avg_drawdown': avg_dd,
+            'max_drawdown_duration': max_dd_duration,
+            'profit_factor': profit_factor,
+            'win_rate': win_rate,
+            'total_trades': total_trades,
+            'equity_curve': equity_curve,  # 返回曲线用于绘图等
+            'transactions': self.account.transaction_history,
+            'status': 'COMPLETED'  # 可根据爆仓情况增加状态
+        }
+        return results
+
+    def _calculate_commission(self, trade_value: float, action: str) -> float:
+        """计算交易成本。你需要根据你的成本模型实现此方法。"""
+        # 示例：万分之三的佣金，最低5元
+        commission_rate = 0.0003
+        min_commission = 5.0
+        commission = max(trade_value * commission_rate, min_commission)
+        # 如果是卖出，可能还需印花税等
+        if action == 'sell':
+            # 例如，千分之一的印花税
+            stamp_duty = trade_value * 0.001
+            commission += stamp_duty
+        return commission
+
+    def _calculate_trade_stats(self, transactions: List[Dict]) -> Tuple[float, float, int]:
+        """从交易列表计算利润因子和胜率。"""
+        gross_profit = 0.0
+        gross_loss = 0.0
+        wins = 0
+        total_trades = 0
+        # 遍历交易对（买入后对应的卖出）
+        # 注意：这里假设交易是配对的。需要更复杂的逻辑来处理未平仓交易。
+        i = 0
+        while i < len(transactions) - 1:
+            buy_tx = transactions[i]
+            sell_tx = transactions[i+1]
+            if buy_tx['action'] == 'BUY' and sell_tx['action'] == 'SELL' and buy_tx['symbol'] == sell_tx['symbol']:
+                # 计算这笔交易的盈亏
+                buy_cost = buy_tx['price'] * buy_tx['shares'] + buy_tx['commission']
+                sell_revenue = sell_tx['price'] * sell_tx['shares'] - sell_tx['commission']
+                pnl = sell_revenue - buy_cost
+                if pnl > 0:
+                    gross_profit += pnl
+                    wins += 1
+                else:
+                    gross_loss += abs(pnl)
+                total_trades += 1
+                i += 2  # 跳过已处理的交易对
+            else:
+                i += 1
+
+        profit_factor = gross_profit / gross_loss if gross_loss > 0 else float('inf') if gross_profit > 0 else 0.0
+        win_rate = wins / total_trades if total_trades > 0 else 0.0
+        return profit_factor, win_rate, total_trades

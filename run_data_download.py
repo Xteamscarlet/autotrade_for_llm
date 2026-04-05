@@ -16,6 +16,7 @@ import talib as ta
 from tqdm import tqdm
 
 from config import get_settings, STOCK_CODES
+from data.indicators_no_transformer import safe_sma
 
 logger = logging.getLogger(__name__)
 
@@ -73,9 +74,9 @@ def process_single_batch(batch_codes: list, start_date: str, end_date: str) -> p
             temp['Code'] = code
 
             # 技术指标
-            temp['MA5'] = ta.SMA(temp['Close'], timeperiod=5)
-            temp['MA10'] = ta.SMA(temp['Close'], timeperiod=10)
-            temp['MA20'] = ta.SMA(temp['Close'], timeperiod=20)
+            temp['MA5'] = safe_sma(temp['Close'], timeperiod=5)
+            temp['MA10'] = safe_sma(temp['Close'], timeperiod=10)
+            temp['MA20'] = safe_sma(temp['Close'], timeperiod=20)
             temp['MACD'], temp['MACD_Signal'], temp['MACD_Hist'] = ta.MACD(
                 temp['Close'], fastperiod=12, slowperiod=26, signalperiod=9)
             temp['K'], temp['D'] = ta.STOCH(

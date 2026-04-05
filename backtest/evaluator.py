@@ -6,7 +6,7 @@
 """
 import numpy as np
 import pandas as pd
-from typing import Dict
+from typing import Dict, Tuple, List
 
 # backtest/evaluator.py
 import numpy as np
@@ -171,4 +171,47 @@ def calculate_comprehensive_stats(
         stats.update({k: round(v, 2) for k, v in durations.items()})
     return stats
 
+# 在 evaluator.py 中
+from typing import Dict, Any
+
+def evaluate_strategy(backtest_results: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    评价策略绩效，直接使用引擎已计算好的指标。
+    可以在此添加额外的评价逻辑或风险检查。
+    """
+    # 简单地将引擎返回的结果作为评价结果
+    # 在实际中，可以在此添加更多衍生指标或风险评分
+    return backtest_results
+
+def check_risk_limits(performance: Dict[str, Any], risk_limits: Dict[str, Any]) -> Tuple[bool, List[str]]:
+    """
+    检查绩效是否通过风控阈值。
+    :param performance: 包含绩效指标的字典。
+    :param risk_limits: 风控阈值字典，例如 {'max_drawdown': -0.2, 'min_sharpe': 0.5, 'min_trades': 15}
+    :return: (是否通过, 未通过的原因列表)
+    """
+    passed = True
+    reasons = []
+
+    if performance['max_drawdown'] < risk_limits.get('max_drawdown', -1.0):
+        passed = False
+        reasons.append(f"最大回撤 {performance['max_drawdown']:.2%} 超过限制 {risk_limits['max_drawdown']:.2%}")
+
+    if performance['sharpe_ratio'] < risk_limits.get('min_sharpe', -999):
+        passed = False
+        reasons.append(f"夏普比率 {performance['sharpe_ratio']:.2f} 低于限制 {risk_limits['min_sharpe']}")
+
+    if performance['total_trades'] < risk_limits.get('min_trades', 0):
+        passed = False
+        reasons.append(f"交易次数 {performance['total_trades']} 少于最小限制 {risk_limits['min_trades']}")
+
+    if performance['win_rate'] < risk_limits.get('min_win_rate', 0.0):
+        passed = False
+        reasons.append(f"胜率 {performance['win_rate']:.2%} 低于限制 {risk_limits['min_win_rate']:.2%}")
+
+    if performance['profit_factor'] < risk_limits.get('min_profit_factor', 0.0):
+        passed = False
+        reasons.append(f"利润因子 {performance['profit_factor']:.2f} 低于限制 {risk_limits['min_profit_factor']}")
+
+    return passed, reasons
 
