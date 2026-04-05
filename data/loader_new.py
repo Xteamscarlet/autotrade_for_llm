@@ -107,23 +107,17 @@ def validate_data_integrity(
         price_cols = ['Open', 'High', 'Low', 'Close']
         for col in price_cols:
             if col in df_clean.columns:
-                # 识别非正常值 (<= 0)
                 invalid_mask = df_clean[col] <= 0
                 invalid_count = invalid_mask.sum()
 
                 if invalid_count > 0:
-                    logger.warning(f"[{code}] {col} 存在 {invalid_count} 个非正值，执行清洗(置NaN后前向填充)")
-
-                    # 步骤A: 将非正常值置为 NaN
-                    df_clean.loc[invalid_mask, col] = np.nan
-
-        # 步骤B: 对价格列进行前向填充
-        # 注意：如果在清洗后仍有NaN（例如第一行就是NaN），后续的dropna或检查会处理
-        if df_clean[price_cols].isna().any().any():
-            df_clean[price_cols] = df_clean[price_cols].ffill()
-            # 如果第一行无法填充，则用后向填充补救
-            df_clean[price_cols] = df_clean[price_cols].bfill()
-
+                    logger.warning(f"[{code}] {col} 存在 {invalid_count} 个非正值")
+                    # 【关键修改】：不要 ffill，直接找到第一个有效值的索引，截断前面的无效数据
+                    first_valid_idx = df_clean[col][df_clean[col] > 0].first_valid_index()
+                    if first_valid_idx is not None:
+                        df_clean = df_clean.loc[first_valid_idx:]
+                    else:
+                        return None, False, f"{col} 全部为非正值，无有效数据"
     # ---------------------------------------------------------
     # 2. 检查缺失值比例 (在清洗后再次检查)
     # ---------------------------------------------------------

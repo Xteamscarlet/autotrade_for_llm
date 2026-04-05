@@ -45,7 +45,7 @@ def check_and_clean_cache(cache_file: str) -> bool:
         with open(cache_file, 'rb') as f:
             data = pickle.load(f)
 
-        last_date = data.get('last_date')
+        last_date = data.get('Date')
         if last_date is None:
             os.remove(cache_file)
             return False
