@@ -116,7 +116,7 @@ class RiskConfig:
 class BacktestConfig:
     """回测参数"""
     train_ratio: float = 0.7
-    test_ratio: float = 0.3
+    val_ratio: float = 0.15
     n_splits: int = 5
     gap_days: int = 20
     n_optuna_trials: int = 150
@@ -126,7 +126,7 @@ class BacktestConfig:
     def from_env(cls) -> "BacktestConfig":
         return cls(
             train_ratio=_env_float("TRAIN_RATIO", 0.7),
-            test_ratio=_env_float("TEST_RATIO", 0.3),
+            val_ratio=_env_float("VAL_RATIO", 0.15),
             n_splits=_env_int("N_SPLITS", 5),
             gap_days=_env_int("GAP_DAYS", 20),
             n_optuna_trials=_env_int("N_OPTUNA_TRIALS", 150),

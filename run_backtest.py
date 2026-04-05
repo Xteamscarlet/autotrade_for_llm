@@ -125,13 +125,10 @@ def process_single_stock(args):
         df = calculate_orthogonal_factors(df, stock_code, allow_save_cache=True)
 
         # 2. Walk-Forward 划分
-        splits = walk_forward_split(
-            df,
-            train_size=settings.backtest.train_ratio,
-            test_size=settings.backtest.test_ratio,
-            n_splits=settings.backtest.n_splits,
-            gap_days=settings.backtest.gap_days,
-        )
+        # Walk-Forward 划分
+        splits = walk_forward_split(df, n_splits=settings.backtest.n_splits, train_ratio=settings.backtest.train_ratio, val_ratio=settings.backtest.val_ratio)
+        if not splits:
+            return stock_code, None, None, None, None, None, None
         if not splits:
             return stock_code, None, None, None, None, None, None
 

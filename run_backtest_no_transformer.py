@@ -104,7 +104,7 @@ def process_single_stock_no_transformer(args):
         df = calculate_orthogonal_factors_no_transformer(df, stock_code=stock_code)
 
         # Walk-Forward 划分
-        splits = walk_forward_split(df, n_splits=5, train_ratio=0.7, val_ratio=0.15)
+        splits = walk_forward_split(df, n_splits=settings.backtest.n_splits, train_ratio=settings.backtest.train_ratio, val_ratio=settings.backtest.val_ratio)
         if not splits:
             return stock_code, None, None, None, None, None, None
 
@@ -120,8 +120,10 @@ def process_single_stock_no_transformer(args):
         factor_cols = [col for col in df.columns
                        if col not in base_cols and col not in transformer_cols]
 
-        for train_start, train_end, test_start, test_end in splits:
+        # ✅ 修改：使用6个变量解包
+        for train_start, train_end, val_start, val_end, test_start, test_end in splits:
             train_df = df.iloc[train_start:train_end]
+            val_df = df.iloc[val_start:val_end]  # 新增验证集
             test_df = df.iloc[test_start:test_end]
 
             if len(train_df) < 100 or len(test_df) < 20:
@@ -142,15 +144,15 @@ def process_single_stock_no_transformer(args):
                 print(f"[硬限制] {stock_name} 参数不合法: {e}")
                 continue
 
-            validated_splits.append((train_start, train_end, test_start, test_end))
+            # ✅ 修改：保存6个元素
+            validated_splits.append((train_start, train_end, val_start, val_end, test_start, test_end))
 
             # 计算得分
             test_df = calculate_multi_timeframe_score_no_transformer(test_df, weights=best_weights)
 
             # 回测（无Transformer版本）
             trades_df, stats, _ = run_backtest_loop_no_transformer(
-                test_df, stock_code, _worker_market_data,
-                best_weights, best_params_map, stocks_data=_worker_stocks_data
+                test_df, stock_code, _worker_market_data, best_weights, best_params_map, stocks_data=_worker_stocks_data
             )
 
             if trades_df is None or len(trades_df) == 0:
@@ -162,6 +164,8 @@ def process_single_stock_no_transformer(args):
             all_trades.append(trades_df)
             best_params_list.append(best_params_map)
             best_weights_list.append(best_weights)
+
+        # ========== 修改结束 ==========
 
         if not all_trades:
             return stock_code, None, None, None, None, None, None
@@ -331,36 +335,98 @@ def main():
 
     # 1. 检查大盘数据
     print("\n[1/3] 检查大盘数据...")
-    market_data = download_market_data()
-    if market_data is None:
-        print("错误: 无法获取大盘数据")
-        return
 
-    # 2. 检查个股数据
+    # ========== 修改1：使用独立的缓存路径 ==========
+    market_cache_file = "./stock_cache/no_transformer_market_data.pkl"
+
+    try:
+        if not check_and_clean_cache(market_cache_file):
+            market_data = download_market_data()
+            save_pickle_cache(market_cache_file, market_data)
+        else:
+            market_data = load_pickle_cache(market_cache_file)
+    except Exception as e:
+        print(f"警告: 大盘数据加载失败: {e}")
+        print("尝试使用本地缓存...")
+        if os.path.exists(market_cache_file):
+            market_data = load_pickle_cache(market_cache_file)
+        else:
+            print("错误: 没有可用的大盘数据")
+            return
+    # ========== 修改2：使用独立的缓存路径 ==========
     print("\n[2/3] 检查个股数据...")
-    cache_file = "./stock_cache/stocks_data.pkl"
-    if not check_and_clean_cache(cache_file):
-        stocks_data = download_stocks_data(STOCK_CODES)
-        save_pickle_cache(cache_file, stocks_data)
-    else:
-        stocks_data = load_pickle_cache(cache_file)
 
+    # ========== 统一使用 check_and_clean_cache ==========
+    stocks_cache_file = "./stock_cache/no_transformer_stocks_data.pkl"
+
+    if not check_and_clean_cache(stocks_cache_file):
+        print("下载股票数据...")
+        stocks_data = download_stocks_data(STOCK_CODES)
+        save_pickle_cache(stocks_cache_file, stocks_data)
+    else:
+        print("使用缓存的股票数据...")
+        stocks_data = load_pickle_cache(stocks_cache_file)
+
+    # 数据验证
     if not stocks_data:
         print("错误: 无法获取个股数据")
         return
 
-    # 过滤股票
-    stocks_data = filter_codes_by_name(stocks_data)
+    print(f"stocks_data 类型: {type(stocks_data)}")
+    print(f"stocks_data 长度: {len(stocks_data)}")
+    print(f"stocks_data 键示例: {list(stocks_data.keys())[:3]}")
 
-    # 3. 多进程回测
-    print("\n[3/3] 开始回测...")
-    args_list = [
-        (name, data, code)
-        for name, data in stocks_data.items()
-        for code in [STOCK_CODES.get(name, '')]
-        if code
-    ]
+    # 3. 验证数据结构
+    print(f"\n数据验证:")
+    print(f"  类型: {type(stocks_data)}")
+    print(f"  长度: {len(stocks_data) if stocks_data else 0}")
 
+    if stocks_data and len(stocks_data) > 0:
+        print(f"  前3个键: {list(stocks_data.keys())[:3]}")
+
+        # 检查是否是错误的结构
+        first_key = list(stocks_data.keys())[0]
+        if first_key in ['stocks_data', 'last_date']:
+            print("\n检测到错误的数据结构，正在修复...")
+            if isinstance(stocks_data, dict) and 'stocks_data' in stocks_data:
+                stocks_data = stocks_data['stocks_data']
+                print(f"修复后键示例: {list(stocks_data.keys())[:3]}")
+
+    if not stocks_data or len(stocks_data) == 0:
+        print("\n错误: 无法获取有效的股票数据")
+        return
+
+    # 4. 保存到独立缓存
+    save_pickle_cache(stocks_cache_file, stocks_data)
+    print(f"\n✓ 缓存已保存到: {stocks_cache_file}")
+
+    # 5. 过滤股票
+    print("\n过滤股票...")
+    valid_stocks = filter_codes_by_name(STOCK_CODES, verbose=True)
+    print(f"过滤后股票数: {len(valid_stocks)}")
+
+    # 6. 构建参数列表
+    args_list = []
+    matched = 0
+    for name, code in valid_stocks.items():
+        if name in stocks_data:
+            df = stocks_data[name]
+            args_list.append((name, df, code))
+            matched += 1
+        else:
+            print(f"警告: 股票 {name} ({code}) 在列表中但缺少数据")
+
+    print(f"\n匹配结果:")
+    print(f"  过滤后股票数: {len(valid_stocks)}")
+    print(f"  成功匹配数: {matched}")
+    print(f"  最终有效股票数: {len(args_list)}")
+
+    if len(args_list) == 0:
+        print("\n❌ 错误: 没有有效的股票数据")
+        return
+
+    # 7. 多进程回测
+    print(f"\n[3/3] 开始回测 {len(args_list)} 只股票...")
     results = []
     n_workers = min(cpu_count(), 4)
 

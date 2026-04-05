@@ -5,7 +5,7 @@ Optuna 多目标优化 + Walk-Forward 划分
 从 backtest_market_v2.py 提取
 """
 import logging
-from typing import Dict, Tuple, Optional
+from typing import Dict, Tuple, Optional, List
 
 import numpy as np
 import pandas as pd
@@ -77,31 +77,92 @@ def calculate_dynamic_weights(df: pd.DataFrame, factor_cols: list, ic_window_ran
 
 
 def walk_forward_split(
-    df: pd.DataFrame,
-    train_size: float = 0.7,
-    test_size: float = 0.3,
-    n_splits: int = 5,
-    gap_days: int = 20,
-) -> list:
-    """Walk-Forward 划分（带 gap 防止数据泄露）"""
+        df: pd.DataFrame,
+        n_splits: int = 5,
+        train_ratio: float = 0.7,
+        val_ratio: float = 0.15,
+        gap_days: int = 20,
+        min_train_size: int = 100,
+        min_test_size: int = 20,
+) -> List[Tuple[int, int, int, int, int, int]]:
+    """
+    Walk-Forward 划分（支持训练集、验证集、测试集）
+
+    参数:
+        df: 股票数据 DataFrame
+        n_splits: 划分次数
+        train_ratio: 训练集比例
+        val_ratio: 验证集比例
+        gap_days: 训练集和验证集之间的间隔天数（防止数据泄露）
+        min_train_size: 训练集最小样本数
+        min_test_size: 测试集最小样本数
+
+    返回:
+        列表，每个元素是 (train_start, train_end, val_start, val_end, test_start, test_end)
+    """
     total_len = len(df)
-    train_len = int(total_len * train_size)
-    test_len = int(total_len * test_size)
+    test_ratio = 1.0 - train_ratio - val_ratio  # 自动计算测试集比例
+
+    if test_ratio <= 0:
+        raise ValueError(f"train_ratio + val_ratio 必须小于 1，当前为 {train_ratio + val_ratio}")
+
+    # 计算各部分的长度
+    train_len = int(total_len * train_ratio)
+    val_len = int(total_len * val_ratio)
+    test_len = int(total_len * test_ratio)
+
+    print(f"\n数据总长度: {total_len}")
+    print(f"训练集长度: {train_len} ({train_ratio * 100:.1f}%)")
+    print(f"验证集长度: {val_len} ({val_ratio * 100:.1f}%)")
+    print(f"测试集长度: {test_len} ({test_ratio * 100:.1f}%)")
+    print(f"间隔天数: {gap_days}")
+
     splits = []
     start_idx = 0
 
     for i in range(n_splits):
+        # 计算训练集的起止索引
         train_start = start_idx
         train_end = train_start + train_len
-        test_start = train_end + gap_days
+
+        # 验证集：在训练集之后，间隔 gap_days
+        val_start = train_end + gap_days
+        val_end = val_start + val_len
+
+        # 测试集：在验证集之后，间隔 gap_days
+        test_start = val_end + gap_days
         test_end = min(test_start + test_len, total_len)
 
-        if test_start >= total_len or test_end - test_start < 20 or train_end - train_start < 100:
+        # 检查是否超出数据范围
+        if test_start >= total_len:
+            print(f"\n第 {i + 1} 次划分：测试集超出数据范围，停止划分")
             break
 
-        splits.append((train_start, train_end, test_start, test_end))
+        # 检查最小样本数
+        actual_train_len = train_end - train_start
+        actual_val_len = val_end - val_start
+        actual_test_len = test_end - test_start
+
+        if actual_train_len < min_train_size:
+            print(f"\n第 {i + 1} 次划分：训练集样本数不足 ({actual_train_len} < {min_train_size})，停止划分")
+            break
+
+        if actual_test_len < min_test_size:
+            print(f"\n第 {i + 1} 次划分：测试集样本数不足 ({actual_test_len} < {min_test_size})，停止划分")
+            break
+
+        # 保存划分结果
+        splits.append((train_start, train_end, val_start, val_end, test_start, test_end))
+
+        print(f"第 {i + 1} 次划分:")
+        print(f"  训练集: [{train_start}:{train_end}] ({actual_train_len} 天)")
+        print(f"  验证集: [{val_start}:{val_end}] ({actual_val_len} 天)")
+        print(f"  测试集: [{test_start}:{test_end}] ({actual_test_len} 天)")
+
+        # 下一次划分的起始位置（滚动窗口）
         start_idx += test_len + gap_days
 
+    print(f"\n总共生成 {len(splits)} 次有效划分")
     return splits
 
 
