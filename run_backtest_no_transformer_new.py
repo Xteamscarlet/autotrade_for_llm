@@ -17,6 +17,7 @@ import pandas as pd
 import numpy as np
 
 from config import get_settings, STOCK_CODES
+from data import check_and_clean_cache, save_pickle_cache, load_pickle_cache
 from data.loader_new import download_market_data, download_stocks_data
 # from data import (
 #     download_market_data, download_stocks_data,
@@ -283,19 +284,63 @@ def main():
     logger.info("步骤1: 准备数据...")
 
     # 下载大盘数据
-    market_data = download_market_data()
+    market_cache_file = "./stock_cache/no_transformer_market_data.pkl"
+    try:
+        if not check_and_clean_cache(market_cache_file):
+            market_data = download_market_data()
+            save_pickle_cache(market_cache_file, market_data)
+        else:
+            market_data = load_pickle_cache(market_cache_file)
+    except Exception as e:
+        print(f"警告: 大盘数据加载失败: {e}")
+        print("尝试使用本地缓存...")
+        if os.path.exists(market_cache_file):
+            market_data = load_pickle_cache(market_cache_file)
+        else:
+            print("错误: 没有可用的大盘数据")
+            return
     if market_data is None or len(market_data) == 0:
         logger.error("大盘数据下载失败")
         return
 
     # 下载股票数据
-    stocks_data = download_stocks_data(
-        codes=STOCK_CODES
-    )
-
+    print("\n[2/3] 检查个股数据...")
+    # ========== 统一使用 check_and_clean_cache ==========
+    stocks_cache_file = "./stock_cache/no_transformer_stocks_data.pkl"
+    if not check_and_clean_cache(stocks_cache_file):
+        print("下载股票数据...")
+        stocks_data = download_stocks_data(STOCK_CODES)
+        save_pickle_cache(stocks_cache_file, stocks_data)
+    else:
+        print("使用缓存的股票数据...")
+        stocks_data = load_pickle_cache(stocks_cache_file)
+    # 数据验证
     if not stocks_data:
-        logger.error("股票数据下载失败")
+        print("错误: 无法获取个股数据")
         return
+    print(f"stocks_data 类型: {type(stocks_data)}")
+    print(f"stocks_data 长度: {len(stocks_data)}")
+    print(f"stocks_data 键示例: {list(stocks_data.keys())[:3]}")
+
+    # 3. 验证数据结构
+    print(f"\n数据验证:")
+    print(f" 类型: {type(stocks_data)}")
+    print(f" 长度: {len(stocks_data) if stocks_data else 0}")
+    if stocks_data and len(stocks_data) > 0:
+        print(f" 前3个键: {list(stocks_data.keys())[:3]}")
+
+    # 检查是否是错误的结构
+    first_key = list(stocks_data.keys())[0]
+    if first_key in ['stocks_data', 'last_date']:
+        print("\n检测到错误的数据结构，正在修复...")
+        if isinstance(stocks_data, dict) and 'stocks_data' in stocks_data:
+            stocks_data = stocks_data['stocks_data']
+        print(f"修复后键示例: {list(stocks_data.keys())[:3]}")
+
+    if not stocks_data or len(stocks_data) == 0:
+        print("\n错误: 无法获取有效的股票数据")
+        return
+
 
     # 过滤股票
     valid_codes = filter_codes_by_name(mapping=STOCK_CODES)

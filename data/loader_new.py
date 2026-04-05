@@ -12,6 +12,7 @@ from typing import Optional, Dict, Tuple
 
 import pandas as pd
 import numpy as np
+from pandas import DataFrame
 
 from config import get_settings
 from exceptions import DataFetchError, DataValidationError
@@ -69,7 +70,7 @@ def validate_data_integrity(
         name: str = "",
         check_nan_ratio: bool = True,
         check_price_validity: bool = True,
-) -> Tuple[pd.DataFrame, bool, str]:
+) -> tuple[None, bool, str] | tuple[DataFrame, bool, str]:
     """数据完整性检查与清洗
 
     不仅检查数据问题，还会尝试修复/过滤非正常值（如价格<=0）。
@@ -264,8 +265,8 @@ def download_stock_data(
 
     for attempt in range(retries):
         try:
-            logger.debug(f"下载股票 {code} 数据:")
-
+            logger.debug(f"隔15秒下载股票 {code} 数据:")
+            time.sleep(15)
             df = ef.stock.get_quote_history(
                 code,
                 klt=101, fqt=1
@@ -305,7 +306,7 @@ def download_stock_data(
 
 def download_stocks_data(
         codes: list,
-        max_workers: int = 5,
+        max_workers: int = 1,
 ) -> Dict[str, pd.DataFrame]:
     """批量下载多只股票数据 - 增强版
 
