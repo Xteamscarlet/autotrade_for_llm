@@ -66,18 +66,41 @@ def calculate_all_indicators(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
+
 def safe_sma(series, period):
-    """安全的简单移动平均计算"""
-    if len(series) < period:
-        logger.warning(f"数据长度 {len(series)} 不足以计算 {period} 日移动平均")
-        return pd.Series(np.nan, index=series.index)
+    """
+    安全的简单移动平均计算
+    修复：
+    1. 兼容 numpy.ndarray / pd.Series / list 输入
+    2. 消除同名递归调用，直接用 pandas rolling 计算
+    """
+    # ---- 类型归一化：统一转成 pd.Series ----
+    if isinstance(series, np.ndarray):
+        s = pd.Series(series)
+    elif isinstance(series, (list, tuple)):
+        s = pd.Series(series)
+    elif isinstance(series, pd.Series):
+        s = series.copy()
+    else:
+        logger.warning(f"safe_sma 收到不支持的类型: {type(series)}，尝试转成 Series")
+        s = pd.Series(series)
 
-    if series.isna().all():
+    n = len(s)
+
+    # ---- 长度不足 ----
+    if n < period:
+        logger.warning(f"数据长度 {n} 不足以计算 {period} 日移动平均")
+        return pd.Series(np.nan, index=s.index)
+
+    # ---- 全 NaN 检测（用 pd.Series 的 .isna()，不会再报错）----
+    if s.isna().all():
         logger.warning("输入序列全为NaN")
-        return pd.Series(np.nan, index=series.index)
+        return pd.Series(np.nan, index=s.index)
 
-    result = safe_sma(series.values,period=period)
-    return pd.Series(result, index=series.index)
+    # ---- 直接用 pandas rolling 计算 SMA，不再递归调用自己 ----
+    result = s.rolling(window=int(period), min_periods=period).mean()
+
+    return result
 
 
 def check_indicator_result(result, indicator_name, code=""):

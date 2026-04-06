@@ -436,6 +436,7 @@ def calculate_dynamic_weights(
     weight_sum = sum(weights.values())
     if weight_sum <= 0:
         logger.warning("权重和 <= 0（可能包含负权重），回退为等权重")
+        logger.warning(weight_sum)
         weight = 1.0 / len(valid_factors)
         return {col: weight for col in valid_factors}
 
