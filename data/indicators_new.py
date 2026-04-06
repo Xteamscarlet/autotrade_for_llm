@@ -374,54 +374,81 @@ def calculate_orthogonal_factors(
 
     return df
 
-
-def get_market_regime(market_data: Optional[pd.DataFrame], current_date) -> str:
-    """市场状态判断：波动率+趋势双确认 - 增强版
-
-    Returns:
-        'strong' / 'weak' / 'neutral'
+def safe_ma(arr: np.ndarray, window: int) -> np.ndarray:
     """
-    if market_data is None or current_date not in market_data.index:
-        return 'neutral'
+    计算简单移动平均，返回与 arr 等长的 ndarray。
+    前 window-1 个位置为 np.nan。
+    """
+    if len(arr) < window:
+        return np.full_like(arr, np.nan, dtype=np.float64)
 
-    try:
-        idx_loc = market_data.index.get_loc(current_date)
-        if isinstance(idx_loc, slice):
-            idx = idx_loc.start
-        else:
-            idx = idx_loc
+    # 使用 pandas 的 rolling 计算，再转回 numpy
+    s = pd.Series(arr)
+    ma = s.rolling(window=window, min_periods=window).mean().to_numpy()
+    return ma
 
-        if idx < 120:
-            return 'neutral'
+def get_market_regime(
+    close: np.ndarray,
+    window: int = 20,
+    threshold: float = 0.0,
+    neutral_value: str = "neutral",
+) -> Tuple[np.ndarray, np.ndarray]:
+    """
+    根据价格与 MA20 判断市场状态：上涨/下跌/中性。
 
-        price = market_data['Close'].iloc[idx]
-        ma20 = market_data['MA20'].iloc[idx]
+    Parameters
+    ----------
+    close : np.ndarray
+        收盘价序列，1D。
+    window : int
+        均线窗口，默认 20。
+    threshold : float
+        价格距离均线超过该阈值才认为是上涨/下跌，否则为中性。
+        例如 threshold=0.02 表示价格距离均线超过 2% 才有方向。
+    neutral_value : str
+        当无法计算 MA 或距离在阈值内时，返回的市场状态值。
 
-        # 安全获取收益率
-        returns = market_data['Close'].pct_change()
-        if returns is None or len(returns) < idx:
-            return 'neutral'
+    Returns
+    -------
+    regime : np.ndarray
+        市场状态序列，取值：
+        - "up"    : 价格 > MA * (1 + threshold)
+        - "down"  : 价格 < MA * (1 - threshold)
+        - neutral_value : 其它情况
+    ma : np.ndarray
+        移动平均序列，与 close 等长。
+    """
+    if close.ndim != 1:
+        raise ValueError("close 必须是 1D array")
 
-        short_vol = returns.iloc[idx - 20:idx].std()
-        long_vol_baseline = returns.iloc[idx - 120:idx].std()
+    ma = safe_ma(close, window)
 
-        if pd.isna(short_vol) or pd.isna(long_vol_baseline) or long_vol_baseline == 0:
-            return 'neutral'
+    # 安全地检查 NaN：用 np.isnan，而不是 .isna()
+    nan_mask = np.isnan(ma)
 
-        high_volatility = short_vol > long_vol_baseline * 1.5
-        uptrend = price > ma20
-        downtrend = price < ma20
+    # 初始化 regime
+    regime = np.full_like(close, neutral_value, dtype=object)
 
-        if uptrend and short_vol < long_vol_baseline * 1.1:
-            return 'strong'
-        elif downtrend and high_volatility:
-            return 'weak'
-        else:
-            return 'neutral'
+    # 只在非 NaN 位置判断方向
+    valid_mask = ~nan_mask
 
-    except Exception as e:
-        logger.warning(f"市场状态判断失败: {e}")
-        return 'neutral'
+    price = close[valid_mask]
+    ma_valid = ma[valid_mask]
+
+    # 计算相对距离
+    rel = (price - ma_valid) / ma_valid
+
+    # 根据阈值划分状态
+    up_mask = rel > threshold
+    down_mask = rel < -threshold
+
+    # 用布尔索引给 regime 赋值
+    # 注意：先赋值 "down"，再 "up"，保证 up 优先于 down（如果同时满足）
+    regime[valid_mask] = neutral_value
+    regime[valid_mask][down_mask] = "down"
+    regime[valid_mask][up_mask] = "up"
+
+    return regime, ma
 
 
 # 在 run_backtest_no_transformer_new.py 中添加收益率计算
@@ -458,3 +485,61 @@ def calculate_future_return(close_prices: pd.Series, periods: int = 1) -> pd.Ser
     # future_return = close_prices.pct_change(periods).shift(-periods)
 
     return future_return
+
+def calculate_orthogonal_factors_without_transformer(
+    df: pd.DataFrame
+) -> pd.DataFrame:
+    """计算正交化因子（传统因子）
+
+    传统因子使用 rolling rank 标准化到 [0, 1]
+    Transformer 因子保持模型原始输出
+
+    Args:
+        df: 包含 OHLCV 的 DataFrame
+
+    Returns:
+        添加了因子列的 DataFrame
+    """
+    df = df.copy()
+
+    # 前向填充缺失值
+    if df['Close'].isna().any():
+        df['Close'] = df['Close'].ffill().bfill()
+    df = df.dropna(subset=['Close', 'Volume'])
+
+    # ========== 传统因子计算 ==========
+    df['mom_10'] = df['Close'].pct_change(10)
+    df['mom_20'] = df['Close'].pct_change(20)
+
+    df['atr'] = ta.ATR(df['High'], df['Low'], df['Close'], timeperiod=14)
+    df['atr_pct'] = df['atr'] / df['Close']
+
+    price_change = df['Close'].pct_change()
+    vol_change = df['Volume'].pct_change()
+    df['vol_price_res'] = (price_change * vol_change).rolling(5).mean()
+
+    df['rsi_norm'] = (ta.RSI(df['Close'], 14) - 50) / 50
+
+    _, _, macdhist = ta.MACD(df['Close'])
+    df['macd_hist_norm'] = macdhist / df['Close']
+
+    ma20 = df['Close'].rolling(20).mean()
+    df['bias_20'] = (df['Close'] - ma20) / ma20
+
+    upper, middle, lower = ta.BBANDS(df['Close'], timeperiod=20, nbdevup=2, nbdevdn=2)
+    df['bb_width'] = (upper - lower) / middle
+
+    # ========== 标准化 ==========
+    # 传统因子: rolling rank 标准化到 [0, 1]
+    for col in TRADITIONAL_FACTOR_COLS:
+        if col in df.columns:
+            df[col] = df[col].rolling(window=250, min_periods=20).rank(pct=True)
+            df[col] = df[col].replace([np.inf, -np.inf], np.nan)
+            df[col] = df[col].fillna(0.5)
+
+
+    # 全局清理
+    df.replace([np.inf, -np.inf], 0, inplace=True)
+    df.fillna(0.5, inplace=True)
+
+    return df

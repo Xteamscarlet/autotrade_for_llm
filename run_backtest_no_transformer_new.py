@@ -18,8 +18,7 @@ import numpy as np
 
 from config import get_settings, STOCK_CODES
 from data import check_and_clean_cache, save_pickle_cache, load_pickle_cache
-from data.indicators import calculate_orthogonal_factors_without_transformer
-from data.indicators_new import prepare_stock_data
+from data.indicators_new import prepare_stock_data,calculate_orthogonal_factors_without_transformer
 from data.loader_new import download_market_data, download_stocks_data
 # from data import (
 #     download_market_data, download_stocks_data,

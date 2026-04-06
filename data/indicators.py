@@ -181,63 +181,6 @@ def calculate_orthogonal_factors(
 
     return df
 
-def calculate_orthogonal_factors_without_transformer(
-    df: pd.DataFrame
-) -> pd.DataFrame:
-    """计算正交化因子（传统因子）
-
-    传统因子使用 rolling rank 标准化到 [0, 1]
-    Transformer 因子保持模型原始输出
-
-    Args:
-        df: 包含 OHLCV 的 DataFrame
-
-    Returns:
-        添加了因子列的 DataFrame
-    """
-    df = df.copy()
-
-    # 前向填充缺失值
-    if df['Close'].isna().any():
-        df['Close'] = df['Close'].ffill().bfill()
-    df = df.dropna(subset=['Close', 'Volume'])
-
-    # ========== 传统因子计算 ==========
-    df['mom_10'] = df['Close'].pct_change(10)
-    df['mom_20'] = df['Close'].pct_change(20)
-
-    df['atr'] = ta.ATR(df['High'], df['Low'], df['Close'], timeperiod=14)
-    df['atr_pct'] = df['atr'] / df['Close']
-
-    price_change = df['Close'].pct_change()
-    vol_change = df['Volume'].pct_change()
-    df['vol_price_res'] = (price_change * vol_change).rolling(5).mean()
-
-    df['rsi_norm'] = (ta.RSI(df['Close'], 14) - 50) / 50
-
-    _, _, macdhist = ta.MACD(df['Close'])
-    df['macd_hist_norm'] = macdhist / df['Close']
-
-    ma20 = df['Close'].rolling(20).mean()
-    df['bias_20'] = (df['Close'] - ma20) / ma20
-
-    upper, middle, lower = ta.BBANDS(df['Close'], timeperiod=20, nbdevup=2, nbdevdn=2)
-    df['bb_width'] = (upper - lower) / middle
-
-    # ========== 标准化 ==========
-    # 传统因子: rolling rank 标准化到 [0, 1]
-    for col in TRADITIONAL_FACTOR_COLS:
-        if col in df.columns:
-            df[col] = df[col].rolling(window=250, min_periods=20).rank(pct=True)
-            df[col] = df[col].replace([np.inf, -np.inf], np.nan)
-            df[col] = df[col].fillna(0.5)
-
-
-    # 全局清理
-    df.replace([np.inf, -np.inf], 0, inplace=True)
-    df.fillna(0.5, inplace=True)
-
-    return df
 
 
 
