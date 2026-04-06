@@ -32,6 +32,14 @@ except ImportError:
 
 logger = logging.getLogger(__name__)
 
+STRATEGY_DIR = "./stock_cache/no_transformer_results"
+
+def load_strategy_for_code(code: str) -> Optional[Dict]:
+    path = os.path.join(STRATEGY_DIR, f"策略_{code}.json")
+    if not os.path.isfile(path):
+        return None
+    with open(path, "r", encoding="utf-8") as f:
+        return json.load(f)
 
 def calculate_traditional_factors(df: pd.DataFrame) -> pd.DataFrame:
     """计算传统技术因子（不使用Transformer模型）
@@ -86,6 +94,158 @@ def calculate_traditional_factors(df: pd.DataFrame) -> pd.DataFrame:
     temp.dropna(inplace=True)
 
     return temp
+# ==================== 因子 → 得分维度映射 ====================
+# 回测优化权重中的正交因子名 → 预测中 calculate_custom_factor_score 的得分维度
+FACTOR_TO_SCORE_DIM = {
+    'mom_10':             'ma',    # 10日动量 → 均线趋势
+    'mom_20':             'ma',    # 20日动量 → 均线趋势
+    'bias_20':            'ma',    # 20日乖离率 → 均线趋势
+    'macd_hist_norm':     'macd',  # 标准化MACD柱 → MACD
+    'rsi_norm':           'rsi',   # 标准化RSI → RSI
+    'bb_width':           'bb',    # 布林带宽度 → 布林带
+    'atr_pct':            'bb',    # ATR百分比 → 布林带(波动率)
+    'vol_price_res':      'vol',   # 量价残差 → 成交量
+    # KDJ 没有单独的正交因子，固定权重 0
+    'kdj':                'kdj',
+}
+
+def calculate_custom_factor_score(df: pd.DataFrame, custom_weights: Dict[str, float]) -> float:
+    """
+    计算综合因子得分（支持自定义权重版本）
+
+    逻辑说明：
+    1. 沿用 calculate_factor_score 的打分规则，将技术指标转换为 0-1 的标准分。
+    2. 使用 custom_weights 对各维度得分进行加权平均。
+
+    Args:
+        df: 包含 OHLCV 数据和技术指标的 DataFrame
+        custom_weights: 自定义权重字典，键应对应以下维度:
+                       'ma', 'macd', 'rsi', 'kdj', 'bb', 'vol'
+
+    Returns:
+        综合得分 (0-1)
+    """
+    if df is None or len(df) < 30:
+        return 0.5
+
+    last = df.iloc[-1]
+    prev = df.iloc[-2]
+
+    # =========================
+    # 1. 计算各维度的原始得分 (0-1)
+    # =========================
+
+    # 1. 均线趋势得分
+    ma_score = 0.5
+    if last['Close'] > last['MA5'] > last['MA10'] > last['MA20']:
+        ma_score = 0.9  # 完美多头排列
+    elif last['Close'] > last['MA5'] and last['MA5'] > last['MA10']:
+        ma_score = 0.7  # 短期多头
+    elif last['Close'] < last['MA5'] < last['MA10'] < last['MA20']:
+        ma_score = 0.1  # 空头排列
+    elif last['Close'] < last['MA5'] and last['MA5'] < last['MA10']:
+        ma_score = 0.3  # 短期空头
+
+    # 2. MACD 得分
+    macd_score = 0.5
+    if last['MACD'] > 0 and last['MACD_Hist'] > 0:
+        macd_score = 0.8
+    elif last['MACD'] > 0 and last['MACD_Hist'] > prev['MACD_Hist']:
+        macd_score = 0.7
+    elif last['MACD'] < 0 and last['MACD_Hist'] > 0:
+        macd_score = 0.6
+    elif last['MACD'] < 0 and last['MACD_Hist'] < prev['MACD_Hist']:
+        macd_score = 0.3
+
+    # 3. RSI 得分
+    rsi_score = 0.5
+    if 40 <= last['RSI'] <= 60:
+        rsi_score = 0.6
+    elif 30 <= last['RSI'] < 40:
+        rsi_score = 0.7
+    elif last['RSI'] < 30:
+        rsi_score = 0.8
+    elif 60 < last['RSI'] <= 70:
+        rsi_score = 0.5
+    elif last['RSI'] > 70:
+        rsi_score = 0.3
+
+    # 4. KDJ 得分
+    kdj_score = 0.5
+    if last['K'] > last['D'] and last['J'] > last['K']:
+        kdj_score = 0.75
+    elif last['K'] > last['D']:
+        kdj_score = 0.65
+    elif last['K'] < last['D'] and last['J'] < last['K']:
+        kdj_score = 0.25
+    elif last['K'] < last['D']:
+        kdj_score = 0.35
+
+    # KDJ 超买超卖调整
+    if last['J'] < 0:
+        kdj_score = min(kdj_score + 0.2, 0.9)
+    elif last['J'] > 100:
+        kdj_score = max(kdj_score - 0.2, 0.1)
+
+    # 5. 布林带位置得分
+    bb_score = 0.5
+    bb_width = last['BB_Upper'] - last['BB_Lower']
+    bb_position = (last['Close'] - last['BB_Lower']) / bb_width if bb_width > 0 else 0.5
+    if bb_position < 0.2:
+        bb_score = 0.8
+    elif bb_position > 0.8:
+        bb_score = 0.3
+    elif 0.4 <= bb_position <= 0.6:
+        bb_score = 0.6
+
+    # 6. 成交量趋势得分
+    vol_score = 0.5
+    if len(df) >= 20:
+        vol_ma5 = df['Volume'].iloc[-5:].mean()
+        vol_ma20 = df['Volume'].iloc[-20:].mean()
+        if vol_ma5 > vol_ma20 * 1.2:
+            vol_score = 0.7
+        elif vol_ma5 < vol_ma20 * 0.8:
+            vol_score = 0.4
+
+    # =========================
+    # 2. 应用自定义权重
+    # =========================
+
+    # 构建得分字典
+    scores = {
+        'ma': ma_score,
+        'macd': macd_score,
+        'rsi': rsi_score,
+        'kdj': kdj_score,
+        'bb': bb_score,
+        'vol': vol_score,
+    }
+
+    # =========================
+    # 2. 通过映射表聚合权重到各维度
+    # =========================
+    aggregated_weights = {}
+    for factor_name, weight in custom_weights.items():
+        dim = FACTOR_TO_SCORE_DIM.get(factor_name)
+        if dim and dim in scores:
+            aggregated_weights[dim] = aggregated_weights.get(dim, 0.0) + weight
+
+    # =========================
+    # 3. 计算加权平均
+    # =========================
+    total_weight = 0.0
+    weighted_sum = 0.0
+    for dim, weight in aggregated_weights.items():
+        weighted_sum += scores[dim] * weight
+        total_weight += weight
+
+    # 防止权重和为 0 的情况（所有权重都映射到不存在的维度时）
+    if total_weight == 0:
+        return 0.5
+
+    final_score = weighted_sum / total_weight
+    return round(final_score, 4)
 
 
 def calculate_factor_score(df: pd.DataFrame) -> float:
@@ -311,7 +471,7 @@ def predict_stocks_no_transformer(target_codes: List[str], code_to_name: Dict[st
     code_to_name = code_to_name or {}
     # 【新增】：加载回测优化后的策略
     strategy_map = {}
-    strategy_file = "./stock_cache/no_transformer_results/backtest_results.json"
+    strategy_file = "./stock_cache/no_transformer_results/optimized_strategies_no_transformer.json"
     if os.path.exists(strategy_file):
         with open(strategy_file, 'r', encoding='utf-8') as f:
             strategies = json.load(f)
@@ -320,14 +480,20 @@ def predict_stocks_no_transformer(target_codes: List[str], code_to_name: Dict[st
         logger.info(f"成功加载 {len(strategy_map)} 个优化策略")
     else:
         logger.warning("未找到回测策略文件，使用默认参数预测")
+    # 只预测有优化策略的股票
+
+    if strategy_map:
+        original_count = len(target_codes)
+        target_codes = [c for c in target_codes if c in strategy_map]
+        logger.info(f"筛选后目标股票: {len(target_codes)}/{original_count}（仅保留有优化策略的股票）")
+
     for i, code in enumerate(tqdm(target_codes, desc="预测进度")):
         try:
             time.sleep(15)  # 避免请求过快
 
             name = code_to_name.get(code, "")
             config = strategy_map.get(code, {})
-            result = predict_single_stock_no_transformer(code, name, strategy_config=config)
-
+            result = predict_single_stock_no_transformer(code, name=name, strategy_config=config)
             if result:
                 predictions.append(result)
 

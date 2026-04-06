@@ -251,10 +251,11 @@ def _process_single_stock(stock_code: str) -> tuple:
         else:
             logger.warning(f"股票 {stock_code}: 无交易记录")
             return stock_code, None, None, None, None, None, None
-
+        # stock_code 实际上是股票名称，需要从 STOCK_CODES 取实际代码
+        actual_code = STOCK_CODES.get(stock_code, stock_code)
         # ===== 构造 main() 需要的 7 元组字段（不改变上面的任何逻辑） =====
         strategy = {
-            'code': stock_code,
+            'code': actual_code,
             'name': stock_code,
             'params': best_params_map if best_params_map else {},
             'weights': best_weights if best_weights else {},
@@ -430,24 +431,8 @@ def main():
             json.dump(serializable_results, f, ensure_ascii=False, indent=2)
 
         logger.info(f"结果已保存到: {result_file}")
-        # 【修改处】：使用 passed_results 提取完整参数，而不是只保存 stats
-        backtest_results = []
-        # passed_results 包含 (code, strategy, stats, df, trades, splits, metadata)
-        for code, strat, stat, df, trades, splits, metadata in passed_strategies:
-            if strat is None: continue
 
-            backtest_results.append({
-                "code": code,
-                "name": strat.get('name', code),
-                "params": strat.get('params'),  # 保存优化后的参数
-                "weights": strat.get('weights'),  # 保存优化后的因子权重
-                "stats": strat.get('stats'),  # 保存回测表现
-            })
 
-        result_file = os.path.join(output_dir, "backtest_results.json")
-        with open(result_file, 'w', encoding='utf-8') as f:
-            json.dump(backtest_results, f, ensure_ascii=False, indent=2)
-        logger.info(f"结果已保存到: {result_file}")
     else:
         logger.error("无策略通过筛选")
 
@@ -457,7 +442,27 @@ def main():
         r for r in results
         if r[0] in passed_codes and r[1] is not None
     ]
+    # 【修改处】：使用 passed_results 提取完整参数，而不是只保存 stats
+    backtest_results = []
+    # 保存结果
+    output_dir = "./stock_cache/no_transformer_results"
+    os.makedirs(output_dir, exist_ok=True)
+    # passed_results 包含 (code, strategy, stats, df, trades, splits, metadata)
+    for code, strat, stat, df, trades, splits, metadata in passed_results:
+        if strat is None: continue
 
+        backtest_results.append({
+            "code": strat.get('code'),
+            "name": strat.get('name', code),
+            "params": strat.get('params'),  # 保存优化后的参数
+            "weights": strat.get('weights'),  # 保存优化后的因子权重
+            "stats": strat.get('stats'),  # 保存回测表现
+        })
+
+    result_file = os.path.join(output_dir, "optimized_strategies_no_transformer.json")
+    with open(result_file, 'w', encoding='utf-8') as f:
+        json.dump(backtest_results, f, ensure_ascii=False, indent=2)
+    logger.info(f"结果已保存到: {result_file}")
     # 7. 生成可视化图表
     print("\n" + "=" * 80)
     print("开始生成可视化图表...")
