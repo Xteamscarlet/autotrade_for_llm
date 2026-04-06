@@ -18,6 +18,7 @@ import numpy as np
 
 from config import get_settings, STOCK_CODES
 from data import check_and_clean_cache, save_pickle_cache, load_pickle_cache
+from data.indicators import calculate_orthogonal_factors_without_transformer
 from data.loader_new import download_market_data, download_stocks_data
 # from data import (
 #     download_market_data, download_stocks_data,
@@ -48,6 +49,15 @@ logger = logging.getLogger(__name__)
 # ==================== 多进程全局变量 ====================
 _worker_market_data = None
 _worker_stocks_data = None
+
+# ========== 结果保存到独立目录 ==========
+# 使用不同的输出目录，不覆盖原有结果
+output_dir = "./stock_cache/no_transformer_results"
+os.makedirs(output_dir, exist_ok=True)
+
+# 图表目录
+viz_dir = os.path.join(output_dir, "backtest_charts")
+os.makedirs(viz_dir, exist_ok=True)
 
 
 # ==================== 新增：数据完整性检查函数 ====================
@@ -178,34 +188,28 @@ def _init_worker(market_data, stocks_data):
     _worker_stocks_data = stocks_data
 
 
-def _process_single_stock(stock_code: str) -> dict:
+def _process_single_stock(stock_code: str) -> tuple:
     """处理单只股票的回测（多进程工作函数）- 增强版
 
-    新增：异常捕获、详细日志
+    返回 7 元组: (code, strategy, stats, df, trades, splits, metadata)
+    失败时返回: (code, None, None, None, None, None, None)
     """
     try:
         # 获取数据
         df = _worker_stocks_data.get(stock_code)
         if df is None or len(df) == 0:
             logger.warning(f"股票 {stock_code} 数据为空，跳过")
-            return {
-                "code": stock_code,
-                "success": False,
-                "error": "数据为空",
-            }
+            return stock_code, None, None, None, None, None, None
 
         # 新增：数据验证
         is_valid, issues = validate_data_for_backtest(df, stock_code)
         if not is_valid:
             logger.warning(f"股票 {stock_code} 数据验证失败: {issues}")
-            return {
-                "code": stock_code,
-                "success": False,
-                "error": f"数据验证失败: {issues}",
-            }
+            return stock_code, None, None, None, None, None, None
 
         # 计算因子权重
         factor_cols = [col for col in df.columns if col in TRADITIONAL_FACTOR_COLS]
+        df = calculate_orthogonal_factors_without_transformer(df)
         best_weights = calculate_dynamic_weights(df, factor_cols)
 
         # 参数优化
@@ -221,11 +225,7 @@ def _process_single_stock(stock_code: str) -> dict:
         splits = walk_forward_split(df)
         if not splits:
             logger.warning(f"股票 {stock_code} 无法进行Walk-Forward划分")
-            return {
-                "code": stock_code,
-                "success": False,
-                "error": "Walk-Forward划分失败",
-            }
+            return stock_code, None, None, None, None, None, None
 
         # 使用最后一个划分进行回测
         train_df, val_df, test_df = splits[-1]
@@ -243,33 +243,42 @@ def _process_single_stock(stock_code: str) -> dict:
         # 检查结果
         if stats is None or len(stats) == 0:
             logger.warning(f"股票 {stock_code} 回测结果为空")
-            return {
-                "code": stock_code,
-                "success": False,
-                "error": "回测结果为空",
-            }
+            return stock_code, None, None, None, None, None, None
 
         # 记录信号统计
         if trades_df is not None and len(trades_df) > 0:
             logger.info(f"股票 {stock_code}: 交易次数 {len(trades_df)}")
         else:
             logger.warning(f"股票 {stock_code}: 无交易记录")
+            return stock_code, None, None, None, None, None, None
 
-        return {
-            "code": stock_code,
-            "success": True,
-            "stats": stats,
-            "trades_count": len(trades_df) if trades_df is not None else 0,
+        # ===== 构造 main() 需要的 7 元组字段（不改变上面的任何逻辑） =====
+        strategy = {
+            'code': stock_code,
+            'name': stock_code,
+            'params': best_params_map if best_params_map else {},
+            'weights': best_weights if best_weights else {},
+            'stats': stats,
         }
+
+        # 计算 test_df 在原始 df 中的起始索引（给 main() 的 metadata 用）
+        test_start_idx = len(df) - len(test_df) if test_df is not None else int(len(df) * 0.7)
+
+        metadata = {
+            'test_start_idx': test_start_idx,
+            'n_splits': len(splits),
+        }
+
+        # main() 会通过 splits[-1][2] 取 test_start_idx，所以格式要兼容
+        validated_splits = [(0, test_start_idx, test_start_idx, len(df))]
+        # ===== 构造结束 =====
+
+        return stock_code, strategy, stats, df, trades_df, validated_splits, metadata
 
     except Exception as e:
         logger.error(f"处理股票 {stock_code} 时出错: {e}")
         logger.error(traceback.format_exc())
-        return {
-            "code": stock_code,
-            "success": False,
-            "error": str(e),
-        }
+        return stock_code, None, None, None, None, None, None
 
 
 def main():
@@ -363,21 +372,33 @@ def main():
 
     # 3. 统计结果
     logger.info("步骤3: 统计结果...")
-    success_count = sum(1 for r in results if r.get("success"))
+    # 成功 = 第2个元素 strategy 不为 None
+    success_count = sum(1 for r in results if r[1] is not None)
     logger.info(f"回测成功: {success_count}/{len(results)}")
 
     # 4. 筛选策略
     logger.info("步骤4: 筛选策略...")
-    successful_results = [r for r in results if r.get("success")]
+    successful_results = [r for r in results if r[1] is not None]
 
     if not successful_results:
         logger.error("所有股票回测均失败，请检查数据和策略参数")
         return
 
+    # 为 filter_strategies_with_fallback 构造它需要的 dict 格式
+    # (不改 filter 函数本身，只在调用前做格式转换)
+    filter_input = []
+    for code, strat, stat, df, trades, splits, metadata in successful_results:
+        filter_input.append({
+            "code": code,
+            "stats": stat,
+            "trades_count": len(trades) if trades is not None else 0,
+            "strategy": strat,
+        })
+
     # 使用降级筛选机制
     risk_manager = RiskManager()
     passed_strategies, filter_log = filter_strategies_with_fallback(
-        strategies=successful_results,
+        strategies=filter_input,
         risk_manager=risk_manager,
     )
 
@@ -410,6 +431,52 @@ def main():
     else:
         logger.error("无策略通过筛选")
 
+    # 6. 筛选出通过策略的完整结果（给可视化用）
+    passed_codes = {r.get("code") for r in passed_strategies}
+    passed_results = [
+        r for r in results
+        if r[0] in passed_codes and r[1] is not None
+    ]
+
+    # 7. 生成可视化图表
+    print("\n" + "=" * 80)
+    print("开始生成可视化图表...")
+    print("=" * 80)
+    for code, strat, stat, df, trades, splits, metadata in passed_results:
+        if strat is None or trades is None or len(trades) == 0:
+            continue
+        stock_name = strat.get('name', code)
+        chart_path = os.path.join(viz_dir, f'{stock_name}_{code}_backtest_no_transformer.png')
+        try:
+            actual_len = len(df)
+            split_idx = int(actual_len * 0.7)
+            if metadata and 'test_start_idx' in metadata:
+                idx_from_meta = metadata['test_start_idx']
+                if 0 < idx_from_meta < actual_len:
+                    split_idx = idx_from_meta
+            elif splits and len(splits) > 0:
+                test_start = splits[-1][2]
+                if 0 < test_start < actual_len:
+                    split_idx = test_start
+            split_idx = max(1, min(split_idx, actual_len - 1))
+
+            visualize_backtest_with_split(
+                df=df,
+                trades_df=trades,
+                stock_name=stock_name,
+                split_idx=split_idx,
+                market_data=market_data,
+                save_path=chart_path,
+                strat=strat,
+            )
+            print(f" ✓ {stock_name} 图表已保存")
+        except Exception as e:
+            print(f" ✗ {stock_name} 图表生成失败: {e}")
+            traceback.print_exc()
+
+    print("\n" + "=" * 80)
+    print(f"所有可视化图表生成完成！目录: {viz_dir}")
+    print("=" * 80)
     logger.info("=" * 80)
     logger.info("回测完成")
     logger.info("=" * 80)

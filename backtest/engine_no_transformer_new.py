@@ -61,7 +61,7 @@ def calculate_transaction_cost(
     comm_cfg: CommissionConfig = settings.commission
 
     # 使用传入参数或配置默认值
-    commission_rate = commission_rate if commission_rate is not None else comm_cfg.rate
+    commission_rate = commission_rate if commission_rate is not None else comm_cfg.commission_rate
     min_commission = min_commission if min_commission is not None else comm_cfg.min_commission
     stamp_duty_rate = stamp_duty_rate if stamp_duty_rate is not None else comm_cfg.stamp_duty_rate
     transfer_fee_rate = transfer_fee_rate if transfer_fee_rate is not None else comm_cfg.transfer_fee_rate

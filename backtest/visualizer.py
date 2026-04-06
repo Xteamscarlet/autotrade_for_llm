@@ -44,13 +44,35 @@ def visualize_backtest_with_split(
         trades_df = trades_df[trades_df['buy_date'] >= test_start_date].copy()
 
     if 'Combined_Score' not in df.columns:
-        from backtest.engine import calculate_multi_timeframe_score
+        # 不再调用有Transformer版本的 calculate_multi_timeframe_score
+        # 直接用权重加权求和，逻辑与无Transformer版本的单日评分完全一致
         if strat and isinstance(strat, dict) and 'weights' in strat and strat['weights']:
             weights_to_use = strat['weights']
         else:
-            factor_cols = [col for col in df.columns if col not in ['Close', 'Open', 'High', 'Low', 'Volume', 'MA20']]
+            factor_cols = [
+                col for col in df.columns
+                if col not in ['Close', 'Open', 'High', 'Low', 'Volume', 'MA20']
+                   and pd.api.types.is_numeric_dtype(df[col])
+            ]
             weights_to_use = {col: 1.0 / len(factor_cols) for col in factor_cols} if factor_cols else {}
-        df = calculate_multi_timeframe_score(df, weights=weights_to_use)
+
+        if weights_to_use:
+            # 只取 df 中实际存在的数值因子列
+            valid_factors = [
+                col for col in weights_to_use
+                if col in df.columns and pd.api.types.is_numeric_dtype(df[col])
+            ]
+            if valid_factors:
+                w = pd.Series(weights_to_use).reindex(valid_factors)
+                w_sum = w.sum()
+                if w_sum > 0:
+                    df['Combined_Score'] = df[valid_factors].mul(w).sum(axis=1) / w_sum
+                else:
+                    df['Combined_Score'] = 0.5
+            else:
+                df['Combined_Score'] = 0.5
+        else:
+            df['Combined_Score'] = 0.5
 
     fig = plt.figure(figsize=(20, 27))
     fig.suptitle(f'{stock_name} 测试集回测可视化 (全因子展示)', fontsize=16, fontweight='bold')

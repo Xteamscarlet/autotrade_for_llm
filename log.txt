@@ -1,79 +1,12 @@
-E:\autotrade\autotrade_for_llm_review>python run_backtest_no_transformer_new.py
-2026-04-05 22:39:17,525 - __main__ - INFO - ================================================================================
-2026-04-05 22:39:17,525 - __main__ - INFO - 开始回测（无Transformer版本）
-2026-04-05 22:39:17,525 - __main__ - INFO - ================================================================================
-2026-04-05 22:39:17,525 - __main__ - INFO - 步骤1: 准备数据...
-2026-04-05 22:39:17,556 - data.loader_new - INFO - 下载大盘数据:(尝试 1/3)
-2026-04-05 22:39:19,603 - data.loader_new - ERROR - 下载大盘数据失败 (尝试 1/3): HTTPSConnectionPool(host='finance.sina.com.cn', port=443): Max retries exceeded with url: /realstock/company/sh000001/hisdata/klc_kl.js?d=2020_2_4 (Caused by ProxyError('Unable to connect to proxy', NewConnectionError('<urllib3.connection.HTTPSConnection object at 0x000002419912B450>: Failed to establish a new connection: [WinError 10061] 由于目标计算机积极拒绝，无法连接。')))
-2026-04-05 22:39:20,604 - data.loader_new - INFO - 下载大盘数据:(尝试 2/3)
-2026-04-05 22:39:22,667 - data.loader_new - ERROR - 下载大盘数据失败 (尝试 2/3): HTTPSConnectionPool(host='finance.sina.com.cn', port=443): Max retries exceeded with url: /realstock/company/sh000001/hisdata/klc_kl.js?d=2020_2_4 (Caused by ProxyError('Unable to connect to proxy', NewConnectionError('<urllib3.connection.HTTPSConnection object at 0x00000241991512D0>: Failed to establish a new connection: [WinError 10061] 由于目标计算机积极拒绝，无法连接。')))
-2026-04-05 22:39:24,667 - data.loader_new - INFO - 下载大盘数据:(尝试 3/3)
-2026-04-05 22:39:28,337 - data.loader_new - INFO - 大盘数据下载成功: 8614 行
+Connected to: <socket.socket fd=776, family=2, type=1, proto=0, laddr=('127.0.0.1', 7374), raddr=('127.0.0.1', 7373)>.
+Connected to pydev debugger (build 252.23892.515)
+2026-04-06 09:31:47,196 - __main__ - INFO - ================================================================================
+2026-04-06 09:31:47,196 - __main__ - INFO - 开始回测（无Transformer版本）
+2026-04-06 09:31:47,196 - __main__ - INFO - ================================================================================
+2026-04-06 09:31:47,196 - __main__ - INFO - 步骤1: 准备数据...
 
 [2/3] 检查个股数据...
-下载股票数据...
-2026-04-05 22:39:28,355 - data.loader_new - INFO - 开始下载 20 只股票数据...
-2026-04-05 22:39:46,219 - data.loader_new - WARNING - [贵州茅台] Open 存在 3508 个非正值，执行清洗(置NaN后前向填充)
-2026-04-05 22:39:46,220 - data.loader_new - WARNING - [贵州茅台] High 存在 3506 个非正值，执行清洗(置NaN后前向填充)
-2026-04-05 22:39:46,221 - data.loader_new - WARNING - [贵州茅台] Low 存在 3510 个非正值，执行清洗(置NaN后前向填充)
-2026-04-05 22:39:46,221 - data.loader_new - WARNING - [贵州茅台] Close 存在 3507 个非正值，执行清洗(置NaN后前向填充)
-2026-04-05 22:40:02,110 - data.loader_new - WARNING - [美的集团] Open 存在 372 个非正值，执行清洗(置NaN后前向填充)
-2026-04-05 22:40:02,110 - data.loader_new - WARNING - [美的集团] High 存在 355 个非正值，执行清洗(置NaN后前向填充)
-2026-04-05 22:40:02,110 - data.loader_new - WARNING - [美的集团] Low 存在 389 个非正值，执行清洗(置NaN后前向填充)
-2026-04-05 22:40:02,110 - data.loader_new - WARNING - [美的集团] Close 存在 370 个非正值，执行清洗(置NaN后前向填充)
-2026-04-05 22:40:34,098 - data.loader_new - WARNING - [隆基绿能] Open 存在 128 个非正值，执行清洗(置NaN后前向填充)
-2026-04-05 22:40:34,099 - data.loader_new - WARNING - [隆基绿能] High 存在 119 个非正值，执行清洗(置NaN后前向填充)
-2026-04-05 22:40:34,099 - data.loader_new - WARNING - [隆基绿能] Low 存在 138 个非正值，执行清洗(置NaN后前向填充)
-2026-04-05 22:40:34,100 - data.loader_new - WARNING - [隆基绿能] Close 存在 124 个非正值，执行清洗(置NaN后前向填充)
-2026-04-05 22:41:22,053 - data.loader_new - WARNING - [科大讯飞] Open 存在 16 个非正值，执行清洗(置NaN后前向填充)
-2026-04-05 22:41:22,058 - data.loader_new - WARNING - [科大讯飞] High 存在 11 个非正值，执行清洗(置NaN后前向填充)
-2026-04-05 22:41:22,061 - data.loader_new - WARNING - [科大讯飞] Low 存在 19 个非正值，执行清洗(置NaN后前向填充)
-2026-04-05 22:41:22,062 - data.loader_new - WARNING - [科大讯飞] Close 存在 15 个非正值，执行清洗(置NaN后前向填充)
-2026-04-05 22:41:38,116 - data.loader_new - WARNING - [海康威视] Open 存在 659 个非正值，执行清洗(置NaN后前向填充)
-2026-04-05 22:41:38,117 - data.loader_new - WARNING - [海康威视] High 存在 652 个非正值，执行清洗(置NaN后前向填充)
-2026-04-05 22:41:38,117 - data.loader_new - WARNING - [海康威视] Low 存在 666 个非正值，执行清洗(置NaN后前向填充)
-2026-04-05 22:41:38,118 - data.loader_new - WARNING - [海康威视] Close 存在 660 个非正值，执行清洗(置NaN后前向填充)
-2026-04-05 22:41:54,259 - data.loader_new - WARNING - [中信证券] Open 存在 894 个非正值，执行清洗(置NaN后前向填充)
-2026-04-05 22:41:54,260 - data.loader_new - WARNING - [中信证券] High 存在 890 个非正值，执行清洗(置NaN后前向填充)
-2026-04-05 22:41:54,260 - data.loader_new - WARNING - [中信证券] Low 存在 899 个非正值，执行清洗(置NaN后前向填充)
-2026-04-05 22:41:54,261 - data.loader_new - WARNING - [中信证券] Close 存在 896 个非正值，执行清洗(置NaN后前向填充)
-2026-04-05 22:42:26,465 - data.loader_new - WARNING - [恒瑞医药] Open 存在 1451 个非正值，执行清洗(置NaN后前向填充)
-2026-04-05 22:42:26,465 - data.loader_new - WARNING - [恒瑞医药] High 存在 1450 个非正值，执行清洗(置NaN后前向填充)
-2026-04-05 22:42:26,466 - data.loader_new - WARNING - [恒瑞医药] Low 存在 1452 个非正值，执行清洗(置NaN后前向填充)
-2026-04-05 22:42:26,467 - data.loader_new - WARNING - [恒瑞医药] Close 存在 1450 个非正值，执行清洗(置NaN后前向填充)
-2026-04-05 22:42:42,588 - data.loader_new - WARNING - [山东黄金] Open 存在 617 个非正值，执行清洗(置NaN后前向填充)
-2026-04-05 22:42:42,589 - data.loader_new - WARNING - [山东黄金] High 存在 611 个非正值，执行清洗(置NaN后前向填充)
-2026-04-05 22:42:42,590 - data.loader_new - WARNING - [山东黄金] Low 存在 624 个非正值，执行清洗(置NaN后前向填充)
-2026-04-05 22:42:42,590 - data.loader_new - WARNING - [山东黄金] Close 存在 614 个非正值，执行清洗(置NaN后前向填充)
-2026-04-05 22:42:58,664 - data.loader_new - WARNING - [紫金矿业] Open 存在 18 个非正值，执行清洗(置NaN后前向填充)
-2026-04-05 22:42:58,665 - data.loader_new - WARNING - [紫金矿业] High 存在 14 个非正值，执行清洗(置NaN后前向填充)
-2026-04-05 22:42:58,665 - data.loader_new - WARNING - [紫金矿业] Low 存在 20 个非正值，执行清洗(置NaN后前向填充)
-2026-04-05 22:42:58,666 - data.loader_new - WARNING - [紫金矿业] Close 存在 16 个非正值，执行清洗(置NaN后前向填充)
-2026-04-05 22:43:14,772 - data.loader_new - WARNING - [长江电力] Open 存在 2194 个非正值，执行清洗(置NaN后前向填充)
-2026-04-05 22:43:14,773 - data.loader_new - WARNING - [长江电力] High 存在 2178 个非正值，执行清洗(置NaN后前向填充)
-2026-04-05 22:43:14,773 - data.loader_new - WARNING - [长江电力] Low 存在 2207 个非正值，执行清洗(置NaN后前向填充)
-2026-04-05 22:43:14,774 - data.loader_new - WARNING - [长江电力] Close 存在 2194 个非正值，执行清洗(置NaN后前向填充)
-2026-04-05 22:43:30,980 - data.loader_new - WARNING - [东方电气] Open 存在 665 个非正值，执行清洗(置NaN后前向填充)
-2026-04-05 22:43:30,981 - data.loader_new - WARNING - [东方电气] High 存在 596 个非正值，执行清洗(置NaN后前向填充)
-2026-04-05 22:43:30,982 - data.loader_new - WARNING - [东方电气] Low 存在 734 个非正值，执行清洗(置NaN后前向填充)
-2026-04-05 22:43:30,982 - data.loader_new - WARNING - [东方电气] Close 存在 668 个非正值，执行清洗(置NaN后前向填充)
-2026-04-05 22:43:47,066 - data.loader_new - WARNING - [歌尔股份] Open 存在 305 个非正值，执行清洗(置NaN后前向填充)
-2026-04-05 22:43:47,066 - data.loader_new - WARNING - [歌尔股份] High 存在 292 个非正值，执行清洗(置NaN后前向填充)
-2026-04-05 22:43:47,067 - data.loader_new - WARNING - [歌尔股份] Low 存在 314 个非正值，执行清洗(置NaN后前向填充)
-2026-04-05 22:43:47,067 - data.loader_new - WARNING - [歌尔股份] Close 存在 300 个非正值，执行清洗(置NaN后前向填充)
-2026-04-05 22:44:19,284 - data.loader_new - WARNING - [中航沈飞] Open 存在 662 个非正值，执行清洗(置NaN后前向填充)
-2026-04-05 22:44:19,284 - data.loader_new - WARNING - [中航沈飞] High 存在 648 个非正值，执行清洗(置NaN后前向填充)
-2026-04-05 22:44:19,285 - data.loader_new - WARNING - [中航沈飞] Low 存在 677 个非正值，执行清洗(置NaN后前向填充)
-2026-04-05 22:44:19,285 - data.loader_new - WARNING - [中航沈飞] Close 存在 663 个非正值，执行清洗(置NaN后前向填充)
-2026-04-05 22:44:35,420 - data.loader_new - WARNING - [北大荒] Open 存在 1041 个非正值，执行清洗(置NaN后前向填充)
-2026-04-05 22:44:35,421 - data.loader_new - WARNING - [北大荒] High 存在 1024 个非正值，执行清洗(置NaN后前向填充)
-2026-04-05 22:44:35,422 - data.loader_new - WARNING - [北大荒] Low 存在 1064 个非正值，执行清洗(置NaN后前向填充)
-2026-04-05 22:44:35,422 - data.loader_new - WARNING - [北大荒] Close 存在 1043 个非正值，执行清洗(置NaN后前向填充)
-2026-04-05 22:44:51,600 - data.loader_new - WARNING - [北新建材] Open 存在 2732 个非正值，执行清洗(置NaN后前向填充)
-2026-04-05 22:44:51,601 - data.loader_new - WARNING - [北新建材] High 存在 2688 个非正值，执行清洗(置NaN后前向填充)
-2026-04-05 22:44:51,601 - data.loader_new - WARNING - [北新建材] Low 存在 2761 个非正值，执行清洗(置NaN后前向填充)
-2026-04-05 22:44:51,602 - data.loader_new - WARNING - [北新建材] Close 存在 2729 个非正值，执行清洗(置NaN后前向填充)
-2026-04-05 22:44:51,605 - data.loader_new - INFO - 下载完成: 成功 20 只, 失败 0 只
+使用缓存的股票数据...
 stocks_data 类型: <class 'dict'>
 stocks_data 长度: 20
 stocks_data 键示例: ['贵州茅台', '美的集团', '国轩高科']
@@ -82,1101 +15,376 @@ stocks_data 键示例: ['贵州茅台', '美的集团', '国轩高科']
  类型: <class 'dict'>
  长度: 20
  前3个键: ['贵州茅台', '美的集团', '国轩高科']
-2026-04-05 22:44:51,616 - utils.stock_filter_new - INFO - 股票池过滤完成: 原始 20 只, 移除 0 只, 保留 20 只
-2026-04-05 22:44:51,616 - __main__ - INFO - 有效股票数量: 20
-2026-04-05 22:44:51,616 - __main__ - INFO - 步骤2: 执行回测...
-回测进度:   0%|                                                                                 | 0/20 [00:00<?, ?it/s]E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-2026-04-05 22:44:58,826 - backtest.optimizer_new - WARNING - 因子 股票名称 IC全为NaN，使用默认权重
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-2026-04-05 22:44:58,954 - backtest.optimizer_new - WARNING - 因子 股票名称 IC全为NaN，使用默认权重
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-2026-04-05 22:44:59,327 - backtest.optimizer_new - WARNING - 因子 股票名称 IC全为NaN，使用默认权重
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-2026-04-05 22:44:59,664 - backtest.optimizer_new - WARNING - 因子 股票名称 IC全为NaN，使用默认权重
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-2026-04-05 22:44:59,758 - backtest.optimizer_new - WARNING - 因子 股票代码 IC全为NaN，使用默认权重
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-2026-04-05 22:44:59,897 - backtest.optimizer_new - WARNING - 因子 股票代码 IC全为NaN，使用默认权重
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-2026-04-05 22:45:00,597 - backtest.optimizer_new - WARNING - 因子 股票代码 IC全为NaN，使用默认权重
-2026-04-05 22:45:01,406 - backtest.optimizer_new - WARNING - 因子 股票代码 IC全为NaN，使用默认权重
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-2026-04-05 22:45:08,605 - backtest.optimizer_new - INFO - 动态权重计算完成: 7 个因子
-2026-04-05 22:45:08,821 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=-999.0000
-2026-04-05 22:45:08,822 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
-2026-04-05 22:45:08,822 - backtest.engine_no_transformer_new - INFO - [美的集团] 开始回测，数据长度: 596，因子数: 7
-2026-04-05 22:45:08,822 - __mp_main__ - ERROR - 处理股票 美的集团 时出错: can't multiply sequence by non-int of type 'float'
-2026-04-05 22:45:08,828 - __mp_main__ - ERROR - Traceback (most recent call last):
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\array_ops.py", line 218, in _na_arithmetic_op
-    result = func(left, right)
-             ^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\computation\expressions.py", line 242, in evaluate
-    return _evaluate(op, op_str, a, b)  # type: ignore[misc]
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\computation\expressions.py", line 131, in _evaluate_numexpr
-    result = _evaluate_standard(op, op_str, a, b)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\computation\expressions.py", line 73, in _evaluate_standard
-    return op(a, b)
-           ^^^^^^^^
-TypeError: can't multiply sequence by non-int of type 'float'
+2026-04-06 09:31:47,215 - utils.stock_filter_new - INFO - 股票池过滤完成: 原始 20 只, 移除 0 只, 保留 20 只
+2026-04-06 09:31:47,216 - __main__ - INFO - 有效股票数量: 20
+2026-04-06 09:31:47,216 - __main__ - INFO - 步骤2: 执行回测...
+Connected to: <socket.socket fd=576, family=2, type=1, proto=0, laddr=('127.0.0.1', 7380), raddr=('127.0.0.1', 7373)>.
+Connected to: <socket.socket fd=520, family=2, type=1, proto=0, laddr=('127.0.0.1', 7382), raddr=('127.0.0.1', 7373)>.
+Connected to: <socket.socket fd=568, family=2, type=1, proto=0, laddr=('127.0.0.1', 7390), raddr=('127.0.0.1', 7373)>.
+Connected to: <socket.socket fd=568, family=2, type=1, proto=0, laddr=('127.0.0.1', 7392), raddr=('127.0.0.1', 7373)>.
+回测进度:   0%|          | 0/20 [00:00<?, ?it/s]2026-04-06 09:32:00,119 - backtest.optimizer_new - WARNING - 无有效因子列，返回空权重
+2026-04-06 09:32:00,121 - backtest.optimizer_new - WARNING - 无有效因子列，返回空权重
+2026-04-06 09:32:00,121 - backtest.optimizer_new - WARNING - 无有效因子列，返回空权重
+2026-04-06 09:32:00,130 - backtest.optimizer_new - WARNING - 无有效因子列，返回空权重
+2026-04-06 09:32:00,512 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=-999.0000
+2026-04-06 09:32:00,514 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
+2026-04-06 09:32:00,514 - backtest.engine_no_transformer_new - INFO - [隆基绿能] 开始回测，数据长度: 643，因子数: 8
+2026-04-06 09:32:00,514 - backtest.engine_no_transformer_new - WARNING - [隆基绿能] 无有效权重，使用等权重
+2026-04-06 09:32:00,516 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=-999.0000
+2026-04-06 09:32:00,517 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
+2026-04-06 09:32:00,518 - backtest.engine_no_transformer_new - INFO - [贵州茅台] 开始回测，数据长度: 476，因子数: 8
+2026-04-06 09:32:00,518 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=-999.0000
+2026-04-06 09:32:00,518 - backtest.engine_no_transformer_new - WARNING - [贵州茅台] 无有效权重，使用等权重
+2026-04-06 09:32:00,519 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
+2026-04-06 09:32:00,519 - backtest.engine_no_transformer_new - INFO - [美的集团] 开始回测，数据长度: 519，因子数: 8
+2026-04-06 09:32:00,519 - backtest.engine_no_transformer_new - WARNING - [美的集团] 无有效权重，使用等权重
+2026-04-06 09:32:00,533 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=-999.0000
+2026-04-06 09:32:00,537 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
+2026-04-06 09:32:00,537 - backtest.engine_no_transformer_new - INFO - [国轩高科] 开始回测，数据长度: 899，因子数: 8
+2026-04-06 09:32:00,537 - backtest.engine_no_transformer_new - WARNING - [国轩高科] 无有效权重，使用等权重
+2026-04-06 09:32:01,436 - backtest.engine_no_transformer_new - INFO - [贵州茅台] 信号统计: 买入=19, 卖出=18
+2026-04-06 09:32:01,442 - backtest.engine_no_transformer_new - INFO - [贵州茅台] 回测完成: 总交易=18, 胜率=38.9%, 夏普=-1.01
+2026-04-06 09:32:01,442 - __mp_main__ - INFO - 股票 贵州茅台: 交易次数 18
+回测进度:   5%|▌         | 1/20 [00:01<00:25,  1.35s/it]2026-04-06 09:32:01,469 - backtest.optimizer_new - WARNING - 无有效因子列，返回空权重
+2026-04-06 09:32:01,512 - backtest.engine_no_transformer_new - INFO - [美的集团] 信号统计: 买入=13, 卖出=12
+2026-04-06 09:32:01,518 - backtest.engine_no_transformer_new - INFO - [美的集团] 回测完成: 总交易=12, 胜率=66.7%, 夏普=0.78
+2026-04-06 09:32:01,518 - __mp_main__ - INFO - 股票 美的集团: 交易次数 12
+2026-04-06 09:32:01,555 - backtest.optimizer_new - WARNING - 无有效因子列，返回空权重
+2026-04-06 09:32:01,765 - backtest.engine_no_transformer_new - INFO - [隆基绿能] 信号统计: 买入=28, 卖出=28
+2026-04-06 09:32:01,769 - backtest.engine_no_transformer_new - INFO - [隆基绿能] 回测完成: 总交易=28, 胜率=39.3%, 夏普=-0.90
+2026-04-06 09:32:01,769 - __mp_main__ - INFO - 股票 隆基绿能: 交易次数 28
+2026-04-06 09:32:01,803 - backtest.optimizer_new - WARNING - 无有效因子列，返回空权重
+2026-04-06 09:32:01,865 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=-999.0000
+2026-04-06 09:32:01,866 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
+2026-04-06 09:32:01,867 - backtest.engine_no_transformer_new - INFO - [赛力斯] 开始回测，数据长度: 471，因子数: 8
+2026-04-06 09:32:01,867 - backtest.engine_no_transformer_new - WARNING - [赛力斯] 无有效权重，使用等权重
+2026-04-06 09:32:01,987 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=-999.0000
+2026-04-06 09:32:01,988 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
+2026-04-06 09:32:01,989 - backtest.engine_no_transformer_new - INFO - [比亚迪] 开始回测，数据长度: 714，因子数: 8
+2026-04-06 09:32:01,989 - backtest.engine_no_transformer_new - WARNING - [比亚迪] 无有效权重，使用等权重
+2026-04-06 09:32:02,203 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=-999.0000
+2026-04-06 09:32:02,204 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
+2026-04-06 09:32:02,205 - backtest.engine_no_transformer_new - INFO - [科大讯飞] 开始回测，数据长度: 848，因子数: 8
+2026-04-06 09:32:02,205 - backtest.engine_no_transformer_new - WARNING - [科大讯飞] 无有效权重，使用等权重
+2026-04-06 09:32:02,331 - backtest.engine_no_transformer_new - INFO - [国轩高科] 信号统计: 买入=38, 卖出=38
+2026-04-06 09:32:02,339 - backtest.engine_no_transformer_new - INFO - [国轩高科] 回测完成: 总交易=38, 胜率=34.2%, 夏普=0.13
+2026-04-06 09:32:02,339 - __mp_main__ - INFO - 股票 国轩高科: 交易次数 38
+回测进度:  15%|█▌        | 3/20 [00:02<00:11,  1.46it/s]2026-04-06 09:32:02,369 - backtest.optimizer_new - WARNING - 无有效因子列，返回空权重
+2026-04-06 09:32:02,779 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=-999.0000
+2026-04-06 09:32:02,780 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
+2026-04-06 09:32:02,780 - backtest.engine_no_transformer_new - INFO - [海康威视] 开始回测，数据长度: 625，因子数: 8
+2026-04-06 09:32:02,780 - backtest.engine_no_transformer_new - WARNING - [海康威视] 无有效权重，使用等权重
+2026-04-06 09:32:02,792 - backtest.engine_no_transformer_new - INFO - [赛力斯] 信号统计: 买入=14, 卖出=14
+2026-04-06 09:32:02,797 - backtest.engine_no_transformer_new - INFO - [赛力斯] 回测完成: 总交易=14, 胜率=28.6%, 夏普=-0.29
+2026-04-06 09:32:02,798 - __mp_main__ - INFO - 股票 赛力斯: 交易次数 14
+回测进度:  25%|██▌       | 5/20 [00:02<00:06,  2.22it/s]2026-04-06 09:32:02,834 - backtest.optimizer_new - WARNING - 无有效因子列，返回空权重
+2026-04-06 09:32:03,239 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=-999.0000
+2026-04-06 09:32:03,240 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
+2026-04-06 09:32:03,240 - backtest.engine_no_transformer_new - INFO - [中信证券] 开始回测，数据长度: 929，因子数: 8
+2026-04-06 09:32:03,240 - backtest.engine_no_transformer_new - WARNING - [中信证券] 无有效权重，使用等权重
+2026-04-06 09:32:03,412 - backtest.engine_no_transformer_new - INFO - [比亚迪] 信号统计: 买入=22, 卖出=22
+2026-04-06 09:32:03,418 - backtest.engine_no_transformer_new - INFO - [比亚迪] 回测完成: 总交易=22, 胜率=31.8%, 夏普=0.32
+2026-04-06 09:32:03,418 - __mp_main__ - INFO - 股票 比亚迪: 交易次数 22
+回测进度:  30%|███       | 6/20 [00:03<00:06,  2.02it/s]2026-04-06 09:32:03,453 - backtest.optimizer_new - WARNING - 无有效因子列，返回空权重
+2026-04-06 09:32:03,878 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=-999.0000
+2026-04-06 09:32:03,879 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
+2026-04-06 09:32:03,880 - backtest.engine_no_transformer_new - INFO - [光迅科技] 开始回测，数据长度: 793，因子数: 8
+2026-04-06 09:32:03,880 - backtest.engine_no_transformer_new - WARNING - [光迅科技] 无有效权重，使用等权重
+2026-04-06 09:32:03,911 - backtest.engine_no_transformer_new - INFO - [科大讯飞] 信号统计: 买入=31, 卖出=31
+2026-04-06 09:32:03,918 - backtest.engine_no_transformer_new - INFO - [科大讯飞] 回测完成: 总交易=31, 胜率=35.5%, 夏普=0.55
+2026-04-06 09:32:03,918 - __mp_main__ - INFO - 股票 科大讯飞: 交易次数 31
+回测进度:  35%|███▌      | 7/20 [00:03<00:06,  2.01it/s]2026-04-06 09:32:03,958 - backtest.optimizer_new - WARNING - 无有效因子列，返回空权重
+2026-04-06 09:32:04,003 - backtest.engine_no_transformer_new - INFO - [海康威视] 信号统计: 买入=14, 卖出=14
+2026-04-06 09:32:04,008 - backtest.engine_no_transformer_new - INFO - [海康威视] 回测完成: 总交易=14, 胜率=71.4%, 夏普=0.46
+2026-04-06 09:32:04,008 - __mp_main__ - INFO - 股票 海康威视: 交易次数 14
+2026-04-06 09:32:04,043 - backtest.optimizer_new - WARNING - 无有效因子列，返回空权重
+2026-04-06 09:32:04,386 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=-999.0000
+2026-04-06 09:32:04,386 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
+2026-04-06 09:32:04,386 - backtest.engine_no_transformer_new - INFO - [恒瑞医药] 开始回测，数据长度: 935，因子数: 8
+2026-04-06 09:32:04,386 - backtest.engine_no_transformer_new - WARNING - [恒瑞医药] 无有效权重，使用等权重
+2026-04-06 09:32:04,460 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=-999.0000
+2026-04-06 09:32:04,461 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
+2026-04-06 09:32:04,461 - backtest.engine_no_transformer_new - INFO - [山东黄金] 开始回测，数据长度: 924，因子数: 8
+2026-04-06 09:32:04,462 - backtest.engine_no_transformer_new - WARNING - [山东黄金] 无有效权重，使用等权重
+2026-04-06 09:32:05,118 - backtest.engine_no_transformer_new - INFO - [中信证券] 信号统计: 买入=28, 卖出=28
+2026-04-06 09:32:05,123 - backtest.engine_no_transformer_new - INFO - [中信证券] 回测完成: 总交易=28, 胜率=39.3%, 夏普=0.75
+2026-04-06 09:32:05,125 - __mp_main__ - INFO - 股票 中信证券: 交易次数 28
+回测进度:  45%|████▌     | 9/20 [00:05<00:05,  1.84it/s]2026-04-06 09:32:05,160 - backtest.optimizer_new - WARNING - 无有效因子列，返回空权重
+2026-04-06 09:32:05,459 - backtest.engine_no_transformer_new - INFO - [光迅科技] 信号统计: 买入=40, 卖出=39
+2026-04-06 09:32:05,466 - backtest.engine_no_transformer_new - INFO - [光迅科技] 回测完成: 总交易=39, 胜率=48.7%, 夏普=0.82
+2026-04-06 09:32:05,466 - __mp_main__ - INFO - 股票 光迅科技: 交易次数 39
+回测进度:  50%|█████     | 10/20 [00:05<00:04,  2.02it/s]2026-04-06 09:32:05,495 - backtest.optimizer_new - WARNING - 无有效因子列，返回空权重
+2026-04-06 09:32:05,562 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=-999.0000
+2026-04-06 09:32:05,563 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
+2026-04-06 09:32:05,563 - backtest.engine_no_transformer_new - INFO - [紫金矿业] 开始回测，数据长度: 859，因子数: 8
+2026-04-06 09:32:05,564 - backtest.engine_no_transformer_new - WARNING - [紫金矿业] 无有效权重，使用等权重
+2026-04-06 09:32:05,900 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=-999.0000
+2026-04-06 09:32:05,901 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
+2026-04-06 09:32:05,901 - backtest.engine_no_transformer_new - INFO - [长江电力] 开始回测，数据长度: 560，因子数: 8
+2026-04-06 09:32:05,901 - backtest.engine_no_transformer_new - WARNING - [长江电力] 无有效权重，使用等权重
+2026-04-06 09:32:06,220 - backtest.engine_no_transformer_new - INFO - [恒瑞医药] 信号统计: 买入=30, 卖出=29
+2026-04-06 09:32:06,229 - backtest.engine_no_transformer_new - INFO - [恒瑞医药] 回测完成: 总交易=29, 胜率=69.0%, 夏普=0.91
+2026-04-06 09:32:06,229 - __mp_main__ - INFO - 股票 恒瑞医药: 交易次数 29
+回测进度:  55%|█████▌    | 11/20 [00:06<00:05,  1.77it/s]2026-04-06 09:32:06,272 - backtest.optimizer_new - WARNING - 无有效因子列，返回空权重
+2026-04-06 09:32:06,300 - backtest.engine_no_transformer_new - INFO - [山东黄金] 信号统计: 买入=38, 卖出=38
+2026-04-06 09:32:06,307 - backtest.engine_no_transformer_new - INFO - [山东黄金] 回测完成: 总交易=38, 胜率=34.2%, 夏普=0.47
+2026-04-06 09:32:06,307 - __mp_main__ - INFO - 股票 山东黄金: 交易次数 38
+2026-04-06 09:32:06,341 - backtest.optimizer_new - WARNING - 无有效因子列，返回空权重
+2026-04-06 09:32:06,716 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=-999.0000
+2026-04-06 09:32:06,717 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
+2026-04-06 09:32:06,718 - backtest.engine_no_transformer_new - INFO - [东方电气] 开始回测，数据长度: 1296，因子数: 8
+2026-04-06 09:32:06,718 - backtest.engine_no_transformer_new - WARNING - [东方电气] 无有效权重，使用等权重
+2026-04-06 09:32:06,786 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=-999.0000
+2026-04-06 09:32:06,786 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
+2026-04-06 09:32:06,786 - backtest.engine_no_transformer_new - INFO - [歌尔股份] 开始回测，数据长度: 799，因子数: 8
+2026-04-06 09:32:06,792 - backtest.engine_no_transformer_new - WARNING - [歌尔股份] 无有效权重，使用等权重
+2026-04-06 09:32:07,007 - backtest.engine_no_transformer_new - INFO - [长江电力] 信号统计: 买入=10, 卖出=10
+2026-04-06 09:32:07,011 - backtest.engine_no_transformer_new - INFO - [长江电力] 回测完成: 总交易=10, 胜率=60.0%, 夏普=1.21
+2026-04-06 09:32:07,011 - __mp_main__ - INFO - 股票 长江电力: 交易次数 10
+2026-04-06 09:32:07,043 - backtest.optimizer_new - WARNING - 无有效因子列，返回空权重
+2026-04-06 09:32:07,318 - backtest.engine_no_transformer_new - INFO - [紫金矿业] 信号统计: 买入=34, 卖出=34
+2026-04-06 09:32:07,320 - backtest.engine_no_transformer_new - INFO - [紫金矿业] 回测完成: 总交易=34, 胜率=47.1%, 夏普=0.97
+2026-04-06 09:32:07,320 - __mp_main__ - INFO - 股票 紫金矿业: 交易次数 34
+回测进度:  65%|██████▌   | 13/20 [00:07<00:03,  1.80it/s]2026-04-06 09:32:07,367 - backtest.optimizer_new - WARNING - 无有效因子列，返回空权重
+2026-04-06 09:32:07,448 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=-999.0000
+2026-04-06 09:32:07,449 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
+2026-04-06 09:32:07,449 - backtest.engine_no_transformer_new - INFO - [东山精密] 开始回测，数据长度: 734，因子数: 8
+2026-04-06 09:32:07,450 - backtest.engine_no_transformer_new - WARNING - [东山精密] 无有效权重，使用等权重
+2026-04-06 09:32:07,809 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=-999.0000
+2026-04-06 09:32:07,810 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
+2026-04-06 09:32:07,811 - backtest.engine_no_transformer_new - INFO - [中航沈飞] 开始回测，数据长度: 1246，因子数: 8
+2026-04-06 09:32:07,811 - backtest.engine_no_transformer_new - WARNING - [中航沈飞] 无有效权重，使用等权重
+2026-04-06 09:32:08,436 - backtest.engine_no_transformer_new - INFO - [歌尔股份] 信号统计: 买入=29, 卖出=29
+2026-04-06 09:32:08,442 - backtest.engine_no_transformer_new - INFO - [歌尔股份] 回测完成: 总交易=29, 胜率=48.3%, 夏普=0.40
+2026-04-06 09:32:08,442 - __mp_main__ - INFO - 股票 歌尔股份: 交易次数 29
+2026-04-06 09:32:08,479 - backtest.optimizer_new - WARNING - 无有效因子列，返回空权重
+2026-04-06 09:32:08,945 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=-999.0000
+2026-04-06 09:32:08,945 - backtest.engine_no_transformer_new - INFO - [东山精密] 信号统计: 买入=28, 卖出=28
+2026-04-06 09:32:08,946 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
+2026-04-06 09:32:08,946 - backtest.engine_no_transformer_new - INFO - [北大荒] 开始回测，数据长度: 932，因子数: 8
+2026-04-06 09:32:08,947 - backtest.engine_no_transformer_new - WARNING - [北大荒] 无有效权重，使用等权重
+2026-04-06 09:32:08,952 - backtest.engine_no_transformer_new - INFO - [东山精密] 回测完成: 总交易=28, 胜率=42.9%, 夏普=0.93
+2026-04-06 09:32:08,952 - __mp_main__ - INFO - 股票 东山精密: 交易次数 28
+2026-04-06 09:32:08,992 - backtest.optimizer_new - WARNING - 无有效因子列，返回空权重
+2026-04-06 09:32:09,415 - backtest.engine_no_transformer_new - INFO - [东方电气] 信号统计: 买入=47, 卖出=47
+2026-04-06 09:32:09,425 - backtest.engine_no_transformer_new - INFO - [东方电气] 回测完成: 总交易=47, 胜率=48.9%, 夏普=0.87
+2026-04-06 09:32:09,425 - __mp_main__ - INFO - 股票 东方电气: 交易次数 47
+回测进度:  75%|███████▌  | 15/20 [00:09<00:03,  1.35it/s]2026-04-06 09:32:09,481 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=-999.0000
+2026-04-06 09:32:09,481 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
+2026-04-06 09:32:09,482 - backtest.engine_no_transformer_new - INFO - [北新建材] 开始回测，数据长度: 804，因子数: 8
+2026-04-06 09:32:09,482 - backtest.engine_no_transformer_new - WARNING - [北新建材] 无有效权重，使用等权重
+2026-04-06 09:32:10,347 - backtest.engine_no_transformer_new - INFO - [中航沈飞] 信号统计: 买入=46, 卖出=46
+2026-04-06 09:32:10,354 - backtest.engine_no_transformer_new - INFO - [中航沈飞] 回测完成: 总交易=46, 胜率=32.6%, 夏普=-0.82
+2026-04-06 09:32:10,354 - __mp_main__ - INFO - 股票 中航沈飞: 交易次数 46
+回测进度:  90%|█████████ | 18/20 [00:10<00:01,  1.82it/s]2026-04-06 09:32:10,794 - backtest.engine_no_transformer_new - INFO - [北大荒] 信号统计: 买入=28, 卖出=28
+2026-04-06 09:32:10,798 - backtest.engine_no_transformer_new - INFO - [北大荒] 回测完成: 总交易=28, 胜率=50.0%, 夏普=-0.88
+2026-04-06 09:32:10,798 - __mp_main__ - INFO - 股票 北大荒: 交易次数 28
+回测进度:  95%|█████████▌| 19/20 [00:10<00:00,  1.89it/s]2026-04-06 09:32:11,031 - backtest.engine_no_transformer_new - INFO - [北新建材] 信号统计: 买入=25, 卖出=24
+2026-04-06 09:32:11,038 - backtest.engine_no_transformer_new - INFO - [北新建材] 回测完成: 总交易=24, 胜率=50.0%, 夏普=0.77
+2026-04-06 09:32:11,038 - __mp_main__ - INFO - 股票 北新建材: 交易次数 24
+回测进度: 100%|██████████| 20/20 [00:10<00:00,  1.83it/s]
+2026-04-06 09:32:11,042 - __main__ - INFO - 步骤3: 统计结果...
+2026-04-06 09:32:11,042 - __main__ - INFO - 回测成功: 20/20
+2026-04-06 09:32:11,042 - __main__ - INFO - 步骤4: 筛选策略...
+2026-04-06 09:32:11,042 - __main__ - INFO - 策略 贵州茅台: 丢弃 - 夏普比率 -1.0096 < 0.0, 最大回撤 -26.80% < -20.0%
+2026-04-06 09:32:11,042 - __main__ - INFO - 策略 美的集团: 通过筛选
+2026-04-06 09:32:11,043 - __main__ - INFO - 策略 国轩高科: 丢弃 - 最大回撤 -58.12% < -20.0%
+2026-04-06 09:32:11,043 - __main__ - INFO - 策略 隆基绿能: 丢弃 - 夏普比率 -0.9021 < 0.0, 最大回撤 -44.35% < -20.0%
+2026-04-06 09:32:11,043 - __main__ - INFO - 策略 赛力斯: 丢弃 - 夏普比率 -0.2893 < 0.0, 最大回撤 -33.58% < -20.0%
+2026-04-06 09:32:11,043 - __main__ - INFO - 策略 比亚迪: 丢弃 - 最大回撤 -23.98% < -20.0%
+2026-04-06 09:32:11,043 - __main__ - INFO - 策略 科大讯飞: 丢弃 - 最大回撤 -42.30% < -20.0%
+2026-04-06 09:32:11,043 - __main__ - INFO - 策略 海康威视: 通过筛选
+2026-04-06 09:32:11,043 - __main__ - INFO - 策略 中信证券: 通过筛选
+2026-04-06 09:32:11,043 - __main__ - INFO - 策略 光迅科技: 丢弃 - 最大回撤 -30.90% < -20.0%
+2026-04-06 09:32:11,043 - __main__ - INFO - 策略 恒瑞医药: 通过筛选
+2026-04-06 09:32:11,043 - __main__ - INFO - 策略 山东黄金: 丢弃 - 最大回撤 -23.08% < -20.0%
+2026-04-06 09:32:11,044 - __main__ - INFO - 策略 紫金矿业: 丢弃 - 最大回撤 -22.32% < -20.0%
+2026-04-06 09:32:11,044 - __main__ - INFO - 策略 长江电力: 通过筛选
+2026-04-06 09:32:11,044 - __main__ - INFO - 策略 东方电气: 丢弃 - 最大回撤 -31.45% < -20.0%
+2026-04-06 09:32:11,044 - __main__ - INFO - 策略 歌尔股份: 丢弃 - 最大回撤 -20.74% < -20.0%
+2026-04-06 09:32:11,044 - __main__ - INFO - 策略 东山精密: 丢弃 - 最大回撤 -28.17% < -20.0%
+2026-04-06 09:32:11,044 - __main__ - INFO - 策略 中航沈飞: 丢弃 - 夏普比率 -0.8184 < 0.0, 最大回撤 -63.19% < -20.0%
+2026-04-06 09:32:11,044 - __main__ - INFO - 策略 北大荒: 丢弃 - 夏普比率 -0.8773 < 0.0, 最大回撤 -28.27% < -20.0%
+2026-04-06 09:32:11,044 - __main__ - INFO - 策略 北新建材: 通过筛选
+2026-04-06 09:32:11,045 - __main__ - INFO - 步骤5: 生成报告...
+2026-04-06 09:32:11,045 - __main__ - INFO - 最终保留 6 个策略
+2026-04-06 09:32:11,053 - __main__ - INFO - 结果已保存到: ./stock_cache/no_transformer_results\backtest_results.json
 
-During handling of the above exception, another exception occurred:
+================================================================================
+开始生成可视化图表...
+================================================================================
+ ✗ 美的集团 图表生成失败: 'MA20'
+Traceback (most recent call last):
+  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\indexes\base.py", line 3805, in get_loc
+    return self._engine.get_loc(casted_key)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "index.pyx", line 167, in pandas._libs.index.IndexEngine.get_loc
+  File "index.pyx", line 196, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas\\_libs\\hashtable_class_helper.pxi", line 7081, in pandas._libs.hashtable.PyObjectHashTable.get_item
+  File "pandas\\_libs\\hashtable_class_helper.pxi", line 7089, in pandas._libs.hashtable.PyObjectHashTable.get_item
+KeyError: 'MA20'
+
+The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "E:\autotrade\autotrade_for_llm_review\run_backtest_no_transformer_new.py", line 234, in _process_single_stock
-    trades_df, stats, result_df = run_backtest_loop_no_transformer(
-                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "E:\autotrade\autotrade_for_llm_review\backtest\engine_no_transformer_new.py", line 168, in run_backtest_loop_no_transformer
-    df['score'] += df[col] * (w / weight_sum)
-                   ~~~~~~~~^~~~~~~~~~~~~~~~~~
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\common.py", line 76, in new_method
-    return method(self, other)
-           ^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\arraylike.py", line 202, in __mul__
-    return self._arith_method(other, operator.mul)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\series.py", line 6135, in _arith_method
-    return base.IndexOpsMixin._arith_method(self, other, op)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\base.py", line 1382, in _arith_method
-    result = ops.arithmetic_op(lvalues, rvalues, op)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\array_ops.py", line 283, in arithmetic_op
-    res_values = _na_arithmetic_op(left, right, op)  # type: ignore[arg-type]
-                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\array_ops.py", line 227, in _na_arithmetic_op
-    result = _masked_arith_op(left, right, op)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\array_ops.py", line 182, in _masked_arith_op
-    result[mask] = op(xrav[mask], y)
-                   ^^^^^^^^^^^^^^^^^
-TypeError: can't multiply sequence by non-int of type 'float'
+  File "E:\autotrade\autotrade_for_llm_review\run_backtest_no_transformer_new.py", line 463, in main
+    visualize_backtest_with_split(
+  File "E:\autotrade\autotrade_for_llm_review\backtest\visualizer.py", line 114, in visualize_backtest_with_split
+    regime = get_market_regime(market_data, buy_date) if market_data is not None else 'neutral'
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\autotrade\autotrade_for_llm_review\data\indicators.py", line 263, in get_market_regime
+    ma20 = market_data['MA20'].iloc[idx]
+           ~~~~~~~~~~~^^^^^^^^
+  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\frame.py", line 4102, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\indexes\base.py", line 3812, in get_loc
+    raise KeyError(key) from err
+KeyError: 'MA20'
+ ✗ 海康威视 图表生成失败: 'MA20'
+Traceback (most recent call last):
+  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\indexes\base.py", line 3805, in get_loc
+    return self._engine.get_loc(casted_key)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "index.pyx", line 167, in pandas._libs.index.IndexEngine.get_loc
+  File "index.pyx", line 196, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas\\_libs\\hashtable_class_helper.pxi", line 7081, in pandas._libs.hashtable.PyObjectHashTable.get_item
+  File "pandas\\_libs\\hashtable_class_helper.pxi", line 7089, in pandas._libs.hashtable.PyObjectHashTable.get_item
+KeyError: 'MA20'
 
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-2026-04-05 22:45:09,516 - backtest.optimizer_new - WARNING - 因子 股票名称 IC全为NaN，使用默认权重
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-2026-04-05 22:45:10,174 - backtest.optimizer_new - WARNING - 因子 股票代码 IC全为NaN，使用默认权重
-2026-04-05 22:45:10,344 - backtest.optimizer_new - INFO - 动态权重计算完成: 7 个因子
-2026-04-05 22:45:10,600 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=-999.0000
-2026-04-05 22:45:10,600 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
-2026-04-05 22:45:10,600 - backtest.engine_no_transformer_new - INFO - [隆基绿能] 开始回测，数据长度: 671，因子数: 7
-2026-04-05 22:45:10,603 - __mp_main__ - ERROR - 处理股票 隆基绿能 时出错: can't multiply sequence by non-int of type 'float'
-2026-04-05 22:45:10,605 - __mp_main__ - ERROR - Traceback (most recent call last):
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\array_ops.py", line 218, in _na_arithmetic_op
-    result = func(left, right)
-             ^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\computation\expressions.py", line 242, in evaluate
-    return _evaluate(op, op_str, a, b)  # type: ignore[misc]
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\computation\expressions.py", line 131, in _evaluate_numexpr
-    result = _evaluate_standard(op, op_str, a, b)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\computation\expressions.py", line 73, in _evaluate_standard
-    return op(a, b)
-           ^^^^^^^^
-TypeError: can't multiply sequence by non-int of type 'float'
-
-During handling of the above exception, another exception occurred:
+The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "E:\autotrade\autotrade_for_llm_review\run_backtest_no_transformer_new.py", line 234, in _process_single_stock
-    trades_df, stats, result_df = run_backtest_loop_no_transformer(
-                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "E:\autotrade\autotrade_for_llm_review\backtest\engine_no_transformer_new.py", line 168, in run_backtest_loop_no_transformer
-    df['score'] += df[col] * (w / weight_sum)
-                   ~~~~~~~~^~~~~~~~~~~~~~~~~~
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\common.py", line 76, in new_method
-    return method(self, other)
-           ^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\arraylike.py", line 202, in __mul__
-    return self._arith_method(other, operator.mul)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\series.py", line 6135, in _arith_method
-    return base.IndexOpsMixin._arith_method(self, other, op)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\base.py", line 1382, in _arith_method
-    result = ops.arithmetic_op(lvalues, rvalues, op)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\array_ops.py", line 283, in arithmetic_op
-    res_values = _na_arithmetic_op(left, right, op)  # type: ignore[arg-type]
-                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\array_ops.py", line 227, in _na_arithmetic_op
-    result = _masked_arith_op(left, right, op)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\array_ops.py", line 182, in _masked_arith_op
-    result[mask] = op(xrav[mask], y)
-                   ^^^^^^^^^^^^^^^^^
-TypeError: can't multiply sequence by non-int of type 'float'
+  File "E:\autotrade\autotrade_for_llm_review\run_backtest_no_transformer_new.py", line 463, in main
+    visualize_backtest_with_split(
+  File "E:\autotrade\autotrade_for_llm_review\backtest\visualizer.py", line 114, in visualize_backtest_with_split
+    regime = get_market_regime(market_data, buy_date) if market_data is not None else 'neutral'
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\autotrade\autotrade_for_llm_review\data\indicators.py", line 263, in get_market_regime
+    ma20 = market_data['MA20'].iloc[idx]
+           ~~~~~~~~~~~^^^^^^^^
+  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\frame.py", line 4102, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\indexes\base.py", line 3812, in get_loc
+    raise KeyError(key) from err
+KeyError: 'MA20'
+ ✗ 中信证券 图表生成失败: 'MA20'
+Traceback (most recent call last):
+  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\indexes\base.py", line 3805, in get_loc
+    return self._engine.get_loc(casted_key)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "index.pyx", line 167, in pandas._libs.index.IndexEngine.get_loc
+  File "index.pyx", line 196, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas\\_libs\\hashtable_class_helper.pxi", line 7081, in pandas._libs.hashtable.PyObjectHashTable.get_item
+  File "pandas\\_libs\\hashtable_class_helper.pxi", line 7089, in pandas._libs.hashtable.PyObjectHashTable.get_item
+KeyError: 'MA20'
 
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-2026-04-05 22:45:11,692 - backtest.optimizer_new - WARNING - 因子 股票名称 IC全为NaN，使用默认权重
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-2026-04-05 22:45:12,741 - backtest.optimizer_new - WARNING - 因子 股票代码 IC全为NaN，使用默认权重
-2026-04-05 22:45:13,990 - backtest.optimizer_new - INFO - 动态权重计算完成: 7 个因子
-2026-04-05 22:45:14,209 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=-999.0000
-2026-04-05 22:45:14,210 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
-2026-04-05 22:45:14,210 - backtest.engine_no_transformer_new - INFO - [贵州茅台] 开始回测，数据长度: 1178，因子数: 7
-2026-04-05 22:45:14,211 - __mp_main__ - ERROR - 处理股票 贵州茅台 时出错: can't multiply sequence by non-int of type 'float'
-2026-04-05 22:45:14,213 - __mp_main__ - ERROR - Traceback (most recent call last):
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\array_ops.py", line 218, in _na_arithmetic_op
-    result = func(left, right)
-             ^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\computation\expressions.py", line 242, in evaluate
-    return _evaluate(op, op_str, a, b)  # type: ignore[misc]
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\computation\expressions.py", line 131, in _evaluate_numexpr
-    result = _evaluate_standard(op, op_str, a, b)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\computation\expressions.py", line 73, in _evaluate_standard
-    return op(a, b)
-           ^^^^^^^^
-TypeError: can't multiply sequence by non-int of type 'float'
-
-During handling of the above exception, another exception occurred:
+The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "E:\autotrade\autotrade_for_llm_review\run_backtest_no_transformer_new.py", line 234, in _process_single_stock
-    trades_df, stats, result_df = run_backtest_loop_no_transformer(
-                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "E:\autotrade\autotrade_for_llm_review\backtest\engine_no_transformer_new.py", line 168, in run_backtest_loop_no_transformer
-    df['score'] += df[col] * (w / weight_sum)
-                   ~~~~~~~~^~~~~~~~~~~~~~~~~~
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\common.py", line 76, in new_method
-    return method(self, other)
-           ^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\arraylike.py", line 202, in __mul__
-    return self._arith_method(other, operator.mul)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\series.py", line 6135, in _arith_method
-    return base.IndexOpsMixin._arith_method(self, other, op)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\base.py", line 1382, in _arith_method
-    result = ops.arithmetic_op(lvalues, rvalues, op)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\array_ops.py", line 283, in arithmetic_op
-    res_values = _na_arithmetic_op(left, right, op)  # type: ignore[arg-type]
-                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\array_ops.py", line 227, in _na_arithmetic_op
-    result = _masked_arith_op(left, right, op)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\array_ops.py", line 182, in _masked_arith_op
-    result[mask] = op(xrav[mask], y)
-                   ^^^^^^^^^^^^^^^^^
-TypeError: can't multiply sequence by non-int of type 'float'
+  File "E:\autotrade\autotrade_for_llm_review\run_backtest_no_transformer_new.py", line 463, in main
+    visualize_backtest_with_split(
+  File "E:\autotrade\autotrade_for_llm_review\backtest\visualizer.py", line 114, in visualize_backtest_with_split
+    regime = get_market_regime(market_data, buy_date) if market_data is not None else 'neutral'
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\autotrade\autotrade_for_llm_review\data\indicators.py", line 263, in get_market_regime
+    ma20 = market_data['MA20'].iloc[idx]
+           ~~~~~~~~~~~^^^^^^^^
+  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\frame.py", line 4102, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\indexes\base.py", line 3812, in get_loc
+    raise KeyError(key) from err
+KeyError: 'MA20'
+ ✗ 恒瑞医药 图表生成失败: 'MA20'
+Traceback (most recent call last):
+  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\indexes\base.py", line 3805, in get_loc
+    return self._engine.get_loc(casted_key)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "index.pyx", line 167, in pandas._libs.index.IndexEngine.get_loc
+  File "index.pyx", line 196, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas\\_libs\\hashtable_class_helper.pxi", line 7081, in pandas._libs.hashtable.PyObjectHashTable.get_item
+  File "pandas\\_libs\\hashtable_class_helper.pxi", line 7089, in pandas._libs.hashtable.PyObjectHashTable.get_item
+KeyError: 'MA20'
 
-回测进度:   5%|███▋                                                                     | 1/20 [00:16<05:09, 16.29s/it]E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-2026-04-05 22:45:14,777 - backtest.optimizer_new - INFO - 动态权重计算完成: 7 个因子
-2026-04-05 22:45:14,985 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=-999.0000
-2026-04-05 22:45:14,986 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
-2026-04-05 22:45:14,986 - backtest.engine_no_transformer_new - INFO - [国轩高科] 开始回测，数据长度: 899，因子数: 7
-2026-04-05 22:45:14,987 - __mp_main__ - ERROR - 处理股票 国轩高科 时出错: can't multiply sequence by non-int of type 'float'
-2026-04-05 22:45:14,989 - __mp_main__ - ERROR - Traceback (most recent call last):
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\array_ops.py", line 218, in _na_arithmetic_op
-    result = func(left, right)
-             ^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\computation\expressions.py", line 242, in evaluate
-    return _evaluate(op, op_str, a, b)  # type: ignore[misc]
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\computation\expressions.py", line 131, in _evaluate_numexpr
-    result = _evaluate_standard(op, op_str, a, b)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\computation\expressions.py", line 73, in _evaluate_standard
-    return op(a, b)
-           ^^^^^^^^
-TypeError: can't multiply sequence by non-int of type 'float'
-
-During handling of the above exception, another exception occurred:
+The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "E:\autotrade\autotrade_for_llm_review\run_backtest_no_transformer_new.py", line 234, in _process_single_stock
-    trades_df, stats, result_df = run_backtest_loop_no_transformer(
-                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "E:\autotrade\autotrade_for_llm_review\backtest\engine_no_transformer_new.py", line 168, in run_backtest_loop_no_transformer
-    df['score'] += df[col] * (w / weight_sum)
-                   ~~~~~~~~^~~~~~~~~~~~~~~~~~
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\common.py", line 76, in new_method
-    return method(self, other)
-           ^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\arraylike.py", line 202, in __mul__
-    return self._arith_method(other, operator.mul)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\series.py", line 6135, in _arith_method
-    return base.IndexOpsMixin._arith_method(self, other, op)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\base.py", line 1382, in _arith_method
-    result = ops.arithmetic_op(lvalues, rvalues, op)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\array_ops.py", line 283, in arithmetic_op
-    res_values = _na_arithmetic_op(left, right, op)  # type: ignore[arg-type]
-                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\array_ops.py", line 227, in _na_arithmetic_op
-    result = _masked_arith_op(left, right, op)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\array_ops.py", line 182, in _masked_arith_op
-    result[mask] = op(xrav[mask], y)
-                   ^^^^^^^^^^^^^^^^^
-TypeError: can't multiply sequence by non-int of type 'float'
+  File "E:\autotrade\autotrade_for_llm_review\run_backtest_no_transformer_new.py", line 463, in main
+    visualize_backtest_with_split(
+  File "E:\autotrade\autotrade_for_llm_review\backtest\visualizer.py", line 114, in visualize_backtest_with_split
+    regime = get_market_regime(market_data, buy_date) if market_data is not None else 'neutral'
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\autotrade\autotrade_for_llm_review\data\indicators.py", line 263, in get_market_regime
+    ma20 = market_data['MA20'].iloc[idx]
+           ~~~~~~~~~~~^^^^^^^^
+  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\frame.py", line 4102, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\indexes\base.py", line 3812, in get_loc
+    raise KeyError(key) from err
+KeyError: 'MA20'
+ ✗ 长江电力 图表生成失败: 'MA20'
+Traceback (most recent call last):
+  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\indexes\base.py", line 3805, in get_loc
+    return self._engine.get_loc(casted_key)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "index.pyx", line 167, in pandas._libs.index.IndexEngine.get_loc
+  File "index.pyx", line 196, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas\\_libs\\hashtable_class_helper.pxi", line 7081, in pandas._libs.hashtable.PyObjectHashTable.get_item
+  File "pandas\\_libs\\hashtable_class_helper.pxi", line 7089, in pandas._libs.hashtable.PyObjectHashTable.get_item
+KeyError: 'MA20'
 
-回测进度:  15%|██████████▉                                                              | 3/20 [00:17<01:16,  4.51s/it]E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-2026-04-05 22:45:15,385 - backtest.optimizer_new - WARNING - 因子 股票名称 IC全为NaN，使用默认权重
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-2026-04-05 22:45:16,081 - backtest.optimizer_new - WARNING - 因子 股票名称 IC全为NaN，使用默认权重
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-2026-04-05 22:45:16,625 - backtest.optimizer_new - WARNING - 因子 股票代码 IC全为NaN，使用默认权重
-2026-04-05 22:45:17,173 - backtest.optimizer_new - WARNING - 因子 股票代码 IC全为NaN，使用默认权重
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-2026-04-05 22:45:17,419 - backtest.optimizer_new - INFO - 动态权重计算完成: 7 个因子
-2026-04-05 22:45:17,626 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=-999.0000
-2026-04-05 22:45:17,626 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
-2026-04-05 22:45:17,626 - backtest.engine_no_transformer_new - INFO - [赛力斯] 开始回测，数据长度: 471，因子数: 7
-2026-04-05 22:45:17,631 - __mp_main__ - ERROR - 处理股票 赛力斯 时出错: can't multiply sequence by non-int of type 'float'
-2026-04-05 22:45:17,632 - __mp_main__ - ERROR - Traceback (most recent call last):
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\array_ops.py", line 218, in _na_arithmetic_op
-    result = func(left, right)
-             ^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\computation\expressions.py", line 242, in evaluate
-    return _evaluate(op, op_str, a, b)  # type: ignore[misc]
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\computation\expressions.py", line 131, in _evaluate_numexpr
-    result = _evaluate_standard(op, op_str, a, b)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\computation\expressions.py", line 73, in _evaluate_standard
-    return op(a, b)
-           ^^^^^^^^
-TypeError: can't multiply sequence by non-int of type 'float'
-
-During handling of the above exception, another exception occurred:
+The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "E:\autotrade\autotrade_for_llm_review\run_backtest_no_transformer_new.py", line 234, in _process_single_stock
-    trades_df, stats, result_df = run_backtest_loop_no_transformer(
-                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "E:\autotrade\autotrade_for_llm_review\backtest\engine_no_transformer_new.py", line 168, in run_backtest_loop_no_transformer
-    df['score'] += df[col] * (w / weight_sum)
-                   ~~~~~~~~^~~~~~~~~~~~~~~~~~
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\common.py", line 76, in new_method
-    return method(self, other)
-           ^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\arraylike.py", line 202, in __mul__
-    return self._arith_method(other, operator.mul)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\series.py", line 6135, in _arith_method
-    return base.IndexOpsMixin._arith_method(self, other, op)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\base.py", line 1382, in _arith_method
-    result = ops.arithmetic_op(lvalues, rvalues, op)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\array_ops.py", line 283, in arithmetic_op
-    res_values = _na_arithmetic_op(left, right, op)  # type: ignore[arg-type]
-                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\array_ops.py", line 227, in _na_arithmetic_op
-    result = _masked_arith_op(left, right, op)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\array_ops.py", line 182, in _masked_arith_op
-    result[mask] = op(xrav[mask], y)
-                   ^^^^^^^^^^^^^^^^^
-TypeError: can't multiply sequence by non-int of type 'float'
+  File "E:\autotrade\autotrade_for_llm_review\run_backtest_no_transformer_new.py", line 463, in main
+    visualize_backtest_with_split(
+  File "E:\autotrade\autotrade_for_llm_review\backtest\visualizer.py", line 114, in visualize_backtest_with_split
+    regime = get_market_regime(market_data, buy_date) if market_data is not None else 'neutral'
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\autotrade\autotrade_for_llm_review\data\indicators.py", line 263, in get_market_regime
+    ma20 = market_data['MA20'].iloc[idx]
+           ~~~~~~~~~~~^^^^^^^^
+  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\frame.py", line 4102, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\indexes\base.py", line 3812, in get_loc
+    raise KeyError(key) from err
+KeyError: 'MA20'
+ ✗ 北新建材 图表生成失败: 'MA20'
 
-回测进度:  25%|██████████████████▎                                                      | 5/20 [00:19<00:43,  2.87s/it]E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-2026-04-05 22:45:19,281 - backtest.optimizer_new - WARNING - 因子 股票名称 IC全为NaN，使用默认权重
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-2026-04-05 22:45:20,912 - backtest.optimizer_new - WARNING - 因子 股票代码 IC全为NaN，使用默认权重
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-2026-04-05 22:45:23,875 - backtest.optimizer_new - INFO - 动态权重计算完成: 7 个因子
-2026-04-05 22:45:24,091 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=-999.0000
-2026-04-05 22:45:24,091 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
-2026-04-05 22:45:24,092 - backtest.engine_no_transformer_new - INFO - [比亚迪] 开始回测，数据长度: 714，因子数: 7
-2026-04-05 22:45:24,093 - __mp_main__ - ERROR - 处理股票 比亚迪 时出错: can't multiply sequence by non-int of type 'float'
-2026-04-05 22:45:24,093 - __mp_main__ - ERROR - Traceback (most recent call last):
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\array_ops.py", line 218, in _na_arithmetic_op
-    result = func(left, right)
-             ^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\computation\expressions.py", line 242, in evaluate
-    return _evaluate(op, op_str, a, b)  # type: ignore[misc]
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\computation\expressions.py", line 131, in _evaluate_numexpr
-    result = _evaluate_standard(op, op_str, a, b)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\computation\expressions.py", line 73, in _evaluate_standard
-    return op(a, b)
-           ^^^^^^^^
-TypeError: can't multiply sequence by non-int of type 'float'
+================================================================================
+所有可视化图表生成完成！目录: ./stock_cache/no_transformer_results\backtest_charts
+================================================================================
+Traceback (most recent call last):
+  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\indexes\base.py", line 3805, in get_loc
+    return self._engine.get_loc(casted_key)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "index.pyx", line 167, in pandas._libs.index.IndexEngine.get_loc
+  File "index.pyx", line 196, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas\\_libs\\hashtable_class_helper.pxi", line 7081, in pandas._libs.hashtable.PyObjectHashTable.get_item
+  File "pandas\\_libs\\hashtable_class_helper.pxi", line 7089, in pandas._libs.hashtable.PyObjectHashTable.get_item
+KeyError: 'MA20'
 
-During handling of the above exception, another exception occurred:
+The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "E:\autotrade\autotrade_for_llm_review\run_backtest_no_transformer_new.py", line 234, in _process_single_stock
-    trades_df, stats, result_df = run_backtest_loop_no_transformer(
-                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "E:\autotrade\autotrade_for_llm_review\backtest\engine_no_transformer_new.py", line 168, in run_backtest_loop_no_transformer
-    df['score'] += df[col] * (w / weight_sum)
-                   ~~~~~~~~^~~~~~~~~~~~~~~~~~
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\common.py", line 76, in new_method
-    return method(self, other)
-           ^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\arraylike.py", line 202, in __mul__
-    return self._arith_method(other, operator.mul)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\series.py", line 6135, in _arith_method
-    return base.IndexOpsMixin._arith_method(self, other, op)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\base.py", line 1382, in _arith_method
-    result = ops.arithmetic_op(lvalues, rvalues, op)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\array_ops.py", line 283, in arithmetic_op
-    res_values = _na_arithmetic_op(left, right, op)  # type: ignore[arg-type]
-                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\array_ops.py", line 227, in _na_arithmetic_op
-    result = _masked_arith_op(left, right, op)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\array_ops.py", line 182, in _masked_arith_op
-    result[mask] = op(xrav[mask], y)
-                   ^^^^^^^^^^^^^^^^^
-TypeError: can't multiply sequence by non-int of type 'float'
-
-回测进度:  30%|█████████████████████▉                                                   | 6/20 [00:26<00:53,  3.84s/it]E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-2026-04-05 22:45:25,266 - backtest.optimizer_new - WARNING - 因子 股票名称 IC全为NaN，使用默认权重
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-2026-04-05 22:45:26,465 - backtest.optimizer_new - WARNING - 因子 股票代码 IC全为NaN，使用默认权重
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-2026-04-05 22:45:28,116 - backtest.optimizer_new - INFO - 动态权重计算完成: 7 个因子
-2026-04-05 22:45:28,372 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=-999.0000
-2026-04-05 22:45:28,372 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
-2026-04-05 22:45:28,373 - backtest.engine_no_transformer_new - INFO - [海康威视] 开始回测，数据长度: 758，因子数: 7
-2026-04-05 22:45:28,373 - __mp_main__ - ERROR - 处理股票 海康威视 时出错: can't multiply sequence by non-int of type 'float'
-2026-04-05 22:45:28,374 - __mp_main__ - ERROR - Traceback (most recent call last):
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\array_ops.py", line 218, in _na_arithmetic_op
-    result = func(left, right)
-             ^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\computation\expressions.py", line 242, in evaluate
-    return _evaluate(op, op_str, a, b)  # type: ignore[misc]
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\computation\expressions.py", line 131, in _evaluate_numexpr
-    result = _evaluate_standard(op, op_str, a, b)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\computation\expressions.py", line 73, in _evaluate_standard
-    return op(a, b)
-           ^^^^^^^^
-TypeError: can't multiply sequence by non-int of type 'float'
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "E:\autotrade\autotrade_for_llm_review\run_backtest_no_transformer_new.py", line 234, in _process_single_stock
-    trades_df, stats, result_df = run_backtest_loop_no_transformer(
-                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "E:\autotrade\autotrade_for_llm_review\backtest\engine_no_transformer_new.py", line 168, in run_backtest_loop_no_transformer
-    df['score'] += df[col] * (w / weight_sum)
-                   ~~~~~~~~^~~~~~~~~~~~~~~~~~
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\common.py", line 76, in new_method
-    return method(self, other)
-           ^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\arraylike.py", line 202, in __mul__
-    return self._arith_method(other, operator.mul)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\series.py", line 6135, in _arith_method
-    return base.IndexOpsMixin._arith_method(self, other, op)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\base.py", line 1382, in _arith_method
-    result = ops.arithmetic_op(lvalues, rvalues, op)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\array_ops.py", line 283, in arithmetic_op
-    res_values = _na_arithmetic_op(left, right, op)  # type: ignore[arg-type]
-                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\array_ops.py", line 227, in _na_arithmetic_op
-    result = _masked_arith_op(left, right, op)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\array_ops.py", line 182, in _masked_arith_op
-    result[mask] = op(xrav[mask], y)
-                   ^^^^^^^^^^^^^^^^^
-TypeError: can't multiply sequence by non-int of type 'float'
-
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-2026-04-05 22:45:30,330 - backtest.optimizer_new - WARNING - 因子 股票名称 IC全为NaN，使用默认权重
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-2026-04-05 22:45:30,441 - backtest.optimizer_new - INFO - 动态权重计算完成: 7 个因子
-2026-04-05 22:45:30,706 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=-999.0000
-2026-04-05 22:45:30,706 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
-2026-04-05 22:45:30,706 - backtest.engine_no_transformer_new - INFO - [科大讯飞] 开始回测，数据长度: 852，因子数: 7
-2026-04-05 22:45:30,706 - __mp_main__ - ERROR - 处理股票 科大讯飞 时出错: can't multiply sequence by non-int of type 'float'
-2026-04-05 22:45:30,710 - __mp_main__ - ERROR - Traceback (most recent call last):
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\array_ops.py", line 218, in _na_arithmetic_op
-    result = func(left, right)
-             ^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\computation\expressions.py", line 242, in evaluate
-    return _evaluate(op, op_str, a, b)  # type: ignore[misc]
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\computation\expressions.py", line 131, in _evaluate_numexpr
-    result = _evaluate_standard(op, op_str, a, b)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\computation\expressions.py", line 73, in _evaluate_standard
-    return op(a, b)
-           ^^^^^^^^
-TypeError: can't multiply sequence by non-int of type 'float'
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "E:\autotrade\autotrade_for_llm_review\run_backtest_no_transformer_new.py", line 234, in _process_single_stock
-    trades_df, stats, result_df = run_backtest_loop_no_transformer(
-                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "E:\autotrade\autotrade_for_llm_review\backtest\engine_no_transformer_new.py", line 168, in run_backtest_loop_no_transformer
-    df['score'] += df[col] * (w / weight_sum)
-                   ~~~~~~~~^~~~~~~~~~~~~~~~~~
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\common.py", line 76, in new_method
-    return method(self, other)
-           ^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\arraylike.py", line 202, in __mul__
-    return self._arith_method(other, operator.mul)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\series.py", line 6135, in _arith_method
-    return base.IndexOpsMixin._arith_method(self, other, op)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\base.py", line 1382, in _arith_method
-    result = ops.arithmetic_op(lvalues, rvalues, op)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\array_ops.py", line 283, in arithmetic_op
-    res_values = _na_arithmetic_op(left, right, op)  # type: ignore[arg-type]
-                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\array_ops.py", line 227, in _na_arithmetic_op
-    result = _masked_arith_op(left, right, op)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\array_ops.py", line 182, in _masked_arith_op
-    result[mask] = op(xrav[mask], y)
-                   ^^^^^^^^^^^^^^^^^
-TypeError: can't multiply sequence by non-int of type 'float'
-
-回测进度:  35%|█████████████████████████▌                                               | 7/20 [00:32<00:59,  4.61s/it]E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-2026-04-05 22:45:32,093 - backtest.optimizer_new - WARNING - 因子 股票代码 IC全为NaN，使用默认权重
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-2026-04-05 22:45:32,204 - backtest.optimizer_new - WARNING - 因子 股票名称 IC全为NaN，使用默认权重
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-2026-04-05 22:45:33,735 - backtest.optimizer_new - WARNING - 因子 股票代码 IC全为NaN，使用默认权重
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-2026-04-05 22:45:37,162 - backtest.optimizer_new - INFO - 动态权重计算完成: 7 个因子
-2026-04-05 22:45:37,369 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=-999.0000
-2026-04-05 22:45:37,369 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
-2026-04-05 22:45:37,370 - backtest.engine_no_transformer_new - INFO - [中信证券] 开始回测，数据长度: 1108，因子数: 7
-2026-04-05 22:45:37,370 - __mp_main__ - ERROR - 处理股票 中信证券 时出错: can't multiply sequence by non-int of type 'float'
-2026-04-05 22:45:37,371 - __mp_main__ - ERROR - Traceback (most recent call last):
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\array_ops.py", line 218, in _na_arithmetic_op
-    result = func(left, right)
-             ^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\computation\expressions.py", line 242, in evaluate
-    return _evaluate(op, op_str, a, b)  # type: ignore[misc]
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\computation\expressions.py", line 131, in _evaluate_numexpr
-    result = _evaluate_standard(op, op_str, a, b)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\computation\expressions.py", line 73, in _evaluate_standard
-    return op(a, b)
-           ^^^^^^^^
-TypeError: can't multiply sequence by non-int of type 'float'
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "E:\autotrade\autotrade_for_llm_review\run_backtest_no_transformer_new.py", line 234, in _process_single_stock
-    trades_df, stats, result_df = run_backtest_loop_no_transformer(
-                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "E:\autotrade\autotrade_for_llm_review\backtest\engine_no_transformer_new.py", line 168, in run_backtest_loop_no_transformer
-    df['score'] += df[col] * (w / weight_sum)
-                   ~~~~~~~~^~~~~~~~~~~~~~~~~~
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\common.py", line 76, in new_method
-    return method(self, other)
-           ^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\arraylike.py", line 202, in __mul__
-    return self._arith_method(other, operator.mul)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\series.py", line 6135, in _arith_method
-    return base.IndexOpsMixin._arith_method(self, other, op)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\base.py", line 1382, in _arith_method
-    result = ops.arithmetic_op(lvalues, rvalues, op)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\array_ops.py", line 283, in arithmetic_op
-    res_values = _na_arithmetic_op(left, right, op)  # type: ignore[arg-type]
-                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\array_ops.py", line 227, in _na_arithmetic_op
-    result = _masked_arith_op(left, right, op)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\array_ops.py", line 182, in _masked_arith_op
-    result[mask] = op(xrav[mask], y)
-                   ^^^^^^^^^^^^^^^^^
-TypeError: can't multiply sequence by non-int of type 'float'
-
-回测进度:  45%|████████████████████████████████▊                                        | 9/20 [00:39<00:44,  4.04s/it]E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-2026-04-05 22:45:38,524 - backtest.optimizer_new - WARNING - 因子 股票名称 IC全为NaN，使用默认权重
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-2026-04-05 22:45:39,056 - backtest.optimizer_new - INFO - 动态权重计算完成: 7 个因子
-2026-04-05 22:45:39,252 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=-999.0000
-2026-04-05 22:45:39,252 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
-2026-04-05 22:45:39,252 - backtest.engine_no_transformer_new - INFO - [光迅科技] 开始回测，数据长度: 793，因子数: 7
-2026-04-05 22:45:39,253 - __mp_main__ - ERROR - 处理股票 光迅科技 时出错: can't multiply sequence by non-int of type 'float'
-2026-04-05 22:45:39,254 - __mp_main__ - ERROR - Traceback (most recent call last):
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\array_ops.py", line 218, in _na_arithmetic_op
-    result = func(left, right)
-             ^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\computation\expressions.py", line 242, in evaluate
-    return _evaluate(op, op_str, a, b)  # type: ignore[misc]
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\computation\expressions.py", line 131, in _evaluate_numexpr
-    result = _evaluate_standard(op, op_str, a, b)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\computation\expressions.py", line 73, in _evaluate_standard
-    return op(a, b)
-           ^^^^^^^^
-TypeError: can't multiply sequence by non-int of type 'float'
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "E:\autotrade\autotrade_for_llm_review\run_backtest_no_transformer_new.py", line 234, in _process_single_stock
-    trades_df, stats, result_df = run_backtest_loop_no_transformer(
-                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "E:\autotrade\autotrade_for_llm_review\backtest\engine_no_transformer_new.py", line 168, in run_backtest_loop_no_transformer
-    df['score'] += df[col] * (w / weight_sum)
-                   ~~~~~~~~^~~~~~~~~~~~~~~~~~
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\common.py", line 76, in new_method
-    return method(self, other)
-           ^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\arraylike.py", line 202, in __mul__
-    return self._arith_method(other, operator.mul)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\series.py", line 6135, in _arith_method
-    return base.IndexOpsMixin._arith_method(self, other, op)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\base.py", line 1382, in _arith_method
-    result = ops.arithmetic_op(lvalues, rvalues, op)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\array_ops.py", line 283, in arithmetic_op
-    res_values = _na_arithmetic_op(left, right, op)  # type: ignore[arg-type]
-                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\array_ops.py", line 227, in _na_arithmetic_op
-    result = _masked_arith_op(left, right, op)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\array_ops.py", line 182, in _masked_arith_op
-    result[mask] = op(xrav[mask], y)
-                   ^^^^^^^^^^^^^^^^^
-TypeError: can't multiply sequence by non-int of type 'float'
-
-回测进度:  50%|████████████████████████████████████                                    | 10/20 [00:41<00:35,  3.52s/it]E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-2026-04-05 22:45:39,641 - backtest.optimizer_new - WARNING - 因子 股票代码 IC全为NaN，使用默认权重
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-2026-04-05 22:45:40,563 - backtest.optimizer_new - WARNING - 因子 股票名称 IC全为NaN，使用默认权重
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-2026-04-05 22:45:41,911 - backtest.optimizer_new - WARNING - 因子 股票代码 IC全为NaN，使用默认权重
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-2026-04-05 22:45:47,814 - backtest.optimizer_new - INFO - 动态权重计算完成: 7 个因子
-2026-04-05 22:45:48,021 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=-999.0000
-2026-04-05 22:45:48,021 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
-2026-04-05 22:45:48,021 - backtest.engine_no_transformer_new - INFO - [恒瑞医药] 开始回测，数据长度: 1225，因子数: 7
-2026-04-05 22:45:48,021 - __mp_main__ - ERROR - 处理股票 恒瑞医药 时出错: can't multiply sequence by non-int of type 'float'
-2026-04-05 22:45:48,021 - __mp_main__ - ERROR - Traceback (most recent call last):
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\array_ops.py", line 218, in _na_arithmetic_op
-    result = func(left, right)
-             ^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\computation\expressions.py", line 242, in evaluate
-    return _evaluate(op, op_str, a, b)  # type: ignore[misc]
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\computation\expressions.py", line 131, in _evaluate_numexpr
-    result = _evaluate_standard(op, op_str, a, b)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\computation\expressions.py", line 73, in _evaluate_standard
-    return op(a, b)
-           ^^^^^^^^
-TypeError: can't multiply sequence by non-int of type 'float'
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "E:\autotrade\autotrade_for_llm_review\run_backtest_no_transformer_new.py", line 234, in _process_single_stock
-    trades_df, stats, result_df = run_backtest_loop_no_transformer(
-                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "E:\autotrade\autotrade_for_llm_review\backtest\engine_no_transformer_new.py", line 168, in run_backtest_loop_no_transformer
-    df['score'] += df[col] * (w / weight_sum)
-                   ~~~~~~~~^~~~~~~~~~~~~~~~~~
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\common.py", line 76, in new_method
-    return method(self, other)
-           ^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\arraylike.py", line 202, in __mul__
-    return self._arith_method(other, operator.mul)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\series.py", line 6135, in _arith_method
-    return base.IndexOpsMixin._arith_method(self, other, op)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\base.py", line 1382, in _arith_method
-    result = ops.arithmetic_op(lvalues, rvalues, op)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\array_ops.py", line 283, in arithmetic_op
-    res_values = _na_arithmetic_op(left, right, op)  # type: ignore[arg-type]
-                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\array_ops.py", line 227, in _na_arithmetic_op
-    result = _masked_arith_op(left, right, op)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\array_ops.py", line 182, in _masked_arith_op
-    result[mask] = op(xrav[mask], y)
-                   ^^^^^^^^^^^^^^^^^
-TypeError: can't multiply sequence by non-int of type 'float'
-
-回测进度:  55%|███████████████████████████████████████▌                                | 11/20 [00:50<00:43,  4.86s/it]E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-2026-04-05 22:45:48,388 - backtest.optimizer_new - INFO - 动态权重计算完成: 7 个因子
-2026-04-05 22:45:48,595 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=-999.0000
-2026-04-05 22:45:48,596 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
-2026-04-05 22:45:48,596 - backtest.engine_no_transformer_new - INFO - [山东黄金] 开始回测，数据长度: 1049，因子数: 7
-2026-04-05 22:45:48,597 - __mp_main__ - ERROR - 处理股票 山东黄金 时出错: can't multiply sequence by non-int of type 'float'
-2026-04-05 22:45:48,598 - __mp_main__ - ERROR - Traceback (most recent call last):
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\array_ops.py", line 218, in _na_arithmetic_op
-    result = func(left, right)
-             ^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\computation\expressions.py", line 242, in evaluate
-    return _evaluate(op, op_str, a, b)  # type: ignore[misc]
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\computation\expressions.py", line 131, in _evaluate_numexpr
-    result = _evaluate_standard(op, op_str, a, b)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\computation\expressions.py", line 73, in _evaluate_standard
-    return op(a, b)
-           ^^^^^^^^
-TypeError: can't multiply sequence by non-int of type 'float'
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "E:\autotrade\autotrade_for_llm_review\run_backtest_no_transformer_new.py", line 234, in _process_single_stock
-    trades_df, stats, result_df = run_backtest_loop_no_transformer(
-                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "E:\autotrade\autotrade_for_llm_review\backtest\engine_no_transformer_new.py", line 168, in run_backtest_loop_no_transformer
-    df['score'] += df[col] * (w / weight_sum)
-                   ~~~~~~~~^~~~~~~~~~~~~~~~~~
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\common.py", line 76, in new_method
-    return method(self, other)
-           ^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\arraylike.py", line 202, in __mul__
-    return self._arith_method(other, operator.mul)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\series.py", line 6135, in _arith_method
-    return base.IndexOpsMixin._arith_method(self, other, op)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\base.py", line 1382, in _arith_method
-    result = ops.arithmetic_op(lvalues, rvalues, op)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\array_ops.py", line 283, in arithmetic_op
-    res_values = _na_arithmetic_op(left, right, op)  # type: ignore[arg-type]
-                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\array_ops.py", line 227, in _na_arithmetic_op
-    result = _masked_arith_op(left, right, op)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\array_ops.py", line 182, in _masked_arith_op
-    result[mask] = op(xrav[mask], y)
-                   ^^^^^^^^^^^^^^^^^
-TypeError: can't multiply sequence by non-int of type 'float'
-
-回测进度:  60%|███████████████████████████████████████████▏                            | 12/20 [00:50<00:29,  3.72s/it]E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-2026-04-05 22:45:49,749 - backtest.optimizer_new - WARNING - 因子 股票名称 IC全为NaN，使用默认权重
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-2026-04-05 22:45:50,134 - backtest.optimizer_new - WARNING - 因子 股票名称 IC全为NaN，使用默认权重
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-2026-04-05 22:45:50,919 - backtest.optimizer_new - WARNING - 因子 股票代码 IC全为NaN，使用默认权重
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-2026-04-05 22:45:52,110 - backtest.optimizer_new - WARNING - 因子 股票代码 IC全为NaN，使用默认权重
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-2026-04-05 22:45:52,264 - backtest.optimizer_new - INFO - 动态权重计算完成: 7 个因子
-2026-04-05 22:45:52,476 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=-999.0000
-2026-04-05 22:45:52,477 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
-2026-04-05 22:45:52,478 - backtest.engine_no_transformer_new - INFO - [紫金矿业] 开始回测，数据长度: 863，因子数: 7
-2026-04-05 22:45:52,478 - __mp_main__ - ERROR - 处理股票 紫金矿业 时出错: can't multiply sequence by non-int of type 'float'
-2026-04-05 22:45:52,479 - __mp_main__ - ERROR - Traceback (most recent call last):
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\array_ops.py", line 218, in _na_arithmetic_op
-    result = func(left, right)
-             ^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\computation\expressions.py", line 242, in evaluate
-    return _evaluate(op, op_str, a, b)  # type: ignore[misc]
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\computation\expressions.py", line 131, in _evaluate_numexpr
-    result = _evaluate_standard(op, op_str, a, b)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\computation\expressions.py", line 73, in _evaluate_standard
-    return op(a, b)
-           ^^^^^^^^
-TypeError: can't multiply sequence by non-int of type 'float'
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "E:\autotrade\autotrade_for_llm_review\run_backtest_no_transformer_new.py", line 234, in _process_single_stock
-    trades_df, stats, result_df = run_backtest_loop_no_transformer(
-                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "E:\autotrade\autotrade_for_llm_review\backtest\engine_no_transformer_new.py", line 168, in run_backtest_loop_no_transformer
-    df['score'] += df[col] * (w / weight_sum)
-                   ~~~~~~~~^~~~~~~~~~~~~~~~~~
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\common.py", line 76, in new_method
-    return method(self, other)
-           ^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\arraylike.py", line 202, in __mul__
-    return self._arith_method(other, operator.mul)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\series.py", line 6135, in _arith_method
-    return base.IndexOpsMixin._arith_method(self, other, op)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\base.py", line 1382, in _arith_method
-    result = ops.arithmetic_op(lvalues, rvalues, op)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\array_ops.py", line 283, in arithmetic_op
-    res_values = _na_arithmetic_op(left, right, op)  # type: ignore[arg-type]
-                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\array_ops.py", line 227, in _na_arithmetic_op
-    result = _masked_arith_op(left, right, op)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\array_ops.py", line 182, in _masked_arith_op
-    result[mask] = op(xrav[mask], y)
-                   ^^^^^^^^^^^^^^^^^
-TypeError: can't multiply sequence by non-int of type 'float'
-
-回测进度:  65%|██████████████████████████████████████████████▊                         | 13/20 [00:54<00:26,  3.76s/it]E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-2026-04-05 22:45:53,368 - backtest.optimizer_new - INFO - 动态权重计算完成: 7 个因子
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-2026-04-05 22:45:53,489 - backtest.optimizer_new - WARNING - 因子 股票名称 IC全为NaN，使用默认权重
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-2026-04-05 22:45:53,583 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=-999.0000
-2026-04-05 22:45:53,583 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
-2026-04-05 22:45:53,583 - backtest.engine_no_transformer_new - INFO - [长江电力] 开始回测，数据长度: 1002，因子数: 7
-2026-04-05 22:45:53,583 - __mp_main__ - ERROR - 处理股票 长江电力 时出错: can't multiply sequence by non-int of type 'float'
-2026-04-05 22:45:53,583 - __mp_main__ - ERROR - Traceback (most recent call last):
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\array_ops.py", line 218, in _na_arithmetic_op
-    result = func(left, right)
-             ^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\computation\expressions.py", line 242, in evaluate
-    return _evaluate(op, op_str, a, b)  # type: ignore[misc]
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\computation\expressions.py", line 131, in _evaluate_numexpr
-    result = _evaluate_standard(op, op_str, a, b)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\computation\expressions.py", line 73, in _evaluate_standard
-    return op(a, b)
-           ^^^^^^^^
-TypeError: can't multiply sequence by non-int of type 'float'
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "E:\autotrade\autotrade_for_llm_review\run_backtest_no_transformer_new.py", line 234, in _process_single_stock
-    trades_df, stats, result_df = run_backtest_loop_no_transformer(
-                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "E:\autotrade\autotrade_for_llm_review\backtest\engine_no_transformer_new.py", line 168, in run_backtest_loop_no_transformer
-    df['score'] += df[col] * (w / weight_sum)
-                   ~~~~~~~~^~~~~~~~~~~~~~~~~~
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\common.py", line 76, in new_method
-    return method(self, other)
-           ^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\arraylike.py", line 202, in __mul__
-    return self._arith_method(other, operator.mul)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\series.py", line 6135, in _arith_method
-    return base.IndexOpsMixin._arith_method(self, other, op)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\base.py", line 1382, in _arith_method
-    result = ops.arithmetic_op(lvalues, rvalues, op)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\array_ops.py", line 283, in arithmetic_op
-    res_values = _na_arithmetic_op(left, right, op)  # type: ignore[arg-type]
-                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\array_ops.py", line 227, in _na_arithmetic_op
-    result = _masked_arith_op(left, right, op)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\array_ops.py", line 182, in _masked_arith_op
-    result[mask] = op(xrav[mask], y)
-                   ^^^^^^^^^^^^^^^^^
-TypeError: can't multiply sequence by non-int of type 'float'
-
-回测进度:  70%|██████████████████████████████████████████████████▍                     | 14/20 [00:55<00:18,  3.01s/it]E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-2026-04-05 22:45:54,454 - backtest.optimizer_new - WARNING - 因子 股票代码 IC全为NaN，使用默认权重
-2026-04-05 22:45:55,464 - backtest.optimizer_new - WARNING - 因子 股票名称 IC全为NaN，使用默认权重
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-2026-04-05 22:45:57,343 - backtest.optimizer_new - WARNING - 因子 股票代码 IC全为NaN，使用默认权重
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-2026-04-05 22:46:03,405 - backtest.optimizer_new - INFO - 动态权重计算完成: 7 个因子
-2026-04-05 22:46:03,612 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=-999.0000
-2026-04-05 22:46:03,613 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
-2026-04-05 22:46:03,613 - backtest.engine_no_transformer_new - INFO - [歌尔股份] 开始回测，数据长度: 862，因子数: 7
-2026-04-05 22:46:03,614 - __mp_main__ - ERROR - 处理股票 歌尔股份 时出错: can't multiply sequence by non-int of type 'float'
-2026-04-05 22:46:03,615 - __mp_main__ - ERROR - Traceback (most recent call last):
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\array_ops.py", line 218, in _na_arithmetic_op
-    result = func(left, right)
-             ^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\computation\expressions.py", line 242, in evaluate
-    return _evaluate(op, op_str, a, b)  # type: ignore[misc]
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\computation\expressions.py", line 131, in _evaluate_numexpr
-    result = _evaluate_standard(op, op_str, a, b)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\computation\expressions.py", line 73, in _evaluate_standard
-    return op(a, b)
-           ^^^^^^^^
-TypeError: can't multiply sequence by non-int of type 'float'
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "E:\autotrade\autotrade_for_llm_review\run_backtest_no_transformer_new.py", line 234, in _process_single_stock
-    trades_df, stats, result_df = run_backtest_loop_no_transformer(
-                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "E:\autotrade\autotrade_for_llm_review\backtest\engine_no_transformer_new.py", line 168, in run_backtest_loop_no_transformer
-    df['score'] += df[col] * (w / weight_sum)
-                   ~~~~~~~~^~~~~~~~~~~~~~~~~~
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\common.py", line 76, in new_method
-    return method(self, other)
-           ^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\arraylike.py", line 202, in __mul__
-    return self._arith_method(other, operator.mul)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\series.py", line 6135, in _arith_method
-    return base.IndexOpsMixin._arith_method(self, other, op)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\base.py", line 1382, in _arith_method
-    result = ops.arithmetic_op(lvalues, rvalues, op)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\array_ops.py", line 283, in arithmetic_op
-    res_values = _na_arithmetic_op(left, right, op)  # type: ignore[arg-type]
-                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\array_ops.py", line 227, in _na_arithmetic_op
-    result = _masked_arith_op(left, right, op)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\array_ops.py", line 182, in _masked_arith_op
-    result[mask] = op(xrav[mask], y)
-                   ^^^^^^^^^^^^^^^^^
-TypeError: can't multiply sequence by non-int of type 'float'
-
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-2026-04-05 22:46:05,299 - backtest.optimizer_new - WARNING - 因子 股票名称 IC全为NaN，使用默认权重
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-2026-04-05 22:46:05,305 - backtest.optimizer_new - INFO - 动态权重计算完成: 7 个因子
-2026-04-05 22:46:05,504 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=-999.0000
-2026-04-05 22:46:05,505 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
-2026-04-05 22:46:05,505 - backtest.engine_no_transformer_new - INFO - [东山精密] 开始回测，数据长度: 734，因子数: 7
-2026-04-05 22:46:05,505 - __mp_main__ - ERROR - 处理股票 东山精密 时出错: can't multiply sequence by non-int of type 'float'
-2026-04-05 22:46:05,506 - __mp_main__ - ERROR - Traceback (most recent call last):
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\array_ops.py", line 218, in _na_arithmetic_op
-    result = func(left, right)
-             ^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\computation\expressions.py", line 242, in evaluate
-    return _evaluate(op, op_str, a, b)  # type: ignore[misc]
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\computation\expressions.py", line 131, in _evaluate_numexpr
-    result = _evaluate_standard(op, op_str, a, b)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\computation\expressions.py", line 73, in _evaluate_standard
-    return op(a, b)
-           ^^^^^^^^
-TypeError: can't multiply sequence by non-int of type 'float'
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "E:\autotrade\autotrade_for_llm_review\run_backtest_no_transformer_new.py", line 234, in _process_single_stock
-    trades_df, stats, result_df = run_backtest_loop_no_transformer(
-                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "E:\autotrade\autotrade_for_llm_review\backtest\engine_no_transformer_new.py", line 168, in run_backtest_loop_no_transformer
-    df['score'] += df[col] * (w / weight_sum)
-                   ~~~~~~~~^~~~~~~~~~~~~~~~~~
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\common.py", line 76, in new_method
-    return method(self, other)
-           ^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\arraylike.py", line 202, in __mul__
-    return self._arith_method(other, operator.mul)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\series.py", line 6135, in _arith_method
-    return base.IndexOpsMixin._arith_method(self, other, op)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\base.py", line 1382, in _arith_method
-    result = ops.arithmetic_op(lvalues, rvalues, op)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\array_ops.py", line 283, in arithmetic_op
-    res_values = _na_arithmetic_op(left, right, op)  # type: ignore[arg-type]
-                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\array_ops.py", line 227, in _na_arithmetic_op
-    result = _masked_arith_op(left, right, op)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\array_ops.py", line 182, in _masked_arith_op
-    result[mask] = op(xrav[mask], y)
-                   ^^^^^^^^^^^^^^^^^
-TypeError: can't multiply sequence by non-int of type 'float'
-
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-E:\autotrade\autotrade_for_llm_review\backtest\optimizer_new.py:81: ConstantInputWarning: An input array is constant; the correlation coefficient is not defined.
-  corr, _ = spearmanr(
-Traceback (most recent call last):
-  File "<frozen importlib._bootstrap_external>", line 1437, in _path_importer_cache
-KeyError: 'C:\\Users\\ydh\\AppData\\Roaming\\Python\\Python311\\site-packages\\pandas\\core\\ops'
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "<string>", line 1, in <module>
-  File "D:\anaconda3\Lib\multiprocessing\spawn.py", line 122, in spawn_main
-    exitcode = _main(fd, parent_sentinel)
-               ^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "D:\anaconda3\Lib\multiprocessing\spawn.py", line 131, in _main
-    prepare(preparation_data)
-  File "D:\anaconda3\Lib\multiprocessing\spawn.py", line 246, in prepare
-    _fixup_main_from_path(data['init_main_from_path'])
-  File "D:\anaconda3\Lib\multiprocessing\spawn.py", line 297, in _fixup_main_from_path
-    main_content = runpy.run_path(main_path,
-                   ^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "<frozen runpy>", line 291, in run_path
-  File "<frozen runpy>", line 98, in _run_module_code
-  File "<frozen runpy>", line 88, in _run_code
-  File "E:\autotrade\autotrade_for_llm_review\run_backtest_no_transformer_new.py", line 16, in <module>
-    import pandas as pd
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\__init__.py", line 62, in <module>
-    from pandas.core.api import (
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\api.py", line 28, in <module>
-    from pandas.core.arrays import Categorical
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\arrays\__init__.py", line 1, in <module>
-    from pandas.core.arrays.arrow import ArrowExtensionArray
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\arrays\arrow\__init__.py", line 5, in <module>
-    from pandas.core.arrays.arrow.array import ArrowExtensionArray
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\arrays\arrow\array.py", line 50, in <module>
-    from pandas.core import (
-  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\ops\__init__.py", line 8, in <module>
-    from pandas.core.ops.array_ops import (
-  File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
-  File "<frozen importlib._bootstrap>", line 1138, in _find_and_load_unlocked
-  File "<frozen importlib._bootstrap>", line 1078, in _find_spec
-  File "<frozen importlib._bootstrap_external>", line 1504, in find_spec
-  File "<frozen importlib._bootstrap_external>", line 1473, in _get_spec
-  File "<frozen importlib._bootstrap_external>", line 1439, in _path_importer_cache
-  File "<frozen importlib._bootstrap_external>", line 1415, in _path_hooks
-  File "<frozen importlib._bootstrap_external>", line 1700, in path_hook_for_FileFinder
-KeyboardInterrupt
+  File "E:\autotrade\autotrade_for_llm_review\run_backtest_no_transformer_new.py", line 463, in main
+    visualize_backtest_with_split(
+  File "E:\autotrade\autotrade_for_llm_review\backtest\visualizer.py", line 114, in visualize_backtest_with_split
+    regime = get_market_regime(market_data, buy_date) if market_data is not None else 'neutral'
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\autotrade\autotrade_for_llm_review\data\indicators.py", line 263, in get_market_regime
+    ma20 = market_data['MA20'].iloc[idx]
+           ~~~~~~~~~~~^^^^^^^^
+  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\frame.py", line 4102, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ydh\AppData\Roaming\Python\Python311\site-packages\pandas\core\indexes\base.py", line 3812, in get_loc
+    raise KeyError(key) from err
+KeyError: 'MA20'
+2026-04-06 09:32:11,344 - __main__ - INFO - ================================================================================
+2026-04-06 09:32:11,344 - __main__ - INFO - 回测完成
+2026-04-06 09:32:11,344 - __main__ - INFO - ================================================================================

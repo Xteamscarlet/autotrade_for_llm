@@ -213,10 +213,19 @@ def get_market_regime(market_data: Optional[pd.DataFrame], current_date) -> str:
 
     if idx < 120:
         return 'neutral'
-
-    price = market_data['Close'].iloc[idx]
-    ma20 = market_data['MA20'].iloc[idx]
-    returns = market_data['Close'].pct_change()
+    # ====== 新增：自动补全市场数据缺失的指标列 ======
+    _df = market_data.copy()
+    if 'MA20' not in _df.columns:
+        if 'Close' in _df.columns:
+            _df['MA20'] = _df['Close'].rolling(window=20, min_periods=1).mean()
+        elif 'close' in _df.columns:
+            _df['MA20'] = _df['close'].rolling(window=20, min_periods=1).mean()
+        else:
+            raise KeyError(f"market_data 中既无 'Close' 也无 'close' 列，"
+                           f"现有列: {list(_df.columns)}，无法计算 MA20")
+    price = _df['Close'].iloc[idx]
+    ma20 = _df['MA20'].iloc[idx]
+    returns = _df['Close'].pct_change()
     short_vol = returns.iloc[idx - 20:idx].std()
     long_vol_baseline = returns.iloc[idx - 120:idx].std()
 
