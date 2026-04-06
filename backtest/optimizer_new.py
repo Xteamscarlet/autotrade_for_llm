@@ -433,12 +433,12 @@ def calculate_dynamic_weights(
         weights = {k: v / weight_sum for k, v in weights.items()}
 
     # ===== 关键修复：权重和为负数时也回退为等权重，避免引擎层误判为“所有权重为 0” =====
-    weight_sum = sum(weights.values())
-    if weight_sum <= 0:
-        logger.warning("权重和 <= 0（可能包含负权重），回退为等权重")
-        logger.warning(weight_sum)
-        weight = 1.0 / len(valid_factors)
-        return {col: weight for col in valid_factors}
+    # weight_sum = sum(weights.values())
+    # if weight_sum <= 0:
+    #     logger.warning("权重和 <= 0（可能包含负权重），回退为等权重")
+    #     logger.warning(weight_sum)
+    #     weight = 1.0 / len(valid_factors)
+    #     return {col: weight for col in valid_factors}
 
     return weights
 
@@ -485,16 +485,16 @@ def optimize_portfolio(
     else:
         # ===== 新增：权重和为负数时回退为等权重 =====
         weight_sum = sum(weights.values())
-        if weight_sum <= 0:
-            logger.warning(
-                "优化返回权重和 <= 0（可能包含负权重），回退为等权重兜底。"
-            )
-            equal_weight = 1.0 / len(factor_cols)
-            weights = {col: equal_weight for col in factor_cols}
-            best_sharpe = 0.0
-        else:
-            # 正常情况：根据 walk-forward 结果输出信息
-            logger.info(f"Walk-Forward划分完成: {n_splits} 个划分")
-            best_sharpe = 0.0
+        # if weight_sum <= 0:
+        #     logger.warning(
+        #         "优化返回权重和 <= 0（可能包含负权重），回退为等权重兜底。"
+        #     )
+        #     equal_weight = 1.0 / len(factor_cols)
+        #     weights = {col: equal_weight for col in factor_cols}
+        #     best_sharpe = 0.0
+        # else:
+        # 正常情况：根据 walk-forward 结果输出信息
+        logger.info(f"Walk-Forward划分完成: {n_splits} 个划分")
+        best_sharpe = 0.0
 
     return weights, best_sharpe

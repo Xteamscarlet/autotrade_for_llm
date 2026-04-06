@@ -181,32 +181,32 @@ def run_backtest_loop_no_transformer(
         else:
             numeric_factor_cols.append(col)
 
-    weight_sum = sum(valid_weights.values())
+    # weight_sum = sum(valid_weights.values())
+    #
+    # # --- 修复：权重全为 0 时改用等权重回退，而不是直接终止回测 ---
+    # if weight_sum <= 0:
+    #     # 使用 factor_cols 中的因子构造等权重
+    #     if len(factor_cols) == 0:
+    #         logger.warning(f"[{stock_code}] 无有效因子列，无法计算 score，跳过该股回测。")
+    #         return None, None, df
 
-    # --- 修复：权重全为 0 时改用等权重回退，而不是直接终止回测 ---
-    if weight_sum <= 0:
-        # 使用 factor_cols 中的因子构造等权重
-        if len(factor_cols) == 0:
-            logger.warning(f"[{stock_code}] 无有效因子列，无法计算 score，跳过该股回测。")
-            return None, None, df
-
-        logger.warning(
-            f"[{stock_code}] 所有权重为 0（可能优化未返回有效权重），weight_sum:{weight_sum}"
-            f"改用等权重（因子数量：{len(factor_cols)}）继续回测。"
-        )
-        equal_weight = 1.0 / len(factor_cols)
-        valid_weights = {col: equal_weight for col in factor_cols}
+        # logger.warning(
+        #     f"[{stock_code}] 所有权重为 0（可能优化未返回有效权重），weight_sum:{weight_sum}"
+        #     f"改用等权重（因子数量：{len(factor_cols)}）继续回测。"
+        # )
+        # equal_weight = 1.0 / len(factor_cols)
+        # valid_weights = {col: equal_weight for col in factor_cols}
         numeric_factor_cols = [
             col for col in factor_cols
             if col in df.columns and df[col].dtype != object
         ]
 
-    # 归一化权重（防止前面有非 0 但未完全归一化的情况）
+    # # 归一化权重（防止前面有非 0 但未完全归一化的情况）
     weight_sum = sum(valid_weights.values())
-    if weight_sum == 0:
-        # 理论上不会走到这里（上面已经处理 factor_cols==0 的情况）
-        logger.error(f"[{stock_code}] 有效因子权重求和仍为 0，回测终止。")
-        return None, None, df
+    # if weight_sum == 0:
+    #     # 理论上不会走到这里（上面已经处理 factor_cols==0 的情况）
+    #     logger.error(f"[{stock_code}] 有效因子权重求和仍为 0，回测终止。")
+    #     return None, None, df
 
     # 计算 score = Σ(因子值 * 归一化权重)
     for col, w in valid_weights.items():
