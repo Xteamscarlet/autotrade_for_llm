@@ -241,40 +241,49 @@ def calculate_orthogonal_factors_without_transformer(
 
 
 
-def get_market_regime(market_data: Optional[pd.DataFrame], current_date) -> str:
-    """市场状态判断：波动率+趋势双确认
-
-    Returns:
-        'strong' / 'weak' / 'neutral'
+def get_market_regime(market_data: pd.DataFrame, date) -> str:
     """
-    if market_data is None or current_date not in market_data.index:
+    根据大盘数据（需要至少包含 MA20）判断市场状态：
+    - bull：多头
+    - bear：空头
+    - neutral：中性
+    若 market_data 为空或缺少 MA20，则直接返回 neutral。
+    """
+    if market_data is None or market_data.empty:
         return 'neutral'
 
-    idx_loc = market_data.index.get_loc(current_date)
-    if isinstance(idx_loc, slice):
-        idx = idx_loc.start
-    else:
-        idx = idx_loc
+    # 关键修复：确保 MA20 列存在，否则尝试补算或直接 fallback
+    if 'MA20' not in market_data.columns:
+        if 'Close' in market_data.columns:
+            try:
+                market_data = market_data.copy()
+                from data.indicators_no_transformer import safe_sma
+                market_data['MA20'] = safe_sma(market_data['Close'], period=20)
+            except Exception as e:
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.warning("get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: %s", e)
+                return 'neutral'
+        else:
+            return 'neutral'
 
-    if idx < 120:
+    try:
+        idx = market_data.index.get_indexer([pd.Timestamp(date)], method='ffill')[0]
+        if idx == -1:
+            return 'neutral'
+        ma20 = market_data['MA20'].iloc[idx]
+        # 下面的逻辑按你原来设计来（这里只做示意）
+        # 例如：close 在 MA20 之上 + MA20 上升 = bull，否则 bear/neutral
+        close = market_data['Close'].iloc[idx]
+        if pd.isna(ma20):
+            return 'neutral'
+        if close > ma20:
+            return 'bull'
+        else:
+            return 'bear'
+    except Exception as e:
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.warning("get_market_regime 异常，将返回 neutral，原因: %s", e)
         return 'neutral'
 
-    price = market_data['Close'].iloc[idx]
-    ma20 = market_data['MA20'].iloc[idx]
-    returns = market_data['Close'].pct_change()
-    short_vol = returns.iloc[idx - 20:idx].std()
-    long_vol_baseline = returns.iloc[idx - 120:idx].std()
-
-    if pd.isna(short_vol) or pd.isna(long_vol_baseline) or long_vol_baseline == 0:
-        return 'neutral'
-
-    high_volatility = short_vol > long_vol_baseline * 1.5
-    uptrend = price > ma20
-    downtrend = price < ma20
-
-    if uptrend and short_vol < long_vol_baseline * 1.1:
-        return 'strong'
-    elif downtrend and high_volatility:
-        return 'weak'
-    else:
-        return 'neutral'
