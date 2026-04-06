@@ -1,14 +1,14 @@
-D:\anaconda3\python.exe "G:/pycharm/PyCharm 2025.2.0.1/plugins/python-ce/helpers/pydev/pydevd.py" --multiprocess --qt-support=auto --client 127.0.0.1 --port 11123 --file E:\autotrade\autotrade_for_llm_review\run_backtest_no_transformer_new.py
-Connected to: <socket.socket fd=640, family=2, type=1, proto=0, laddr=('127.0.0.1', 11124), raddr=('127.0.0.1', 11123)>.
+D:\anaconda3\python.exe "G:/pycharm/PyCharm 2025.2.0.1/plugins/python-ce/helpers/pydev/pydevd.py" --multiprocess --qt-support=auto --client 127.0.0.1 --port 12805 --file E:\autotrade\autotrade_for_llm_review\run_backtest_no_transformer_new.py
+Connected to: <socket.socket fd=840, family=2, type=1, proto=0, laddr=('127.0.0.1', 12806), raddr=('127.0.0.1', 12805)>.
 Connected to pydev debugger (build 252.23892.515)
-2026-04-06 10:28:31,185 - __main__ - INFO - ================================================================================
-2026-04-06 10:28:31,185 - __main__ - INFO - 开始回测（无Transformer版本）
-2026-04-06 10:28:31,185 - __main__ - INFO - ================================================================================
-2026-04-06 10:28:31,186 - __main__ - INFO - 步骤1: 准备数据...
-2026-04-06 10:28:31,204 - __main__ - INFO - 步骤1.5: 计算收益率...
+2026-04-06 10:50:41,648 - __main__ - INFO - ================================================================================
+2026-04-06 10:50:41,649 - __main__ - INFO - 开始回测（无Transformer版本）
+2026-04-06 10:50:41,649 - __main__ - INFO - ================================================================================
+2026-04-06 10:50:41,649 - __main__ - INFO - 步骤1: 准备数据...
 
 [2/3] 检查个股数据...
 使用缓存的股票数据...
+2026-04-06 10:50:41,667 - __main__ - INFO - 步骤1.5: 计算收益率...
 stocks_data 类型: <class 'dict'>
 stocks_data 长度: 20
 stocks_data 键示例: ['贵州茅台', '美的集团', '国轩高科']
@@ -17,334 +17,334 @@ stocks_data 键示例: ['贵州茅台', '美的集团', '国轩高科']
  类型: <class 'dict'>
  长度: 20
  前3个键: ['贵州茅台', '美的集团', '国轩高科']
-2026-04-06 10:28:31,219 - utils.stock_filter_new - INFO - 股票池过滤完成: 原始 20 只, 移除 0 只, 保留 20 只
-2026-04-06 10:28:31,219 - __main__ - INFO - 有效股票数量: 20
-2026-04-06 10:28:31,219 - __main__ - INFO - 步骤2: 执行回测...
-Connected to: <socket.socket fd=552, family=2, type=1, proto=0, laddr=('127.0.0.1', 11134), raddr=('127.0.0.1', 11123)>.
-Connected to: <socket.socket fd=568, family=2, type=1, proto=0, laddr=('127.0.0.1', 11136), raddr=('127.0.0.1', 11123)>.
-Connected to: <socket.socket fd=520, family=2, type=1, proto=0, laddr=('127.0.0.1', 11144), raddr=('127.0.0.1', 11123)>.
-Connected to: <socket.socket fd=576, family=2, type=1, proto=0, laddr=('127.0.0.1', 11150), raddr=('127.0.0.1', 11123)>.
-回测进度:   0%|          | 0/20 [00:00<?, ?it/s]2026-04-06 10:28:48,642 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=-999.0000
-2026-04-06 10:28:48,643 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
-2026-04-06 10:28:48,644 - backtest.engine_no_transformer_new - INFO - [贵州茅台] 开始回测，数据长度: 476，因子数: 8
-2026-04-06 10:28:48,645 - backtest.engine_no_transformer_new - WARNING - [贵州茅台] 所有权重为 0（可能优化未返回有效权重），weight_sum:-0.6720594365823674改用等权重（因子数量：8）继续回测。
-2026-04-06 10:28:49,065 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=-999.0000
-2026-04-06 10:28:49,067 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
-2026-04-06 10:28:49,067 - backtest.engine_no_transformer_new - INFO - [美的集团] 开始回测，数据长度: 519，因子数: 8
-2026-04-06 10:28:49,068 - backtest.engine_no_transformer_new - WARNING - [美的集团] 所有权重为 0（可能优化未返回有效权重），weight_sum:-0.5750788175109327改用等权重（因子数量：8）继续回测。
-2026-04-06 10:28:49,543 - backtest.engine_no_transformer_new - INFO - [贵州茅台] 信号统计: 买入=19, 卖出=18
-2026-04-06 10:28:49,549 - backtest.engine_no_transformer_new - INFO - [贵州茅台] 回测完成: 总交易=18, 胜率=38.9%, 夏普=-1.01
-2026-04-06 10:28:49,549 - __mp_main__ - INFO - 股票 贵州茅台: 交易次数 18
-回测进度:   5%|▌         | 1/20 [00:05<01:40,  5.28s/it]2026-04-06 10:28:50,069 - backtest.engine_no_transformer_new - INFO - [美的集团] 信号统计: 买入=13, 卖出=12
-2026-04-06 10:28:50,075 - backtest.engine_no_transformer_new - INFO - [美的集团] 回测完成: 总交易=12, 胜率=66.7%, 夏普=0.78
-2026-04-06 10:28:50,075 - __mp_main__ - INFO - 股票 美的集团: 交易次数 12
-回测进度:  10%|█         | 2/20 [00:05<00:44,  2.49s/it]2026-04-06 10:28:50,209 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=0.0000
-2026-04-06 10:28:50,211 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
-2026-04-06 10:28:50,211 - backtest.engine_no_transformer_new - INFO - [隆基绿能] 开始回测，数据长度: 643，因子数: 8
-2026-04-06 10:28:51,462 - backtest.engine_no_transformer_new - INFO - [隆基绿能] 信号统计: 买入=44, 卖出=44
-2026-04-06 10:28:51,472 - backtest.engine_no_transformer_new - INFO - [隆基绿能] 回测完成: 总交易=44, 胜率=50.0%, 夏普=-0.47
-2026-04-06 10:28:51,472 - __mp_main__ - INFO - 股票 隆基绿能: 交易次数 44
-2026-04-06 10:28:52,675 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=0.0000
-2026-04-06 10:28:52,676 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
-2026-04-06 10:28:52,676 - backtest.engine_no_transformer_new - INFO - [国轩高科] 开始回测，数据长度: 899，因子数: 8
-2026-04-06 10:28:54,398 - backtest.engine_no_transformer_new - INFO - [国轩高科] 信号统计: 买入=36, 卖出=35
-2026-04-06 10:28:54,406 - backtest.engine_no_transformer_new - INFO - [国轩高科] 回测完成: 总交易=35, 胜率=40.0%, 夏普=0.68
-2026-04-06 10:28:54,406 - __mp_main__ - INFO - 股票 国轩高科: 交易次数 35
-回测进度:  15%|█▌        | 3/20 [00:10<00:56,  3.33s/it]2026-04-06 10:28:55,467 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=0.0000
-2026-04-06 10:28:55,468 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
-2026-04-06 10:28:55,468 - backtest.engine_no_transformer_new - INFO - [赛力斯] 开始回测，数据长度: 471，因子数: 8
-2026-04-06 10:28:56,345 - backtest.engine_no_transformer_new - INFO - [赛力斯] 信号统计: 买入=8, 卖出=8
-2026-04-06 10:28:56,353 - backtest.engine_no_transformer_new - INFO - [赛力斯] 回测完成: 总交易=8, 胜率=62.5%, 夏普=1.18
-2026-04-06 10:28:56,353 - __mp_main__ - INFO - 股票 赛力斯: 交易次数 8
-回测进度:  25%|██▌       | 5/20 [00:12<00:29,  2.00s/it]2026-04-06 10:28:56,501 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=0.0000
-2026-04-06 10:28:56,502 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
-2026-04-06 10:28:56,502 - backtest.engine_no_transformer_new - INFO - [比亚迪] 开始回测，数据长度: 714，因子数: 8
-2026-04-06 10:28:56,503 - backtest.engine_no_transformer_new - WARNING - [比亚迪] 所有权重为 0（可能优化未返回有效权重），weight_sum:-0.1780651972356922改用等权重（因子数量：8）继续回测。
-2026-04-06 10:28:57,874 - backtest.engine_no_transformer_new - INFO - [比亚迪] 信号统计: 买入=22, 卖出=22
-2026-04-06 10:28:57,879 - backtest.engine_no_transformer_new - INFO - [比亚迪] 回测完成: 总交易=22, 胜率=31.8%, 夏普=0.32
-2026-04-06 10:28:57,879 - __mp_main__ - INFO - 股票 比亚迪: 交易次数 22
-回测进度:  30%|███       | 6/20 [00:13<00:26,  1.86s/it]2026-04-06 10:28:59,159 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=0.0000
-2026-04-06 10:28:59,160 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
-2026-04-06 10:28:59,160 - backtest.engine_no_transformer_new - INFO - [科大讯飞] 开始回测，数据长度: 848，因子数: 8
-2026-04-06 10:29:00,088 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=-999.0000
-2026-04-06 10:29:00,090 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
-2026-04-06 10:29:00,090 - backtest.engine_no_transformer_new - INFO - [海康威视] 开始回测，数据长度: 625，因子数: 8
-2026-04-06 10:29:00,090 - backtest.engine_no_transformer_new - WARNING - [海康威视] 所有权重为 0（可能优化未返回有效权重），weight_sum:-0.6612348613771085改用等权重（因子数量：8）继续回测。
-2026-04-06 10:29:00,844 - backtest.engine_no_transformer_new - INFO - [科大讯飞] 信号统计: 买入=49, 卖出=48
-2026-04-06 10:29:00,852 - backtest.engine_no_transformer_new - INFO - [科大讯飞] 回测完成: 总交易=48, 胜率=54.2%, 夏普=0.02
-2026-04-06 10:29:00,852 - __mp_main__ - INFO - 股票 科大讯飞: 交易次数 48
-回测进度:  35%|███▌      | 7/20 [00:16<00:28,  2.18s/it]2026-04-06 10:29:01,278 - backtest.engine_no_transformer_new - INFO - [海康威视] 信号统计: 买入=14, 卖出=14
-2026-04-06 10:29:01,279 - backtest.engine_no_transformer_new - INFO - [海康威视] 回测完成: 总交易=14, 胜率=71.4%, 夏普=0.46
-2026-04-06 10:29:01,279 - __mp_main__ - INFO - 股票 海康威视: 交易次数 14
-回测进度:  40%|████      | 8/20 [00:17<00:20,  1.67s/it]2026-04-06 10:29:04,516 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=-999.0000
-2026-04-06 10:29:04,517 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
-2026-04-06 10:29:04,518 - backtest.engine_no_transformer_new - INFO - [中信证券] 开始回测，数据长度: 929，因子数: 8
-2026-04-06 10:29:04,518 - backtest.engine_no_transformer_new - WARNING - [中信证券] 所有权重为 0（可能优化未返回有效权重），weight_sum:-0.5465910564604726改用等权重（因子数量：8）继续回测。
-2026-04-06 10:29:04,902 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=-999.0000
-2026-04-06 10:29:04,904 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
-2026-04-06 10:29:04,904 - backtest.engine_no_transformer_new - INFO - [光迅科技] 开始回测，数据长度: 793，因子数: 8
-2026-04-06 10:29:04,905 - backtest.engine_no_transformer_new - WARNING - [光迅科技] 所有权重为 0（可能优化未返回有效权重），weight_sum:-0.6135645361230141改用等权重（因子数量：8）继续回测。
-2026-04-06 10:29:06,373 - backtest.engine_no_transformer_new - INFO - [中信证券] 信号统计: 买入=28, 卖出=28
-2026-04-06 10:29:06,381 - backtest.engine_no_transformer_new - INFO - [中信证券] 回测完成: 总交易=28, 胜率=39.3%, 夏普=0.75
-2026-04-06 10:29:06,381 - __mp_main__ - INFO - 股票 中信证券: 交易次数 28
-回测进度:  45%|████▌     | 9/20 [00:22<00:29,  2.68s/it]2026-04-06 10:29:06,433 - backtest.engine_no_transformer_new - INFO - [光迅科技] 信号统计: 买入=40, 卖出=39
-2026-04-06 10:29:06,440 - backtest.engine_no_transformer_new - INFO - [光迅科技] 回测完成: 总交易=39, 胜率=48.7%, 夏普=0.82
-2026-04-06 10:29:06,440 - __mp_main__ - INFO - 股票 光迅科技: 交易次数 39
-2026-04-06 10:29:09,318 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=-999.0000
-2026-04-06 10:29:09,318 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
-2026-04-06 10:29:09,318 - backtest.engine_no_transformer_new - INFO - [恒瑞医药] 开始回测，数据长度: 935，因子数: 8
-2026-04-06 10:29:09,318 - backtest.engine_no_transformer_new - WARNING - [恒瑞医药] 所有权重为 0（可能优化未返回有效权重），weight_sum:-0.8507013414328859改用等权重（因子数量：8）继续回测。
-2026-04-06 10:29:09,537 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=-999.0000
-2026-04-06 10:29:09,538 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
-2026-04-06 10:29:09,538 - backtest.engine_no_transformer_new - INFO - [山东黄金] 开始回测，数据长度: 924，因子数: 8
-2026-04-06 10:29:09,540 - backtest.engine_no_transformer_new - WARNING - [山东黄金] 所有权重为 0（可能优化未返回有效权重），weight_sum:-0.42690616143211924改用等权重（因子数量：8）继续回测。
-2026-04-06 10:29:11,202 - backtest.engine_no_transformer_new - INFO - [恒瑞医药] 信号统计: 买入=30, 卖出=29
-2026-04-06 10:29:11,208 - backtest.engine_no_transformer_new - INFO - [恒瑞医药] 回测完成: 总交易=29, 胜率=69.0%, 夏普=0.91
-2026-04-06 10:29:11,208 - __mp_main__ - INFO - 股票 恒瑞医药: 交易次数 29
-回测进度:  55%|█████▌    | 11/20 [00:26<00:23,  2.56s/it]2026-04-06 10:29:11,347 - backtest.engine_no_transformer_new - INFO - [山东黄金] 信号统计: 买入=38, 卖出=38
-2026-04-06 10:29:11,353 - backtest.engine_no_transformer_new - INFO - [山东黄金] 回测完成: 总交易=38, 胜率=34.2%, 夏普=0.47
-2026-04-06 10:29:11,354 - __mp_main__ - INFO - 股票 山东黄金: 交易次数 38
-回测进度:  60%|██████    | 12/20 [00:27<00:15,  1.96s/it]2026-04-06 10:29:11,664 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=-999.0000
-2026-04-06 10:29:11,666 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
-2026-04-06 10:29:11,666 - backtest.engine_no_transformer_new - INFO - [长江电力] 开始回测，数据长度: 560，因子数: 8
-2026-04-06 10:29:11,667 - backtest.engine_no_transformer_new - WARNING - [长江电力] 所有权重为 0（可能优化未返回有效权重），weight_sum:-0.42518350367946617改用等权重（因子数量：8）继续回测。
-2026-04-06 10:29:12,763 - backtest.engine_no_transformer_new - INFO - [长江电力] 信号统计: 买入=10, 卖出=10
-2026-04-06 10:29:12,768 - backtest.engine_no_transformer_new - INFO - [长江电力] 回测完成: 总交易=10, 胜率=60.0%, 夏普=1.21
-2026-04-06 10:29:12,768 - __mp_main__ - INFO - 股票 长江电力: 交易次数 10
-2026-04-06 10:29:13,830 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=-999.0000
-2026-04-06 10:29:13,831 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
-2026-04-06 10:29:13,831 - backtest.engine_no_transformer_new - INFO - [紫金矿业] 开始回测，数据长度: 859，因子数: 8
-2026-04-06 10:29:13,832 - backtest.engine_no_transformer_new - WARNING - [紫金矿业] 所有权重为 0（可能优化未返回有效权重），weight_sum:-0.7745826664701025改用等权重（因子数量：8）继续回测。
-2026-04-06 10:29:15,488 - backtest.engine_no_transformer_new - INFO - [紫金矿业] 信号统计: 买入=34, 卖出=34
-2026-04-06 10:29:15,494 - backtest.engine_no_transformer_new - INFO - [紫金矿业] 回测完成: 总交易=34, 胜率=47.1%, 夏普=0.97
-2026-04-06 10:29:15,494 - __mp_main__ - INFO - 股票 紫金矿业: 交易次数 34
-回测进度:  65%|██████▌   | 13/20 [00:31<00:17,  2.53s/it]2026-04-06 10:29:18,626 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=-999.0000
-2026-04-06 10:29:18,627 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
-2026-04-06 10:29:18,628 - backtest.engine_no_transformer_new - INFO - [歌尔股份] 开始回测，数据长度: 799，因子数: 8
-2026-04-06 10:29:18,629 - backtest.engine_no_transformer_new - WARNING - [歌尔股份] 所有权重为 0（可能优化未返回有效权重），weight_sum:-0.7543155534620539改用等权重（因子数量：8）继续回测。
-2026-04-06 10:29:19,383 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=0.0000
-2026-04-06 10:29:19,384 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
-2026-04-06 10:29:19,384 - backtest.engine_no_transformer_new - INFO - [东山精密] 开始回测，数据长度: 734，因子数: 8
-2026-04-06 10:29:20,180 - backtest.engine_no_transformer_new - INFO - [歌尔股份] 信号统计: 买入=29, 卖出=29
-2026-04-06 10:29:20,187 - backtest.engine_no_transformer_new - INFO - [歌尔股份] 回测完成: 总交易=29, 胜率=48.3%, 夏普=0.40
-2026-04-06 10:29:20,187 - __mp_main__ - INFO - 股票 歌尔股份: 交易次数 29
-2026-04-06 10:29:20,848 - backtest.engine_no_transformer_new - INFO - [东山精密] 信号统计: 买入=47, 卖出=46
-2026-04-06 10:29:20,855 - backtest.engine_no_transformer_new - INFO - [东山精密] 回测完成: 总交易=46, 胜率=56.5%, 夏普=1.05
-2026-04-06 10:29:20,855 - __mp_main__ - INFO - 股票 东山精密: 交易次数 46
-2026-04-06 10:29:22,394 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=-999.0000
-2026-04-06 10:29:22,395 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
-2026-04-06 10:29:22,395 - backtest.engine_no_transformer_new - INFO - [东方电气] 开始回测，数据长度: 1296，因子数: 8
-2026-04-06 10:29:22,396 - backtest.engine_no_transformer_new - WARNING - [东方电气] 所有权重为 0（可能优化未返回有效权重），weight_sum:-0.7166535125681135改用等权重（因子数量：8）继续回测。
-2026-04-06 10:29:24,869 - backtest.engine_no_transformer_new - INFO - [东方电气] 信号统计: 买入=47, 卖出=47
-2026-04-06 10:29:24,874 - backtest.engine_no_transformer_new - INFO - [东方电气] 回测完成: 总交易=47, 胜率=48.9%, 夏普=0.87
-2026-04-06 10:29:24,874 - __mp_main__ - INFO - 股票 东方电气: 交易次数 47
-回测进度:  75%|███████▌  | 15/20 [00:40<00:17,  3.45s/it]2026-04-06 10:29:26,213 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=-999.0000
-2026-04-06 10:29:26,214 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
-2026-04-06 10:29:26,214 - backtest.engine_no_transformer_new - INFO - [中航沈飞] 开始回测，数据长度: 1246，因子数: 8
-2026-04-06 10:29:26,215 - backtest.engine_no_transformer_new - WARNING - [中航沈飞] 所有权重为 0（可能优化未返回有效权重），weight_sum:-0.3903401672817984改用等权重（因子数量：8）继续回测。
-2026-04-06 10:29:27,832 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=-999.0000
-2026-04-06 10:29:27,833 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
-2026-04-06 10:29:27,833 - backtest.engine_no_transformer_new - INFO - [北新建材] 开始回测，数据长度: 804，因子数: 8
-2026-04-06 10:29:27,834 - backtest.engine_no_transformer_new - WARNING - [北新建材] 所有权重为 0（可能优化未返回有效权重），weight_sum:-0.46172868859255367改用等权重（因子数量：8）继续回测。
-2026-04-06 10:29:28,297 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=-999.0000
-2026-04-06 10:29:28,298 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
-2026-04-06 10:29:28,298 - backtest.engine_no_transformer_new - INFO - [北大荒] 开始回测，数据长度: 932，因子数: 8
-2026-04-06 10:29:28,299 - backtest.engine_no_transformer_new - WARNING - [北大荒] 所有权重为 0（可能优化未返回有效权重），weight_sum:-0.8437999699950026改用等权重（因子数量：8）继续回测。
-2026-04-06 10:29:28,629 - backtest.engine_no_transformer_new - INFO - [中航沈飞] 信号统计: 买入=46, 卖出=46
-2026-04-06 10:29:28,637 - backtest.engine_no_transformer_new - INFO - [中航沈飞] 回测完成: 总交易=46, 胜率=32.6%, 夏普=-0.82
-2026-04-06 10:29:28,637 - __mp_main__ - INFO - 股票 中航沈飞: 交易次数 46
-回测进度:  90%|█████████ | 18/20 [00:44<00:04,  2.40s/it]2026-04-06 10:29:29,387 - backtest.engine_no_transformer_new - INFO - [北新建材] 信号统计: 买入=25, 卖出=24
-2026-04-06 10:29:29,394 - backtest.engine_no_transformer_new - INFO - [北新建材] 回测完成: 总交易=24, 胜率=50.0%, 夏普=0.77
-2026-04-06 10:29:29,395 - __mp_main__ - INFO - 股票 北新建材: 交易次数 24
-2026-04-06 10:29:30,067 - backtest.engine_no_transformer_new - INFO - [北大荒] 信号统计: 买入=28, 卖出=28
-2026-04-06 10:29:30,074 - backtest.engine_no_transformer_new - INFO - [北大荒] 回测完成: 总交易=28, 胜率=50.0%, 夏普=-0.88
-2026-04-06 10:29:30,074 - __mp_main__ - INFO - 股票 北大荒: 交易次数 28
-回测进度: 100%|██████████| 20/20 [00:45<00:00,  2.29s/it]
-2026-04-06 10:29:30,078 - __main__ - INFO - 步骤3: 统计结果...
-2026-04-06 10:29:30,078 - __main__ - INFO - 回测成功: 20/20
-2026-04-06 10:29:30,078 - __main__ - INFO - 步骤4: 筛选策略...
-2026-04-06 10:29:30,078 - __main__ - INFO - 策略 贵州茅台: 丢弃 - 夏普比率 -1.0096 < 0.0, 最大回撤 -26.80% < -20.0%
-2026-04-06 10:29:30,078 - __main__ - INFO - 策略 美的集团: 通过筛选
-2026-04-06 10:29:30,079 - __main__ - INFO - 策略 国轩高科: 丢弃 - 最大回撤 -28.05% < -20.0%
-2026-04-06 10:29:30,079 - __main__ - INFO - 策略 隆基绿能: 丢弃 - 夏普比率 -0.4723 < 0.0, 最大回撤 -38.90% < -20.0%
-2026-04-06 10:29:30,079 - __main__ - INFO - 策略 赛力斯: 通过筛选
-2026-04-06 10:29:30,079 - __main__ - INFO - 策略 比亚迪: 丢弃 - 最大回撤 -23.98% < -20.0%
-2026-04-06 10:29:30,079 - __main__ - INFO - 策略 科大讯飞: 丢弃 - 最大回撤 -39.62% < -20.0%
-2026-04-06 10:29:30,079 - __main__ - INFO - 策略 海康威视: 通过筛选
-2026-04-06 10:29:30,080 - __main__ - INFO - 策略 中信证券: 通过筛选
-2026-04-06 10:29:30,080 - __main__ - INFO - 策略 光迅科技: 丢弃 - 最大回撤 -30.90% < -20.0%
-2026-04-06 10:29:30,080 - __main__ - INFO - 策略 恒瑞医药: 通过筛选
-2026-04-06 10:29:30,080 - __main__ - INFO - 策略 山东黄金: 丢弃 - 最大回撤 -23.08% < -20.0%
-2026-04-06 10:29:30,080 - __main__ - INFO - 策略 紫金矿业: 丢弃 - 最大回撤 -22.32% < -20.0%
-2026-04-06 10:29:30,080 - __main__ - INFO - 策略 长江电力: 通过筛选
-2026-04-06 10:29:30,080 - __main__ - INFO - 策略 东方电气: 丢弃 - 最大回撤 -31.45% < -20.0%
-2026-04-06 10:29:30,080 - __main__ - INFO - 策略 歌尔股份: 丢弃 - 最大回撤 -20.74% < -20.0%
-2026-04-06 10:29:30,080 - __main__ - INFO - 策略 东山精密: 丢弃 - 最大回撤 -32.38% < -20.0%
-2026-04-06 10:29:30,080 - __main__ - INFO - 策略 中航沈飞: 丢弃 - 夏普比率 -0.8184 < 0.0, 最大回撤 -63.19% < -20.0%
-2026-04-06 10:29:30,080 - __main__ - INFO - 策略 北大荒: 丢弃 - 夏普比率 -0.8773 < 0.0, 最大回撤 -28.27% < -20.0%
-2026-04-06 10:29:30,080 - __main__ - INFO - 策略 北新建材: 通过筛选
-2026-04-06 10:29:30,081 - __main__ - INFO - 步骤5: 生成报告...
-2026-04-06 10:29:30,081 - __main__ - INFO - 最终保留 7 个策略
-2026-04-06 10:29:30,085 - __main__ - INFO - 结果已保存到: ./stock_cache/no_transformer_results\backtest_results.json
+2026-04-06 10:50:41,682 - utils.stock_filter_new - INFO - 股票池过滤完成: 原始 20 只, 移除 0 只, 保留 20 只
+2026-04-06 10:50:41,682 - __main__ - INFO - 有效股票数量: 20
+2026-04-06 10:50:41,682 - __main__ - INFO - 步骤2: 执行回测...
+Connected to: <socket.socket fd=580, family=2, type=1, proto=0, laddr=('127.0.0.1', 12810), raddr=('127.0.0.1', 12805)>.
+Connected to: <socket.socket fd=548, family=2, type=1, proto=0, laddr=('127.0.0.1', 12814), raddr=('127.0.0.1', 12805)>.
+Connected to: <socket.socket fd=576, family=2, type=1, proto=0, laddr=('127.0.0.1', 12828), raddr=('127.0.0.1', 12805)>.
+Connected to: <socket.socket fd=672, family=2, type=1, proto=0, laddr=('127.0.0.1', 12832), raddr=('127.0.0.1', 12805)>.
+回测进度:   0%|          | 0/20 [00:00<?, ?it/s]2026-04-06 10:50:59,532 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=-999.0000
+2026-04-06 10:50:59,533 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
+2026-04-06 10:50:59,533 - backtest.engine_no_transformer_new - INFO - [贵州茅台] 开始回测，数据长度: 476，因子数: 8
+2026-04-06 10:50:59,534 - backtest.engine_no_transformer_new - WARNING - [贵州茅台] 所有权重为 0（可能优化未返回有效权重），weight_sum:-0.6720594365823674改用等权重（因子数量：8）继续回测。
+2026-04-06 10:50:59,960 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=-999.0000
+2026-04-06 10:50:59,961 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
+2026-04-06 10:50:59,961 - backtest.engine_no_transformer_new - INFO - [美的集团] 开始回测，数据长度: 519，因子数: 8
+2026-04-06 10:50:59,963 - backtest.engine_no_transformer_new - WARNING - [美的集团] 所有权重为 0（可能优化未返回有效权重），weight_sum:-0.5750788175109327改用等权重（因子数量：8）继续回测。
+2026-04-06 10:51:00,483 - backtest.engine_no_transformer_new - INFO - [贵州茅台] 信号统计: 买入=19, 卖出=18
+2026-04-06 10:51:00,490 - backtest.engine_no_transformer_new - INFO - [贵州茅台] 回测完成: 总交易=18, 胜率=38.9%, 夏普=-1.01
+2026-04-06 10:51:00,491 - __mp_main__ - INFO - 股票 贵州茅台: 交易次数 18
+回测进度:   5%|▌         | 1/20 [00:05<01:41,  5.36s/it]2026-04-06 10:51:01,066 - backtest.engine_no_transformer_new - INFO - [美的集团] 信号统计: 买入=13, 卖出=12
+2026-04-06 10:51:01,072 - backtest.engine_no_transformer_new - INFO - [美的集团] 回测完成: 总交易=12, 胜率=66.7%, 夏普=0.78
+2026-04-06 10:51:01,072 - __mp_main__ - INFO - 股票 美的集团: 交易次数 12
+回测进度:  10%|█         | 2/20 [00:05<00:45,  2.55s/it]2026-04-06 10:51:01,193 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=0.0000
+2026-04-06 10:51:01,194 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
+2026-04-06 10:51:01,195 - backtest.engine_no_transformer_new - INFO - [隆基绿能] 开始回测，数据长度: 643，因子数: 8
+2026-04-06 10:51:02,607 - backtest.engine_no_transformer_new - INFO - [隆基绿能] 信号统计: 买入=44, 卖出=44
+2026-04-06 10:51:02,614 - backtest.engine_no_transformer_new - INFO - [隆基绿能] 回测完成: 总交易=44, 胜率=50.0%, 夏普=-0.47
+2026-04-06 10:51:02,614 - __mp_main__ - INFO - 股票 隆基绿能: 交易次数 44
+2026-04-06 10:51:03,941 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=0.0000
+2026-04-06 10:51:03,944 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
+2026-04-06 10:51:03,944 - backtest.engine_no_transformer_new - INFO - [国轩高科] 开始回测，数据长度: 899，因子数: 8
+2026-04-06 10:51:05,857 - backtest.engine_no_transformer_new - INFO - [国轩高科] 信号统计: 买入=36, 卖出=35
+2026-04-06 10:51:05,865 - backtest.engine_no_transformer_new - INFO - [国轩高科] 回测完成: 总交易=35, 胜率=40.0%, 夏普=0.68
+2026-04-06 10:51:05,865 - __mp_main__ - INFO - 股票 国轩高科: 交易次数 35
+回测进度:  15%|█▌        | 3/20 [00:10<01:00,  3.57s/it]2026-04-06 10:51:07,071 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=0.0000
+2026-04-06 10:51:07,072 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
+2026-04-06 10:51:07,073 - backtest.engine_no_transformer_new - INFO - [赛力斯] 开始回测，数据长度: 471，因子数: 8
+2026-04-06 10:51:08,046 - backtest.engine_no_transformer_new - INFO - [赛力斯] 信号统计: 买入=8, 卖出=8
+2026-04-06 10:51:08,051 - backtest.engine_no_transformer_new - INFO - [赛力斯] 回测完成: 总交易=8, 胜率=62.5%, 夏普=1.18
+2026-04-06 10:51:08,051 - __mp_main__ - INFO - 股票 赛力斯: 交易次数 8
+回测进度:  25%|██▌       | 5/20 [00:12<00:32,  2.17s/it]2026-04-06 10:51:08,147 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=0.0000
+2026-04-06 10:51:08,148 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
+2026-04-06 10:51:08,149 - backtest.engine_no_transformer_new - INFO - [比亚迪] 开始回测，数据长度: 714，因子数: 8
+2026-04-06 10:51:08,149 - backtest.engine_no_transformer_new - WARNING - [比亚迪] 所有权重为 0（可能优化未返回有效权重），weight_sum:-0.1780651972356922改用等权重（因子数量：8）继续回测。
+2026-04-06 10:51:09,708 - backtest.engine_no_transformer_new - INFO - [比亚迪] 信号统计: 买入=22, 卖出=22
+2026-04-06 10:51:09,713 - backtest.engine_no_transformer_new - INFO - [比亚迪] 回测完成: 总交易=22, 胜率=31.8%, 夏普=0.32
+2026-04-06 10:51:09,713 - __mp_main__ - INFO - 股票 比亚迪: 交易次数 22
+回测进度:  30%|███       | 6/20 [00:14<00:28,  2.02s/it]2026-04-06 10:51:11,024 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=0.0000
+2026-04-06 10:51:11,025 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
+2026-04-06 10:51:11,025 - backtest.engine_no_transformer_new - INFO - [科大讯飞] 开始回测，数据长度: 848，因子数: 8
+2026-04-06 10:51:11,822 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=-999.0000
+2026-04-06 10:51:11,824 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
+2026-04-06 10:51:11,825 - backtest.engine_no_transformer_new - INFO - [海康威视] 开始回测，数据长度: 625，因子数: 8
+2026-04-06 10:51:11,826 - backtest.engine_no_transformer_new - WARNING - [海康威视] 所有权重为 0（可能优化未返回有效权重），weight_sum:-0.6612348613771085改用等权重（因子数量：8）继续回测。
+2026-04-06 10:51:12,994 - backtest.engine_no_transformer_new - INFO - [科大讯飞] 信号统计: 买入=49, 卖出=48
+2026-04-06 10:51:13,005 - backtest.engine_no_transformer_new - INFO - [科大讯飞] 回测完成: 总交易=48, 胜率=54.2%, 夏普=0.02
+2026-04-06 10:51:13,005 - __mp_main__ - INFO - 股票 科大讯飞: 交易次数 48
+回测进度:  35%|███▌      | 7/20 [00:17<00:31,  2.39s/it]2026-04-06 10:51:13,343 - backtest.engine_no_transformer_new - INFO - [海康威视] 信号统计: 买入=14, 卖出=14
+2026-04-06 10:51:13,349 - backtest.engine_no_transformer_new - INFO - [海康威视] 回测完成: 总交易=14, 胜率=71.4%, 夏普=0.46
+2026-04-06 10:51:13,350 - __mp_main__ - INFO - 股票 海康威视: 交易次数 14
+回测进度:  40%|████      | 8/20 [00:18<00:21,  1.79s/it]2026-04-06 10:51:16,913 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=-999.0000
+2026-04-06 10:51:16,913 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
+2026-04-06 10:51:16,914 - backtest.engine_no_transformer_new - INFO - [中信证券] 开始回测，数据长度: 929，因子数: 8
+2026-04-06 10:51:16,915 - backtest.engine_no_transformer_new - WARNING - [中信证券] 所有权重为 0（可能优化未返回有效权重），weight_sum:-0.5465910564604726改用等权重（因子数量：8）继续回测。
+2026-04-06 10:51:17,421 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=-999.0000
+2026-04-06 10:51:17,422 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
+2026-04-06 10:51:17,422 - backtest.engine_no_transformer_new - INFO - [光迅科技] 开始回测，数据长度: 793，因子数: 8
+2026-04-06 10:51:17,423 - backtest.engine_no_transformer_new - WARNING - [光迅科技] 所有权重为 0（可能优化未返回有效权重），weight_sum:-0.6135645361230141改用等权重（因子数量：8）继续回测。
+2026-04-06 10:51:18,881 - backtest.engine_no_transformer_new - INFO - [中信证券] 信号统计: 买入=28, 卖出=28
+2026-04-06 10:51:18,887 - backtest.engine_no_transformer_new - INFO - [中信证券] 回测完成: 总交易=28, 胜率=39.3%, 夏普=0.75
+2026-04-06 10:51:18,887 - __mp_main__ - INFO - 股票 中信证券: 交易次数 28
+回测进度:  45%|████▌     | 9/20 [00:23<00:31,  2.90s/it]2026-04-06 10:51:19,081 - backtest.engine_no_transformer_new - INFO - [光迅科技] 信号统计: 买入=40, 卖出=39
+2026-04-06 10:51:19,088 - backtest.engine_no_transformer_new - INFO - [光迅科技] 回测完成: 总交易=39, 胜率=48.7%, 夏普=0.82
+2026-04-06 10:51:19,088 - __mp_main__ - INFO - 股票 光迅科技: 交易次数 39
+回测进度:  50%|█████     | 10/20 [00:23<00:20,  2.10s/it]2026-04-06 10:51:21,924 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=-999.0000
+2026-04-06 10:51:21,925 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
+2026-04-06 10:51:21,925 - backtest.engine_no_transformer_new - INFO - [恒瑞医药] 开始回测，数据长度: 935，因子数: 8
+2026-04-06 10:51:21,926 - backtest.engine_no_transformer_new - WARNING - [恒瑞医药] 所有权重为 0（可能优化未返回有效权重），weight_sum:-0.8507013414328859改用等权重（因子数量：8）继续回测。
+2026-04-06 10:51:21,968 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=-999.0000
+2026-04-06 10:51:21,969 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
+2026-04-06 10:51:21,969 - backtest.engine_no_transformer_new - INFO - [山东黄金] 开始回测，数据长度: 924，因子数: 8
+2026-04-06 10:51:21,970 - backtest.engine_no_transformer_new - WARNING - [山东黄金] 所有权重为 0（可能优化未返回有效权重），weight_sum:-0.42690616143211924改用等权重（因子数量：8）继续回测。
+2026-04-06 10:51:23,861 - backtest.engine_no_transformer_new - INFO - [恒瑞医药] 信号统计: 买入=30, 卖出=29
+2026-04-06 10:51:23,867 - backtest.engine_no_transformer_new - INFO - [恒瑞医药] 回测完成: 总交易=29, 胜率=69.0%, 夏普=0.91
+2026-04-06 10:51:23,868 - __mp_main__ - INFO - 股票 恒瑞医药: 交易次数 29
+回测进度:  55%|█████▌    | 11/20 [00:28<00:26,  2.90s/it]2026-04-06 10:51:23,927 - backtest.engine_no_transformer_new - INFO - [山东黄金] 信号统计: 买入=38, 卖出=38
+2026-04-06 10:51:23,935 - backtest.engine_no_transformer_new - INFO - [山东黄金] 回测完成: 总交易=38, 胜率=34.2%, 夏普=0.47
+2026-04-06 10:51:23,935 - __mp_main__ - INFO - 股票 山东黄金: 交易次数 38
+2026-04-06 10:51:24,549 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=-999.0000
+2026-04-06 10:51:24,550 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
+2026-04-06 10:51:24,550 - backtest.engine_no_transformer_new - INFO - [长江电力] 开始回测，数据长度: 560，因子数: 8
+2026-04-06 10:51:24,551 - backtest.engine_no_transformer_new - WARNING - [长江电力] 所有权重为 0（可能优化未返回有效权重），weight_sum:-0.42518350367946617改用等权重（因子数量：8）继续回测。
+2026-04-06 10:51:25,810 - backtest.engine_no_transformer_new - INFO - [长江电力] 信号统计: 买入=10, 卖出=10
+2026-04-06 10:51:25,815 - backtest.engine_no_transformer_new - INFO - [长江电力] 回测完成: 总交易=10, 胜率=60.0%, 夏普=1.21
+2026-04-06 10:51:25,815 - __mp_main__ - INFO - 股票 长江电力: 交易次数 10
+2026-04-06 10:51:27,007 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=-999.0000
+2026-04-06 10:51:27,008 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
+2026-04-06 10:51:27,009 - backtest.engine_no_transformer_new - INFO - [紫金矿业] 开始回测，数据长度: 859，因子数: 8
+2026-04-06 10:51:27,010 - backtest.engine_no_transformer_new - WARNING - [紫金矿业] 所有权重为 0（可能优化未返回有效权重），weight_sum:-0.7745826664701025改用等权重（因子数量：8）继续回测。
+2026-04-06 10:51:28,977 - backtest.engine_no_transformer_new - INFO - [紫金矿业] 信号统计: 买入=34, 卖出=34
+2026-04-06 10:51:28,983 - backtest.engine_no_transformer_new - INFO - [紫金矿业] 回测完成: 总交易=34, 胜率=47.1%, 夏普=0.97
+2026-04-06 10:51:28,983 - __mp_main__ - INFO - 股票 紫金矿业: 交易次数 34
+回测进度:  65%|██████▌   | 13/20 [00:33<00:19,  2.74s/it]2026-04-06 10:51:31,794 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=-999.0000
+2026-04-06 10:51:31,795 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
+2026-04-06 10:51:31,795 - backtest.engine_no_transformer_new - INFO - [歌尔股份] 开始回测，数据长度: 799，因子数: 8
+2026-04-06 10:51:31,796 - backtest.engine_no_transformer_new - WARNING - [歌尔股份] 所有权重为 0（可能优化未返回有效权重），weight_sum:-0.7543155534620539改用等权重（因子数量：8）继续回测。
+2026-04-06 10:51:33,248 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=0.0000
+2026-04-06 10:51:33,249 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
+2026-04-06 10:51:33,249 - backtest.engine_no_transformer_new - INFO - [东山精密] 开始回测，数据长度: 734，因子数: 8
+2026-04-06 10:51:33,538 - backtest.engine_no_transformer_new - INFO - [歌尔股份] 信号统计: 买入=29, 卖出=29
+2026-04-06 10:51:33,544 - backtest.engine_no_transformer_new - INFO - [歌尔股份] 回测完成: 总交易=29, 胜率=48.3%, 夏普=0.40
+2026-04-06 10:51:33,545 - __mp_main__ - INFO - 股票 歌尔股份: 交易次数 29
+2026-04-06 10:51:34,711 - backtest.engine_no_transformer_new - INFO - [东山精密] 信号统计: 买入=47, 卖出=46
+2026-04-06 10:51:34,718 - backtest.engine_no_transformer_new - INFO - [东山精密] 回测完成: 总交易=46, 胜率=56.5%, 夏普=1.05
+2026-04-06 10:51:34,719 - __mp_main__ - INFO - 股票 东山精密: 交易次数 46
+2026-04-06 10:51:36,355 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=-999.0000
+2026-04-06 10:51:36,356 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
+2026-04-06 10:51:36,356 - backtest.engine_no_transformer_new - INFO - [东方电气] 开始回测，数据长度: 1296，因子数: 8
+2026-04-06 10:51:36,357 - backtest.engine_no_transformer_new - WARNING - [东方电气] 所有权重为 0（可能优化未返回有效权重），weight_sum:-0.7166535125681135改用等权重（因子数量：8）继续回测。
+2026-04-06 10:51:39,421 - backtest.engine_no_transformer_new - INFO - [东方电气] 信号统计: 买入=47, 卖出=47
+2026-04-06 10:51:39,429 - backtest.engine_no_transformer_new - INFO - [东方电气] 回测完成: 总交易=47, 胜率=48.9%, 夏普=0.87
+2026-04-06 10:51:39,429 - __mp_main__ - INFO - 股票 东方电气: 交易次数 47
+回测进度:  75%|███████▌  | 15/20 [00:44<00:18,  3.72s/it]2026-04-06 10:51:40,665 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=-999.0000
+2026-04-06 10:51:40,666 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
+2026-04-06 10:51:40,666 - backtest.engine_no_transformer_new - INFO - [中航沈飞] 开始回测，数据长度: 1246，因子数: 8
+2026-04-06 10:51:40,666 - backtest.engine_no_transformer_new - WARNING - [中航沈飞] 所有权重为 0（可能优化未返回有效权重），weight_sum:-0.3903401672817984改用等权重（因子数量：8）继续回测。
+2026-04-06 10:51:42,484 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=-999.0000
+2026-04-06 10:51:42,487 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
+2026-04-06 10:51:42,487 - backtest.engine_no_transformer_new - INFO - [北大荒] 开始回测，数据长度: 932，因子数: 8
+2026-04-06 10:51:42,488 - backtest.engine_no_transformer_new - WARNING - [北大荒] 所有权重为 0（可能优化未返回有效权重），weight_sum:-0.8437999699950026改用等权重（因子数量：8）继续回测。
+2026-04-06 10:51:42,660 - backtest.optimizer_new - INFO - 优化完成: 最优夏普比率=-999.0000
+2026-04-06 10:51:42,661 - backtest.optimizer_new - INFO - Walk-Forward划分完成: 5 个划分
+2026-04-06 10:51:42,661 - backtest.engine_no_transformer_new - INFO - [北新建材] 开始回测，数据长度: 804，因子数: 8
+2026-04-06 10:51:42,662 - backtest.engine_no_transformer_new - WARNING - [北新建材] 所有权重为 0（可能优化未返回有效权重），weight_sum:-0.46172868859255367改用等权重（因子数量：8）继续回测。
+2026-04-06 10:51:43,425 - backtest.engine_no_transformer_new - INFO - [中航沈飞] 信号统计: 买入=46, 卖出=46
+2026-04-06 10:51:43,433 - backtest.engine_no_transformer_new - INFO - [中航沈飞] 回测完成: 总交易=46, 胜率=32.6%, 夏普=-0.82
+2026-04-06 10:51:43,433 - __mp_main__ - INFO - 股票 中航沈飞: 交易次数 46
+回测进度:  90%|█████████ | 18/20 [00:48<00:05,  2.63s/it]2026-04-06 10:51:44,383 - backtest.engine_no_transformer_new - INFO - [北新建材] 信号统计: 买入=25, 卖出=24
+2026-04-06 10:51:44,389 - backtest.engine_no_transformer_new - INFO - [北新建材] 回测完成: 总交易=24, 胜率=50.0%, 夏普=0.77
+2026-04-06 10:51:44,390 - __mp_main__ - INFO - 股票 北新建材: 交易次数 24
+2026-04-06 10:51:44,452 - backtest.engine_no_transformer_new - INFO - [北大荒] 信号统计: 买入=28, 卖出=28
+2026-04-06 10:51:44,457 - backtest.engine_no_transformer_new - INFO - [北大荒] 回测完成: 总交易=28, 胜率=50.0%, 夏普=-0.88
+2026-04-06 10:51:44,457 - __mp_main__ - INFO - 股票 北大荒: 交易次数 28
+回测进度: 100%|██████████| 20/20 [00:49<00:00,  2.47s/it]
+2026-04-06 10:51:44,461 - __main__ - INFO - 步骤3: 统计结果...
+2026-04-06 10:51:44,461 - __main__ - INFO - 回测成功: 20/20
+2026-04-06 10:51:44,461 - __main__ - INFO - 步骤4: 筛选策略...
+2026-04-06 10:51:44,462 - __main__ - INFO - 策略 贵州茅台: 丢弃 - 夏普比率 -1.0096 < 0.0, 最大回撤 -26.80% < -20.0%
+2026-04-06 10:51:44,462 - __main__ - INFO - 策略 美的集团: 通过筛选
+2026-04-06 10:51:44,462 - __main__ - INFO - 策略 国轩高科: 丢弃 - 最大回撤 -28.05% < -20.0%
+2026-04-06 10:51:44,462 - __main__ - INFO - 策略 隆基绿能: 丢弃 - 夏普比率 -0.4723 < 0.0, 最大回撤 -38.90% < -20.0%
+2026-04-06 10:51:44,462 - __main__ - INFO - 策略 赛力斯: 通过筛选
+2026-04-06 10:51:44,462 - __main__ - INFO - 策略 比亚迪: 丢弃 - 最大回撤 -23.98% < -20.0%
+2026-04-06 10:51:44,462 - __main__ - INFO - 策略 科大讯飞: 丢弃 - 最大回撤 -39.62% < -20.0%
+2026-04-06 10:51:44,462 - __main__ - INFO - 策略 海康威视: 通过筛选
+2026-04-06 10:51:44,462 - __main__ - INFO - 策略 中信证券: 通过筛选
+2026-04-06 10:51:44,462 - __main__ - INFO - 策略 光迅科技: 丢弃 - 最大回撤 -30.90% < -20.0%
+2026-04-06 10:51:44,463 - __main__ - INFO - 策略 恒瑞医药: 通过筛选
+2026-04-06 10:51:44,463 - __main__ - INFO - 策略 山东黄金: 丢弃 - 最大回撤 -23.08% < -20.0%
+2026-04-06 10:51:44,463 - __main__ - INFO - 策略 紫金矿业: 丢弃 - 最大回撤 -22.32% < -20.0%
+2026-04-06 10:51:44,463 - __main__ - INFO - 策略 长江电力: 通过筛选
+2026-04-06 10:51:44,463 - __main__ - INFO - 策略 东方电气: 丢弃 - 最大回撤 -31.45% < -20.0%
+2026-04-06 10:51:44,464 - __main__ - INFO - 策略 歌尔股份: 丢弃 - 最大回撤 -20.74% < -20.0%
+2026-04-06 10:51:44,464 - __main__ - INFO - 策略 东山精密: 丢弃 - 最大回撤 -32.38% < -20.0%
+2026-04-06 10:51:44,464 - __main__ - INFO - 策略 中航沈飞: 丢弃 - 夏普比率 -0.8184 < 0.0, 最大回撤 -63.19% < -20.0%
+2026-04-06 10:51:44,464 - __main__ - INFO - 策略 北大荒: 丢弃 - 夏普比率 -0.8773 < 0.0, 最大回撤 -28.27% < -20.0%
+2026-04-06 10:51:44,464 - __main__ - INFO - 策略 北新建材: 通过筛选
+2026-04-06 10:51:44,464 - __main__ - INFO - 步骤5: 生成报告...
+2026-04-06 10:51:44,464 - __main__ - INFO - 最终保留 7 个策略
+2026-04-06 10:51:44,469 - __main__ - INFO - 结果已保存到: ./stock_cache/no_transformer_results\backtest_results.json
 
 ================================================================================
 开始生成可视化图表...
 ================================================================================
-2026-04-06 10:29:30,120 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:30,130 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:30,136 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:30,142 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:30,149 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:30,155 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:30,162 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:30,168 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:30,174 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:30,181 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:30,187 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:30,193 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:51:44,509 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:51:44,515 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:51:44,522 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:51:44,528 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:51:44,534 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:51:44,540 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:51:44,546 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:51:44,552 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:51:44,559 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:51:44,565 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:51:44,572 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:51:44,578 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
 E:\autotrade\autotrade_for_llm_review\backtest\visualizer.py:203: UserWarning: This figure includes Axes that are not compatible with tight_layout, so results might be incorrect.
   plt.tight_layout()
-2026-04-06 10:29:34,813 - backtest.visualizer - INFO - 图表已保存: ./stock_cache/no_transformer_results\backtest_charts\美的集团_美的集团_backtest_no_transformer.png
+2026-04-06 10:51:49,581 - backtest.visualizer - INFO - 图表已保存: ./stock_cache/no_transformer_results\backtest_charts\美的集团_美的集团_backtest_no_transformer.png
  ✓ 美的集团 图表已保存
-2026-04-06 10:29:34,845 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:34,847 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:34,858 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:34,863 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:34,870 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:34,876 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:34,880 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:34,888 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:51:49,611 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:51:49,615 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:51:49,624 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:51:49,630 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:51:49,637 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:51:49,642 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:51:49,648 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:51:49,655 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
 E:\autotrade\autotrade_for_llm_review\backtest\visualizer.py:203: UserWarning: This figure includes Axes that are not compatible with tight_layout, so results might be incorrect.
   plt.tight_layout()
-2026-04-06 10:29:38,937 - backtest.visualizer - INFO - 图表已保存: ./stock_cache/no_transformer_results\backtest_charts\赛力斯_赛力斯_backtest_no_transformer.png
-2026-04-06 10:29:38,961 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:38,967 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:51:53,780 - backtest.visualizer - INFO - 图表已保存: ./stock_cache/no_transformer_results\backtest_charts\赛力斯_赛力斯_backtest_no_transformer.png
  ✓ 赛力斯 图表已保存
-2026-04-06 10:29:38,973 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:38,979 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:38,984 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:38,986 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:38,996 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:39,002 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:39,009 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:39,016 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:39,019 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:39,028 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:39,034 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:39,041 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:51:53,804 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:51:53,810 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:51:53,817 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:51:53,823 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:51:53,830 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:51:53,831 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:51:53,842 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:51:53,848 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:51:53,855 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:51:53,861 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:51:53,865 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:51:53,874 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:51:53,880 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:51:53,887 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
 E:\autotrade\autotrade_for_llm_review\backtest\visualizer.py:203: UserWarning: This figure includes Axes that are not compatible with tight_layout, so results might be incorrect.
   plt.tight_layout()
-2026-04-06 10:29:44,457 - backtest.visualizer - INFO - 图表已保存: ./stock_cache/no_transformer_results\backtest_charts\海康威视_海康威视_backtest_no_transformer.png
+2026-04-06 10:51:59,147 - backtest.visualizer - INFO - 图表已保存: ./stock_cache/no_transformer_results\backtest_charts\海康威视_海康威视_backtest_no_transformer.png
  ✓ 海康威视 图表已保存
-2026-04-06 10:29:44,480 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:44,487 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:44,493 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:44,499 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:44,505 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:44,510 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:44,514 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:44,522 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:44,527 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:44,535 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:44,541 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:44,547 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:44,553 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:44,560 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:44,566 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:44,571 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:44,578 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:44,581 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:44,591 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:44,597 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:44,604 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:44,610 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:44,614 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:44,622 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:44,629 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:44,635 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:44,642 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:44,647 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:51:59,171 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:51:59,178 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:51:59,184 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:51:59,187 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:51:59,196 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:51:59,202 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:51:59,208 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:51:59,213 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:51:59,220 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:51:59,226 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:51:59,232 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:51:59,237 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:51:59,245 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:51:59,250 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:51:59,254 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:51:59,263 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:51:59,269 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:51:59,276 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:51:59,281 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:51:59,287 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:51:59,295 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:51:59,301 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:51:59,307 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:51:59,312 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:51:59,319 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:51:59,320 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:51:59,331 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:51:59,337 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
 E:\autotrade\autotrade_for_llm_review\backtest\visualizer.py:203: UserWarning: This figure includes Axes that are not compatible with tight_layout, so results might be incorrect.
   plt.tight_layout()
-2026-04-06 10:29:52,524 - backtest.visualizer - INFO - 图表已保存: ./stock_cache/no_transformer_results\backtest_charts\中信证券_中信证券_backtest_no_transformer.png
+2026-04-06 10:52:06,838 - backtest.visualizer - INFO - 图表已保存: ./stock_cache/no_transformer_results\backtest_charts\中信证券_中信证券_backtest_no_transformer.png
  ✓ 中信证券 图表已保存
-2026-04-06 10:29:52,549 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:52,555 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:52,559 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:52,567 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:52,573 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:52,579 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:52,586 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:52,592 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:52,598 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:52,604 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:52,611 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:52,616 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:52,620 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:52,625 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:52,636 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:52,642 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:52,649 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:52,656 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:52,659 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:52,668 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:52,675 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:52,682 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:52,688 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:52,692 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:52,701 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:52,709 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:52,715 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:52,722 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:29:52,725 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:52:06,864 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:52:06,869 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:52:06,876 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:52:06,882 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:52:06,888 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:52:06,895 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:52:06,901 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:52:06,904 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:52:06,914 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:52:06,920 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:52:06,926 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:52:06,933 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:52:06,937 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:52:06,946 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:52:06,952 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:52:06,958 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:52:06,965 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:52:06,971 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:52:06,978 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:52:06,985 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:52:06,992 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:52:06,999 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:52:07,004 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:52:07,012 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:52:07,018 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:52:07,024 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:52:07,030 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:52:07,037 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:52:07,044 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
 E:\autotrade\autotrade_for_llm_review\backtest\visualizer.py:203: UserWarning: This figure includes Axes that are not compatible with tight_layout, so results might be incorrect.
   plt.tight_layout()
-2026-04-06 10:30:02,350 - backtest.visualizer - INFO - 图表已保存: ./stock_cache/no_transformer_results\backtest_charts\恒瑞医药_恒瑞医药_backtest_no_transformer.png
+2026-04-06 10:52:14,852 - backtest.visualizer - INFO - 图表已保存: ./stock_cache/no_transformer_results\backtest_charts\恒瑞医药_恒瑞医药_backtest_no_transformer.png
  ✓ 恒瑞医药 图表已保存
-2026-04-06 10:30:02,370 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:30:02,381 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:30:02,387 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:30:02,393 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:30:02,398 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:30:02,405 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:30:02,411 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:30:02,418 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:30:02,424 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:30:02,431 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:52:14,877 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:52:14,883 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:52:14,888 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:52:14,895 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:52:14,900 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:52:14,907 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:52:14,913 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:52:14,919 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:52:14,921 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:52:14,931 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
 E:\autotrade\autotrade_for_llm_review\backtest\visualizer.py:203: UserWarning: This figure includes Axes that are not compatible with tight_layout, so results might be incorrect.
   plt.tight_layout()
-2026-04-06 10:30:07,065 - backtest.visualizer - INFO - 图表已保存: ./stock_cache/no_transformer_results\backtest_charts\长江电力_长江电力_backtest_no_transformer.png
+2026-04-06 10:52:19,471 - backtest.visualizer - INFO - 图表已保存: ./stock_cache/no_transformer_results\backtest_charts\长江电力_长江电力_backtest_no_transformer.png
  ✓ 长江电力 图表已保存
-2026-04-06 10:30:07,089 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:30:07,093 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:30:07,101 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:30:07,107 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:30:07,113 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:30:07,120 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:30:07,126 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:30:07,133 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:30:07,139 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:30:07,143 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:30:07,152 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:30:07,160 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:30:07,166 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:30:07,172 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:30:07,179 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:30:07,185 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:30:07,192 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:30:07,198 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:30:07,204 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:30:07,210 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:30:07,217 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:30:07,222 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:30:07,229 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
-2026-04-06 10:30:07,231 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:52:19,495 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:52:19,501 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:52:19,508 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:52:19,510 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:52:19,520 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:52:19,525 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:52:19,531 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:52:19,537 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:52:19,544 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:52:19,549 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:52:19,555 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:52:19,562 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:52:19,569 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:52:19,574 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:52:19,577 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:52:19,587 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:52:19,593 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:52:19,600 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:52:19,606 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:52:19,610 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:52:19,618 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:52:19,625 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:52:19,631 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
+2026-04-06 10:52:19,636 - data.indicators - WARNING - get_market_regime: 无法计算 MA20，将按 neutral 处理，原因: 'numpy.ndarray' object has no attribute 'isna'
 E:\autotrade\autotrade_for_llm_review\backtest\visualizer.py:203: UserWarning: This figure includes Axes that are not compatible with tight_layout, so results might be incorrect.
   plt.tight_layout()
-2026-04-06 10:30:15,848 - backtest.visualizer - INFO - 图表已保存: ./stock_cache/no_transformer_results\backtest_charts\北新建材_北新建材_backtest_no_transformer.png
-2026-04-06 10:30:15,849 - __main__ - INFO - ================================================================================
-2026-04-06 10:30:15,849 - __main__ - INFO - 回测完成
-2026-04-06 10:30:15,849 - __main__ - INFO - ================================================================================
+2026-04-06 10:52:26,394 - backtest.visualizer - INFO - 图表已保存: ./stock_cache/no_transformer_results\backtest_charts\北新建材_北新建材_backtest_no_transformer.png
+2026-04-06 10:52:26,394 - __main__ - INFO - ================================================================================
+2026-04-06 10:52:26,395 - __main__ - INFO - 回测完成
+2026-04-06 10:52:26,395 - __main__ - INFO - ================================================================================
  ✓ 北新建材 图表已保存
 
 ================================================================================
