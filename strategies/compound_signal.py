@@ -85,15 +85,20 @@ class CompoundSignalStrategy(BaseStrategy):
                     "reason": f"AI概率不足({transformer_prob:.2f}<{transformer_buy_threshold})",
                 }
 
-            # 弱势市场阻断
-            if regime == "weak":
-                return {
-                    "action": "hold",
-                    "score": score,
-                    "confidence": transformer_conf,
-                    "position_ratio": 0.0,
-                    "reason": "弱势市场阻断",
-                }
+            # ★ 修复B6：弱势市场不再一刀切阻断，改为限制仓位
+            if regime == "bear":
+                # bear 市场只允许极强信号
+                if score < 0.85:
+                    return {
+                        "action": "hold",
+                        "score": score,
+                        "confidence": transformer_conf,
+                        "position_ratio": 0.0,
+                        "reason": f"空头市场信号不足({score:.2f}<0.85)",
+                    }
+            elif regime == "weak":
+                # 弱势市场降低仓位而非阻断
+                position_ratio *= 0.3
 
             # ATR动态仓位
             atr = df["atr"].iloc[idx] if "atr" in df.columns else price * 0.02
@@ -156,6 +161,9 @@ class CompoundSignalStrategy(BaseStrategy):
             stop_loss = params.get("stop_loss", -0.08)
             take_profit = params.get("take_profit", 0.20)
 
+            # ★ M6 修复：与 engine.py 统一，使用 ATR 倍数止盈
+            take_profit_multiplier = params.get("take_profit_multiplier", 3.0)
+
             # 固定止损
             if pnl_ratio <= stop_loss:
                 return {
@@ -166,15 +174,17 @@ class CompoundSignalStrategy(BaseStrategy):
                     "reason": f"固定止损({pnl_ratio:.2%}<={stop_loss:.2%})",
                 }
 
-            # 固定止盈
-            if pnl_ratio >= take_profit:
-                return {
-                    "action": "sell",
-                    "score": score,
-                    "confidence": transformer_conf,
-                    "position_ratio": 0.0,
-                    "reason": f"固定止盈({pnl_ratio:.2%}>={take_profit:.2%})",
-                }
+            # ATR 动态止盈
+            if 'atr' in df.columns and not pd.isna(df['atr'].iloc[idx]):
+                atr = df['atr'].iloc[idx]
+                if pnl_ratio >= take_profit_multiplier * (atr / cost_price):
+                    return {
+                        "action": "sell",
+                        "score": score,
+                        "confidence": transformer_conf,
+                        "position_ratio": 0.0,
+                        "reason": f"动态止盈({pnl_ratio:.2%}>=ATR*{take_profit_multiplier})",
+                    }
 
             # 移动止损
             tp1 = params.get("trailing_profit_level1", 0.06)
@@ -274,11 +284,12 @@ class CompoundSignalStrategy(BaseStrategy):
                 "high": -0.03,
                 "step": 0.01,
             },
-            "take_profit": {
+            # ★ M6 修复：与 engine.py 统一，使用 ATR 倍数
+            "take_profit_multiplier": {
                 "type": "float",
-                "low": 0.05,
-                "high": 0.40,
-                "step": 0.05,
+                "low": 1.5,
+                "high": 5.0,
+                "step": 0.25,
             },
             # 移动止损（触发阈值 + 回撤幅度）
             "trailing_profit_level1": {

@@ -63,18 +63,26 @@ def check_and_clean_cache(cache_file: str) -> bool:
             logger.warning(f"未知缓存类型: {type(data)}，已删除: {cache_file}")
             return False
         # ==================================================================
-        #2026/04/06今天暂时屏蔽
-        return True
+        last_date = pd.to_datetime(last_date).date()
+        today = datetime.now().date()
 
-        # last_date = pd.to_datetime(last_date).date()
-        # today = datetime.now().date()
-        #
-        # if last_date >= today - timedelta(days=1):
-        #     logger.info(f"缓存有效: {cache_file} (最后日期: {last_date})")
-        #     return True
-        # else:
-        #     logger.info(f"缓存过期: {cache_file} (最后日期: {last_date})")
-        #     return False
+        # ★ M5 修复：恢复缓存有效期检查
+        # 周末/节假日：数据最多滞后2天（周五数据周一才更新）
+        # 盘中：数据当天有效
+        weekday = today.weekday()
+        if weekday == 5:  # 周六
+            max_staleness = timedelta(days=2)
+        elif weekday == 6:  # 周日
+            max_staleness = timedelta(days=3)
+        else:
+            max_staleness = timedelta(days=2)
+
+        if last_date >= today - max_staleness:
+            logger.info(f"缓存有效: {cache_file} (最后日期: {last_date})")
+            return True
+        else:
+            logger.info(f"缓存过期: {cache_file} (最后日期: {last_date})")
+            return False
 
     except Exception as e:
         logger.warning(f"缓存读取异常: {e}")
