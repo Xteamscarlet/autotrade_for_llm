@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 集中配置管理模块
-使用 dataclass + .env 实现统一配置源，避免参数散落在各文件中
+使用 dataclass + .env 实现统一配置源，避免参数散落在各文件�?
 """
 import os
 from dataclasses import dataclass, field
@@ -46,7 +46,7 @@ class ModelConfig:
     num_heads: int = 8
     num_layers: int = 4
     dim_feedforward: int = 512
-    dropout: float = 0.4
+    dropout: float = 0.5
     num_classes: int = 4
 
     # 训练高级配置
@@ -64,7 +64,7 @@ class ModelConfig:
 
     # 推理配置
     mc_forward_train: int = 10     # 训练/实盘 MC Dropout 采样次数
-    mc_forward_backtest: int = 3   # 回测时降低采样次数加速
+    mc_forward_backtest: int = 3   # 回测时降低采样次数加�?
     inference_batch_size: int = 64 # 批量推理 batch size
 
     @classmethod
@@ -78,7 +78,7 @@ class ModelConfig:
             num_heads=_env_int("NUM_HEADS", 8),
             num_layers=_env_int("NUM_LAYERS", 4),
             dim_feedforward=_env_int("DIM_FEEDFORWARD", 512),
-            dropout=_env_float("DROPOUT", 0.4),
+            dropout=_env_float("DROPOUT", 0.5),
             accumulation_steps=_env_int("ACCUMULATION_STEPS", 4),
             ema_decay=_env_float("EMA_DECAY", 0.999),
             warmup_epochs=_env_int("WARMUP_EPOCHS", 3),
@@ -107,8 +107,8 @@ class RiskConfig:
     min_trades: int = 15
     max_trades: int = 120
     max_daily_loss_ratio: float = 0.03
-    max_correlation: float = 0.7      # 组合内持仓最大相关系数
-    max_sector_ratio: float = 0.40    # 板块集中度上限
+    max_correlation: float = 0.7      # 组合内持仓最大相关系�?
+    max_sector_ratio: float = 0.40    # 板块集中度上�?
 
     @classmethod
     def from_env(cls) -> "RiskConfig":
@@ -263,13 +263,13 @@ class SchedulerConfig:
 
 @dataclass
 class RegimeConfig:
-    """市场状态判断配置"""
+    """市场状态判断配"""
     ma_period: int = 20              # MA 周期
-    volatility_period: int = 60      # 波动率周期
-    high_vol_threshold: float = 1.5  # 高波动阈值（相对中位数倍数）
+    volatility_period: int = 60      # 波动率周�?
+    high_vol_threshold: float = 1.5  # 高波动阈值（相对中位数倍数�?
     trend_strength_period: int = 20  # 趋势强度计算周期
     weak_regime_buy_cap: float = 0.3 # 弱势市场中允许的买入仓位上限
-    bear_max_position: float = 0.15  # 熊市单只最大仓位
+    bear_max_position: float = 0.15  # 熊市单只最大仓�?
 
     @classmethod
     def from_env(cls) -> "RegimeConfig":
@@ -321,30 +321,30 @@ STOCK_CODES = {
     '美的集团': '000333',
 
     # 新能源
-    '国轩高科': '002074',
-    '隆基绿能': '601012',
-    '赛力斯':   '601127',
-    '比亚迪':   '002594',
+    '国轩高科': '002074',     # 动力电池（替代宁德时代）
+    '隆基绿能': '601012',     # 光伏组件龙头
+    '赛力斯':   '601127',     # 新能源车（华为合作，弹性标的）
+    '比亚迪':   '002594',     # 新能源车整车龙头（与赛力斯互补）
 
     # AI / 科技
     '科大讯飞': '002230',
     '海康威视': '002415',
 
-    # 金融
-    '中信证券': '600030',
+    # 金融（替代东方财富）
+    '中信证券': '600030',     # 券商龙头
 
-    # 通信/算力
-    '光迅科技': '002281',
+    # 通信/算力（替代中际旭创）
+    '光迅科技': '002281',     # 光模块/光通信龙头
 
-    # 医药
-    '恒瑞医药': '600276',
+    # 医药（替代迈瑞医疗）
+    '恒瑞医药': '600276',     # 创新药龙头
 
     # 黄金 / 有色 / 资源
     '山东黄金': '600547',
-    '紫金矿业': '601899',
+    '紫金矿业': '601899',     # 铜+金资源龙头
 
-    # 电力/公用事业
-    '长江电力': '600900',
+    # 电力/公用事业（防御）
+    '长江电力': '600900',     # 水电龙头
     '东方电气': '600875',
 
     # 电子/消费电子

@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 """
-模型训练模块 V2 — 突破 val_loss 瓶颈
-核心改动：
-1. 标签体系：4分类→动态阈值+类别加权（解决类别不平衡）
+模型训练模块 V2 �?突破 val_loss 瓶颈
+核心改动�?
+1. 标签体系�?分类→动态阈�?类别加权（解决类别不平衡�?
 2. 损失函数：Focal Loss 替代 CrossEntropy（聚焦难分样本）+ 回归损失自适应权重
 3. 数据增强：降低强度，金融数据不能随意缩放
-4. 特征工程：增加收益率特征，提高信号密度
-5. 训练策略：更多 epochs + cosine annealing + 更高初始学习率
-6. 标签平滑：0.1→0.05（金融数据已高噪声，不需要过多平滑）
-7. 标准化：quantile_range (5,95)→(10,90)，保留更多区分度
+4. 特征工程：增加收益率特征，提高信号密�?
+5. 训练策略：更�?epochs + cosine annealing + 更高初始学习�?
+6. 标签平滑�?.1�?.05（金融数据已高噪声，不需要过多平滑）
+7. 标准化：quantile_range (5,95)�?10,90)，保留更多区分度
 """
 import os
 import glob
@@ -41,7 +41,7 @@ logger = logging.getLogger(__name__)
 # ==================== Focal Loss ====================
 
 class FocalLoss(nn.Module):
-    """Focal Loss — 聚焦难分样本，解决类别不平衡
+    """Focal Loss �?聚焦难分样本，解决类别不平衡
     
     FL(p_t) = -alpha_t * (1 - p_t)^gamma * log(p_t)
     
@@ -92,7 +92,7 @@ class FocalLoss(nn.Module):
 # ==================== 训练辅助组件 ====================
 
 class CosineAnnealingWarmRestarts:
-    """余弦退火 + 热重启调度器"""
+    """余弦退�?+ 热重启调度器"""
     def __init__(self, optimizer, T_0=10, T_mult=2, eta_min=1e-6):
         self.optimizer = optimizer
         self.T_0 = T_0
@@ -119,7 +119,7 @@ class CosineAnnealingWarmRestarts:
 
 
 class FinanceScheduler:
-    """金融专用调度器：Warmup + Plateau + Cyclical微震荡"""
+    """金融专用调度器：Warmup + Plateau + Cyclical微震�?"""
 
     def __init__(self, optimizer, warmup_steps=1000, base_lr=3e-5, min_lr=1e-6,
                  plateau_patience=2, plateau_factor=0.5, cycle_amplitude=0.2, cycle_length=5):
@@ -239,13 +239,9 @@ class EarlyStopping:
         return self.early_stop
 
 
-# ==================== 数据集 V2 ====================
+# ==================== 数据�?V2 ====================
 
 class MultiStockDatasetV2(torch.utils.data.Dataset):
-    """多股票时序数据集 V2
-    
-    标签改进：动态阈值 + 更细粒度
-    """
     def __init__(self, combined_df, lookback_days, label_mode='dynamic'):
         self.lookback_days = lookback_days
         self.label_mode = label_mode
@@ -253,7 +249,7 @@ class MultiStockDatasetV2(torch.utils.data.Dataset):
         self.code_array = combined_df['Code'].values
         self.date_array = combined_df['Date'].values
         
-        # ★ 预计算全局收益率分位数，用于动态标签
+        # �?预计算全局收益率分位数，用于动态标�?
         all_rets = []
         for i in range(len(self.data_array)):
             if i >= lookback_days:
@@ -267,7 +263,7 @@ class MultiStockDatasetV2(torch.utils.data.Dataset):
         
         if all_rets:
             ret_arr = np.array(all_rets)
-            # ★ 动态阈值：基于实际分布而非固定 5%
+            # �?动态阈值：基于实际分布而非固定 5%
             self.q25 = np.percentile(ret_arr, 25)  # 下四分位
             self.q75 = np.percentile(ret_arr, 75)  # 上四分位
             self.q10 = np.percentile(ret_arr, 10)  # 极端下跌
@@ -279,15 +275,15 @@ class MultiStockDatasetV2(torch.utils.data.Dataset):
         self.code_ranges = self._build_code_ranges()
         self.index_map = self._build_index_map()
         
-        # ★ 计算类别分布（用于 Focal Loss 的 alpha）
+        # �?计算类别分布（用�?Focal Loss �?alpha�?
         label_counts = np.zeros(4)
         for _, _, _, label in self.index_map:
             label_counts[label] += 1
         total = label_counts.sum()
         if total > 0:
-            # 逆频率加权，但限制最大权重避免过拟合罕见类
+            # 逆频率加权，但限制最大权重避免过拟合罕见�?
             self.class_weights = np.clip(total / (4 * label_counts + 1), 0.5, 3.0)
-            self.class_weights = self.class_weights / self.class_weights.sum() * 4  # 归一化到和=4
+            self.class_weights = self.class_weights / self.class_weights.sum() * 4  # 归一化到�?4
         else:
             self.class_weights = np.ones(4)
         
@@ -326,7 +322,7 @@ class MultiStockDatasetV2(torch.utils.data.Dataset):
                 if np.isnan(ret) or np.isinf(ret):
                     continue
 
-                # ★ 动态阈值标签（替代固定 5%）
+                # �?动态阈值标签（替代固定 5%�?
                 if self.label_mode == 'dynamic':
                     if ret > self.q90:
                         label = 3  # 大涨
@@ -337,7 +333,7 @@ class MultiStockDatasetV2(torch.utils.data.Dataset):
                     else:
                         label = 0  # 大跌
                 else:
-                    # 原始固定阈值
+                    # 原始固定阈�?
                     if ret > 0.05:
                         label = 3
                     elif ret > 0:
@@ -364,14 +360,6 @@ class MultiStockDatasetV2(torch.utils.data.Dataset):
 
 
 class WeightedMultiStockDatasetV2(MultiStockDatasetV2):
-    """带时间权重和温和数据增强的数据集 V2
-    
-    ★ 关键改动：降低增强强度
-    - 缩放范围：0.9~1.1 → 0.95~1.05
-    - 噪声强度：0.02 → 0.01
-    - Mask概率：0.3*0.1 → 0.15*0.05
-    - 增强触发概率：0.5 → 0.3
-    """
     def __init__(self, combined_df, lookback_days, augment=True, label_mode='dynamic'):
         super().__init__(combined_df, lookback_days, label_mode=label_mode)
         self.weights_array = combined_df['time_weight'].values.astype(np.float32)
@@ -382,14 +370,14 @@ class WeightedMultiStockDatasetV2(MultiStockDatasetV2):
         sequence = self.data_array[start_idx:start_idx + self.lookback_days]
         weight = self.weights_array[start_idx + self.lookback_days]
 
-        # ★ 温和数据增强
-        if self.augment and np.random.rand() < 0.3:  # 0.5→0.3
-            scale = np.random.uniform(0.95, 1.05)  # 0.9~1.1 → 0.95~1.05
+        # �?温和数据增强
+        if self.augment and np.random.rand() < 0.4:  # 0.5�?.3
+            scale = np.random.uniform(0.92, 1.08)  # 0.9~1.1 �?0.95~1.05
             sequence = sequence * scale
-            noise = np.random.normal(0, 0.01, sequence.shape)  # 0.02→0.01
+            noise = np.random.normal(0, 0.015, sequence.shape)  # 0.02�?.01
             sequence = sequence + noise
-            if np.random.rand() < 0.15:  # 0.3→0.15
-                mask = np.random.rand(self.lookback_days) > 0.05  # 0.1→0.05
+            if np.random.rand() < 0.15:  # 0.3�?.15
+                mask = np.random.rand(self.lookback_days) > 0.05  # 0.1�?.05
                 sequence = sequence * mask[:, np.newaxis]
 
         return (
@@ -400,10 +388,9 @@ class WeightedMultiStockDatasetV2(MultiStockDatasetV2):
         )
 
 
-# ==================== 训练主函数 V2 ====================
+# ==================== 训练主函�?V2 ====================
 
 def train_model(settings: Optional[AppConfig] = None) -> None:
-    """完整的模型训练流程 V2 — 突破 val_loss 瓶颈"""
     if settings is None:
         settings = get_settings()
 
@@ -417,9 +404,9 @@ def train_model(settings: Optional[AppConfig] = None) -> None:
     if os.path.exists(pc.stock_data_file):
         combined_df = pd.read_feather(pc.stock_data_file)
     else:
-        raise FileNotFoundError(f"数据文件不存在: {pc.stock_data_file}")
+        raise FileNotFoundError(f"数据文件不存�? {pc.stock_data_file}")
 
-    # ========== 2. 数据预处理 ==========
+    # ========== 2. 数据预处�?==========
     logger.info("数据预处理：严格清洗...")
     if 'Code' not in combined_df.columns or 'Date' not in combined_df.columns:
         if 'Date' not in combined_df.columns and combined_df.index.name == 'Date':
@@ -440,15 +427,15 @@ def train_model(settings: Optional[AppConfig] = None) -> None:
         (combined_df['daily_ret'].abs() <= 0.3) | (combined_df['daily_ret'].isna())
     ]
 
-    # ★ 新增：收益率特征（提高信号密度）
+    # �?新增：收益率特征（提高信号密度）
     for lag in [1, 3, 5, 10]:
         col_name = f'ret_{lag}'
         combined_df[col_name] = combined_df.groupby('Code')['Close'].pct_change(lag)
-        # 如果 FEATURES 不包含这些列，后面标准化时需要处理
+        # 如果 FEATURES 不包含这些列，后面标准化时需要处�?
         if col_name not in FEATURES:
             FEATURES.append(col_name)
     
-    # 重新截断极端特征值（包含新加的收益率特征）
+    # 重新截断极端特征值（包含新加的收益率特征�?
     for col in FEATURES:
         if col in combined_df.columns:
             q01 = combined_df[col].quantile(0.01)
@@ -459,8 +446,8 @@ def train_model(settings: Optional[AppConfig] = None) -> None:
     combined_df = combined_df.reset_index(drop=True)
     logger.info(f"清洗后数据量: {len(combined_df)}")
 
-    # ========== 3. 按股票划分 + 独立标准化 ==========
-    logger.info("按股票划分训练集/验证集，独立标准化...")
+    # ========== 3. 按股票划�?+ 独立标准�?==========
+    logger.info("按股票划分训练集/验证集，独立标准�?..")
     scalers = {}
     train_dfs = []
     val_dfs = []
@@ -492,7 +479,7 @@ def train_model(settings: Optional[AppConfig] = None) -> None:
             continue
 
         try:
-            # ★ 标准化范围：(5,95) → (10,90)，保留更多区分度
+            # �?标准化范围：(5,95) �?(10,90)，保留更多区分度
             scaler = RobustScaler(quantile_range=(10, 90))
             train_part[FEATURES] = scaler.fit_transform(train_part[FEATURES])
             val_part[FEATURES] = scaler.transform(val_part[FEATURES])
@@ -518,7 +505,7 @@ def train_model(settings: Optional[AppConfig] = None) -> None:
     val_df = pd.concat(val_dfs, ignore_index=True)
 
     joblib.dump(scalers, pc.scaler_path)
-    logger.info(f"已保存 {len(scalers)} 个股票的独立 scaler")
+    logger.info(f"已保�?{len(scalers)} 个股票的独立 scaler")
 
     all_train_data = train_df[FEATURES].values
     global_scaler = RobustScaler(quantile_range=(10, 90))
@@ -531,7 +518,7 @@ def train_model(settings: Optional[AppConfig] = None) -> None:
         train_df['Date'] = pd.to_datetime(train_df['Date'])
         max_date = train_df['Date'].max()
         train_df['days_to_recent'] = (max_date - train_df['Date']).dt.days.clip(lower=0)
-        # ★ 减小衰减率：0.001 → 0.0005，让更早的数据也有更多权重
+        # �?减小衰减率：0.001 �?0.0005，让更早的数据也有更多权�?
         train_df['time_weight'] = np.exp(-0.0005 * train_df['days_to_recent'])
         train_df['time_weight'] = train_df['time_weight'].clip(0.1, 1.0).fillna(0.5)
     else:
@@ -550,11 +537,11 @@ def train_model(settings: Optional[AppConfig] = None) -> None:
     train_dataset = WeightedMultiStockDatasetV2(train_df, mc.lookback_days, augment=True, label_mode='dynamic')
     val_dataset = WeightedMultiStockDatasetV2(val_df, mc.lookback_days, augment=False, label_mode='dynamic')
 
-    # ★ 获取类别权重用于 Focal Loss
+    # �?获取类别权重用于 Focal Loss
     class_weights = torch.FloatTensor(train_dataset.class_weights).to(device)
     logger.info(f"类别权重: {class_weights.cpu().numpy()}")
 
-    logger.info(f"训练集: {len(train_dataset)} 序列 | 验证集: {len(val_dataset)} 序列")
+    logger.info(f"训练�? {len(train_dataset)} 序列 | 验证�? {len(val_dataset)} 序列")
 
     train_loader = DataLoader(
         train_dataset, batch_size=mc.batch_size, shuffle=True,
@@ -566,11 +553,11 @@ def train_model(settings: Optional[AppConfig] = None) -> None:
     )
 
     # ========== 6. 模型与优化器 ==========
-    # ★ 更高初始学习率（1e-4 替代 3e-5），配合 cosine annealing 会自动降
-    actual_lr = 1e-4
+    # �?更高初始学习率（1e-4 替代 3e-5），配合 cosine annealing 会自动降
+    actual_lr = 5e-5
 
     model = StockTransformer(
-        input_dim=len(FEATURES),  # ★ 包含新增的收益率特征
+        input_dim=len(FEATURES),  # �?包含新增的收益率特征
         lookback_days=mc.lookback_days,
         num_heads=mc.num_heads,
         dim_feedforward=mc.dim_feedforward,
@@ -584,13 +571,11 @@ def train_model(settings: Optional[AppConfig] = None) -> None:
     )
     grad_scaler = GradScaler('cuda', enabled=(device.type == 'cuda'))
 
-    # ★ 余弦退火 + 热重启（替代 FinanceScheduler）
-    cosine_scheduler = CosineAnnealingWarmRestarts(
-        optimizer, T_0=10, T_mult=2, eta_min=1e-6
-    )
+    # �?余弦退�?+ 热重启（替代 FinanceScheduler�?
+    cosine_scheduler = CosineAnnealingWarmRestarts(optimizer, T_0=20, T_mult=2, eta_min=1e-6)
 
     # Warmup 步数
-    warmup_steps = len(train_loader) * 2  # 前2个epoch做warmup
+    warmup_steps = len(train_loader) * 2  # �?个epoch做warmup
     warmup_scheduler = FinanceScheduler(
         optimizer,
         warmup_steps=warmup_steps,
@@ -601,15 +586,15 @@ def train_model(settings: Optional[AppConfig] = None) -> None:
 
     ema = EMA(model, decay=mc.ema_decay)
     swa_model = AveragedModel(model)
-    swa_start = int(mc.epochs * 0.6)  # ★ 更早开始 SWA（0.7→0.6）
+    swa_start = int(mc.epochs * 0.6)  # �?更早开�?SWA�?.7�?.6�?
     topk = TopKCheckpoint(k=mc.topk_save_count, save_dir=pc.topk_checkpoint_dir)
-    early_stopping = EarlyStopping(patience=5, min_delta=0.002)  # ★ patience 3→5，min_delta 0.005→0.002
+    early_stopping = EarlyStopping(patience=3, min_delta=0.001)  # �?patience 3�?，min_delta 0.005�?.002
 
-    # ★ Focal Loss（替代 CrossEntropyLoss）
+    # �?Focal Loss（替�?CrossEntropyLoss�?
     focal_loss_fn = FocalLoss(
         alpha=class_weights,
         gamma=2.0,
-        label_smoothing=0.05,  # ★ 0.1→0.05
+        label_smoothing=0.05,  # �?0.1�?.05
         reduction='none',
     ).to(device)
 
@@ -628,7 +613,7 @@ def train_model(settings: Optional[AppConfig] = None) -> None:
         logger.warning(f"恢复检查点: {latest_checkpoint}, 起始周期: {start_epoch}")
 
     # ========== 7. 训练循环 ==========
-    # ★ 回归损失自适应权重：初始0.5，随训练进展逐渐增加到1.0
+    # �?回归损失自适应权重：初�?.5，随训练进展逐渐增加�?.0
     ret_loss_weight_initial = 0.5
     ret_loss_weight_final = 1.0
 
@@ -639,8 +624,8 @@ def train_model(settings: Optional[AppConfig] = None) -> None:
         total_ret_loss = 0
         optimizer.zero_grad()
 
-        # ★ Warmup 阶段用 FinanceScheduler，之后切换到 Cosine Annealing
-        is_warmup = epoch < 2
+        # �?Warmup 阶段�?FinanceScheduler，之后切换到 Cosine Annealing
+        is_warmup = epoch < 3
 
         progress_bar = tqdm(train_loader, desc=f"Epoch {epoch + 1}/{mc.epochs}", leave=False)
 
@@ -665,14 +650,14 @@ def train_model(settings: Optional[AppConfig] = None) -> None:
                 if torch.isnan(ret_pred).any() or torch.isinf(ret_pred).any():
                     continue
 
-                # ★ Focal Loss 替代 CrossEntropy
+                # �?Focal Loss 替代 CrossEntropy
                 loss_cls = focal_loss_fn(logits, labels, sample_weights=weights)
                 loss_cls = loss_cls.mean()
 
                 loss_ret = nn.SmoothL1Loss(reduction='none')(ret_pred.squeeze(), rets.squeeze())
                 loss_ret = (loss_ret * weights).mean()
 
-                # ★ 回归损失权重自适应增加
+                # �?回归损失权重自适应增加
                 progress = min(1.0, epoch / max(mc.epochs - 1, 1))
                 ret_loss_weight = ret_loss_weight_initial + (ret_loss_weight_final - ret_loss_weight_initial) * progress
 
@@ -702,11 +687,11 @@ def train_model(settings: Optional[AppConfig] = None) -> None:
                     optimizer.zero_grad()
                     ema.update(model)
 
-            # ★ 学习率调度
+            # �?学习率调�?
             if is_warmup:
                 warmup_scheduler.step_batch()
             else:
-                # warmup 结束后由 epoch 级别的 cosine scheduler 控制
+                # warmup 结束后由 epoch 级别�?cosine scheduler 控制
                 pass
 
             current_batch_loss = loss.item() * mc.accumulation_steps
@@ -720,7 +705,7 @@ def train_model(settings: Optional[AppConfig] = None) -> None:
                 lr=f"{optimizer.param_groups[0]['lr']:.2e}",
             )
 
-        # ★ Epoch 结束：更新 cosine scheduler
+        # �?Epoch 结束：更�?cosine scheduler
         if not is_warmup:
             cosine_scheduler.step()
 
@@ -779,11 +764,11 @@ def train_model(settings: Optional[AppConfig] = None) -> None:
             'loss': avg_val_loss,
         }, checkpoint_path)
 
-        # 保存最佳模型（EMA）
+        # 保存最佳模型（EMA�?
         if avg_val_loss <= best_val_loss:
             best_val_loss = avg_val_loss
             torch.save(ema.get_model().state_dict(), pc.model_path)
-            logger.warning(f"更优模型(EMA)已保存, 损失: {best_val_loss:.4f}")
+            logger.warning(f"更优模型(EMA)已保�? 损失: {best_val_loss:.4f}")
 
         topk.save(ema.get_model(), avg_val_loss, epoch)
 
@@ -794,7 +779,7 @@ def train_model(settings: Optional[AppConfig] = None) -> None:
             break
 
         if np.isnan(avg_val_loss) or np.isinf(avg_val_loss):
-            logger.error("验证损失异常，停止训练")
+            logger.error(f"验证损失异常，停止训练")
             break
 
     # ========== SWA 收尾 ==========
@@ -804,6 +789,6 @@ def train_model(settings: Optional[AppConfig] = None) -> None:
         torch.save(swa_model.state_dict(), pc.swa_model_path)
         logger.warning(f"SWA 模型已保存: {pc.swa_model_path}")
 
-    logger.warning(f"EMA 最佳模型: {pc.model_path}")
+    logger.warning(f"EMA 最佳模存: {pc.model_path}")
     logger.warning(f"Top-K 集成模型: {pc.topk_checkpoint_dir}/")
-    logger.warning(f"最终 val_loss: {avg_val_loss:.4f}, 最佳 val_loss: {best_val_loss:.4f}")
+    logger.warning(f"最佳val_loss: {avg_val_loss:.4f}, 最佳val_loss: {best_val_loss:.4f}")
