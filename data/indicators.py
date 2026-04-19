@@ -162,6 +162,8 @@ def calculate_orthogonal_factors(
         trans_result['transformer_uncertainty'] = 0.15
 
     df['transformer_prob'] = trans_result['transformer_prob']
+    # 保留原始收益率预测，供仓位控制/风控使用。
+    df['transformer_pred_ret_raw'] = trans_result['transformer_pred_ret']
     df['transformer_pred_ret'] = trans_result['transformer_pred_ret']
     df['transformer_conf'] = 1.0 - trans_result['transformer_uncertainty']
 

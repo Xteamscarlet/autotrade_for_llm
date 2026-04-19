@@ -24,7 +24,10 @@ AI_FACTOR_COLS = ['transformer_prob', 'transformer_pred_ret', 'transformer_conf'
 
 ALL_FACTOR_COLS = TRADITIONAL_FACTOR_COLS + AI_FACTOR_COLS
 
-NON_FACTOR_COLS = ['Close', 'Open', 'High', 'Low', 'Volume', 'MA20', 'Combined_Score']
+NON_FACTOR_COLS = [
+    'Close', 'Open', 'High', 'Low', 'Volume', 'MA20', 'Combined_Score',
+    'Close_raw', 'transformer_pred_ret_raw',
+]
 
 # ★ 扩展市场状态（5种）
 REGIME_STRONG_BULL = 'strong_bull'

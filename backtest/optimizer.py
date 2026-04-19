@@ -78,6 +78,46 @@ def calculate_dynamic_weights(df: pd.DataFrame, factor_cols: list, ic_window_ran
     return {col: abs(icir_dict.get(col, 0)) / sum_abs for col in factor_cols}
 
 
+def build_factor_weights(
+    df: pd.DataFrame,
+    base_weights: Dict[str, float],
+    transformer_weight: float = 0.0,
+) -> Dict[str, float]:
+    """将 transformer_prob 真正纳入 Combined_Score 权重。"""
+    weights = {}
+
+    traditional_cols = [
+        col for col in df.columns
+        if col in TRADITIONAL_FACTOR_COLS and col in base_weights
+    ]
+    has_transformer_prob = 'transformer_prob' in df.columns
+
+    clipped_transformer_weight = float(np.clip(transformer_weight, 0.0, 1.0))
+    if not has_transformer_prob:
+        clipped_transformer_weight = 0.0
+
+    traditional_budget = max(0.0, 1.0 - clipped_transformer_weight)
+    traditional_base_sum = sum(base_weights.get(col, 0.0) for col in traditional_cols)
+
+    if traditional_cols:
+        if traditional_base_sum > 0:
+            for col in traditional_cols:
+                weights[col] = traditional_budget * base_weights.get(col, 0.0) / traditional_base_sum
+        else:
+            default_weight = traditional_budget / len(traditional_cols)
+            for col in traditional_cols:
+                weights[col] = default_weight
+
+    if has_transformer_prob and clipped_transformer_weight > 0:
+        weights['transformer_prob'] = clipped_transformer_weight
+
+    total = sum(weights.values())
+    if total > 0:
+        weights = {k: v / total for k, v in weights.items()}
+
+    return weights
+
+
 def walk_forward_split(
         df: pd.DataFrame,
         n_splits: int = 5,
@@ -235,11 +275,11 @@ def optimize_strategy(
         if trial_params['buy_threshold'] <= trial_params['sell_threshold']:
             return -999.0, -1.0, -999.0
 
-        adjusted_weights = weights.copy()
-        if 'transformer_prob' in adjusted_weights:
-            adjusted_weights['transformer_prob'] = trial_params['transformer_weight']
-        total = sum(adjusted_weights.values())
-        adjusted_weights = {k: v / total for k, v in adjusted_weights.items()}
+        adjusted_weights = build_factor_weights(
+            df=df,
+            base_weights=weights,
+            transformer_weight=trial_params['transformer_weight'],
+        )
 
         trades_df, stats, _ = run_backtest_loop(
             df, stock_code, market_data, adjusted_weights,

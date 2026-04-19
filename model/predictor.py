@@ -36,8 +36,16 @@ except ImportError:
     ef = None
 
 
+# ★ 次要修复: 模型加载缓存，避免回测时每只股票都重复加载几百 MB 权重
+_MODEL_CACHE: Dict[str, List[tuple]] = {}
+
+
 def _load_ensemble_models(device: torch.device) -> List[tuple]:
-    """动态加载所有可用模型"""
+    """动态加载所有可用模型（带进程内缓存）"""
+    cache_key = str(device)
+    if cache_key in _MODEL_CACHE:
+        return _MODEL_CACHE[cache_key]
+
     settings = get_settings()
     models = []
 
@@ -64,7 +72,7 @@ def _load_ensemble_models(device: torch.device) -> List[tuple]:
     topk_dir = settings.paths.topk_checkpoint_dir
     if os.path.exists(topk_dir):
         for fname in os.listdir(topk_dir):
-            if fname.endswith(".pth"):
+            if fname.startswith("topk_rawclose_") and fname.endswith(".pth"):
                 try:
                     m = StockTransformer(input_dim=len(FEATURES), lookback_days=settings.model.lookback_days).to(device)
                     ckpt = torch.load(os.path.join(topk_dir, fname), map_location=device)
@@ -75,6 +83,7 @@ def _load_ensemble_models(device: torch.device) -> List[tuple]:
                 except Exception as e:
                     logger.warning(f"TopK 模型 {fname} 加载失败: {e}")
 
+    _MODEL_CACHE[cache_key] = models
     return models
 
 
@@ -89,6 +98,25 @@ def _load_scalers() -> tuple:
         global_scaler = joblib.load(settings.paths.global_scaler_path)
 
     return scalers, global_scaler
+
+
+# ★ 修复6: 训练集分位数阈值缓存（用于预测时把"上涨/下跌"映射到真实涨跌幅区间）
+_THRESHOLD_CACHE: Optional[dict] = None
+
+
+def _load_label_thresholds() -> Optional[dict]:
+    global _THRESHOLD_CACHE
+    if _THRESHOLD_CACHE is not None:
+        return _THRESHOLD_CACHE
+    settings = get_settings()
+    path = settings.paths.label_thresholds_path
+    if os.path.exists(path):
+        try:
+            _THRESHOLD_CACHE = joblib.load(path)
+            return _THRESHOLD_CACHE
+        except Exception as e:
+            logger.warning(f"加载分位数阈值失败: {e}")
+    return None
 
 
 def _prepare_features(df: pd.DataFrame) -> pd.DataFrame:
@@ -138,17 +166,19 @@ def predict_stocks(target_codes: List[str], models: Optional[List] = None) -> pd
         return pd.DataFrame()
 
     scalers, global_scaler = _load_scalers()
+    thresholds = _load_label_thresholds()
     predictions = []
 
     for i, target_code in enumerate(target_codes):
         try:
+            # ★ 次要修复: 先检查依赖再 sleep，避免没装 efinance 还浪费时间
+            if not _EF_AVAILABLE:
+                continue
+
             time.sleep(1)
             if i > 0 and i % 100 == 0:
                 logger.warning('每100只暂停100秒')
                 time.sleep(100)
-
-            if not _EF_AVAILABLE:
-                continue
 
             df = ef.stock.get_quote_history(target_code, beg='20210101', end='20270101')
             if df is None or df.empty:
@@ -196,7 +226,8 @@ def predict_stocks(target_codes: List[str], models: Optional[List] = None) -> pd
 
             probs_1d = ensemble_probs.squeeze(0)
             up_prob = (probs_1d[2] + probs_1d[3]).item()
-            pred_ret = ensemble_ret.item()
+            # ★ 修复5: 训练时 ret target 除以 ret_target_scale=0.05，推理时需还原
+            pred_ret = ensemble_ret.item() * settings.model.ret_target_scale
             trend = "上涨" if up_prob > 0.5 else "下跌"
             confidence = up_prob if trend == "上涨" else (1 - up_prob)
             risk_flag = "⚠️ 高模型分歧" if inter_model_uncertainty > 0.05 else "正常"
@@ -212,6 +243,9 @@ def predict_stocks(target_codes: List[str], models: Optional[List] = None) -> pd
                 'expected_score': round(float(expected_score), 4),
                 'ensemble_size': len(models),
                 'scaler_type': scaler_type,
+                # ★ 修复6: 附带训练集分位数阈值，让"上涨"的语义清晰
+                'label_threshold_q75': round(float(thresholds['q75']), 4) if thresholds else None,
+                'label_threshold_q90': round(float(thresholds['q90']), 4) if thresholds else None,
             })
 
         except Exception as e:
@@ -320,7 +354,8 @@ def calculate_transformer_factor_series(
         ensemble_probs = stack_probs.mean(dim=0)
         inter_model_std = stack_probs.std(dim=0).mean(dim=-1).numpy()
         up_probs = (ensemble_probs[:, 2] + ensemble_probs[:, 3]).numpy()
-        mean_rets = torch.stack(all_rets_list).mean(dim=0).squeeze(-1).numpy()
+        # ★ 修复5: 还原 ret 尺度（训练时 target 除以 ret_target_scale）
+        mean_rets = torch.stack(all_rets_list).mean(dim=0).squeeze(-1).numpy() * settings.model.ret_target_scale
 
         result_df = pd.DataFrame({
             'transformer_prob': up_probs,

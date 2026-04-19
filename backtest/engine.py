@@ -149,6 +149,22 @@ def _check_rsi_extreme(df: pd.DataFrame, idx: int) -> Optional[str]:
     return None
 
 
+def _get_raw_transformer_pred_ret(df: pd.DataFrame, idx: int) -> float:
+    """优先读取未压缩的收益率预测；兼容旧数据时再从 [0,1] 分数反推。"""
+    if 'transformer_pred_ret_raw' in df.columns:
+        val = df['transformer_pred_ret_raw'].iloc[idx]
+        if pd.notna(val):
+            return float(val)
+
+    if 'transformer_pred_ret' in df.columns:
+        val = df['transformer_pred_ret'].iloc[idx]
+        if pd.notna(val):
+            clipped = float(np.clip(val, 1e-6, 1 - 1e-6))
+            return float(np.arctanh(2 * clipped - 1) / 10.0)
+
+    return 0.0
+
+
 def run_backtest_loop(
     df: pd.DataFrame,
     stock_code: str,
@@ -291,7 +307,7 @@ def run_backtest_loop(
             position_ratio = min(max(position_ratio, 0.1), 1.0)
 
             if has_pred_ret:
-                pred_ret = df['transformer_pred_ret'].iloc[i]
+                pred_ret = _get_raw_transformer_pred_ret(df, i)
                 signal_strength = max(0.5, min(1.5, 1 + pred_ret / 0.05))
                 position_ratio *= signal_strength
 

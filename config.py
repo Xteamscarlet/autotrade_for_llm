@@ -40,19 +40,19 @@ class ModelConfig:
     """深度学习模型超参数"""
     lookback_days: int = 120
     batch_size: int = 256
-    epochs: int = 7
+    epochs: int = 30                 # ★ 修复1: 7 → 30，避免训练不足
     learning_rate: float = 3e-5
-    weight_decay: float = 0.05
+    weight_decay: float = 0.10       # ★ 修复1: 0.05 → 0.10，加强正则
     num_heads: int = 8
     num_layers: int = 4
     dim_feedforward: int = 512
-    dropout: float = 0.45
+    dropout: float = 0.50            # ★ 修复1: 0.45 → 0.50，加强正则
     num_classes: int = 4
 
     # 训练高级配置
     accumulation_steps: int = 4
-    ema_decay: float = 0.999
-    warmup_epochs: int = 3
+    ema_decay: float = 0.9995        # ★ 修复1: 0.999 → 0.9995，更平滑
+    warmup_epochs: int = 2           # ★ 修复1: 3 → 2，减少 warmup 占比
     plateau_patience: int = 2
     plateau_factor: float = 0.5
     cycle_amplitude: float = 0.2
@@ -61,6 +61,12 @@ class ModelConfig:
     grad_clip_norm: float = 0.3
     label_smoothing: float = 0.1
     time_decay_rate: float = 0.001
+    # ★ 修复1: 早停参数迁入 config 集中管理
+    early_stop_patience: int = 6     # 7 → 30 epoch 配 6 patience
+    early_stop_min_delta: float = 0.0005
+    swa_start_ratio: float = 0.5     # ★ 修复1: 0.6 → 0.5，让 SWA 至少累积一半 epoch
+    # ★ 修复5: 收益率标准化系数（rets 除以该值后送入 SmoothL1Loss）
+    ret_target_scale: float = 0.05
 
     # 推理配置
     mc_forward_train: int = 10     # 训练/实盘 MC Dropout 采样次数
@@ -72,16 +78,16 @@ class ModelConfig:
         return cls(
             lookback_days=_env_int("LOOKBACK_DAYS", 120),
             batch_size=_env_int("BATCH_SIZE", 256),
-            epochs=_env_int("EPOCHS", 7),
+            epochs=_env_int("EPOCHS", 30),
             learning_rate=_env_float("LEARNING_RATE", 3e-5),
-            weight_decay=_env_float("WEIGHT_DECAY", 0.05),
+            weight_decay=_env_float("WEIGHT_DECAY", 0.10),
             num_heads=_env_int("NUM_HEADS", 8),
             num_layers=_env_int("NUM_LAYERS", 4),
             dim_feedforward=_env_int("DIM_FEEDFORWARD", 512),
-            dropout=_env_float("DROPOUT", 0.5),
+            dropout=_env_float("DROPOUT", 0.50),
             accumulation_steps=_env_int("ACCUMULATION_STEPS", 4),
-            ema_decay=_env_float("EMA_DECAY", 0.999),
-            warmup_epochs=_env_int("WARMUP_EPOCHS", 3),
+            ema_decay=_env_float("EMA_DECAY", 0.9995),
+            warmup_epochs=_env_int("WARMUP_EPOCHS", 2),
             plateau_patience=_env_int("PLATEAU_PATIENCE", 2),
             plateau_factor=_env_float("PLATEAU_FACTOR", 0.5),
             cycle_amplitude=_env_float("CYCLE_AMPLITUDE", 0.2),
@@ -90,6 +96,10 @@ class ModelConfig:
             grad_clip_norm=_env_float("GRAD_CLIP_NORM", 0.3),
             label_smoothing=_env_float("LABEL_SMOOTHING", 0.1),
             time_decay_rate=_env_float("TIME_DECAY_RATE", 0.001),
+            early_stop_patience=_env_int("EARLY_STOP_PATIENCE", 6),
+            early_stop_min_delta=_env_float("EARLY_STOP_MIN_DELTA", 0.0005),
+            swa_start_ratio=_env_float("SWA_START_RATIO", 0.5),
+            ret_target_scale=_env_float("RET_TARGET_SCALE", 0.05),
             mc_forward_train=_env_int("MC_FORWARD_TRAIN", 10),
             mc_forward_backtest=_env_int("MC_FORWARD_BACKTEST", 3),
             inference_batch_size=_env_int("INFERENCE_BATCH_SIZE", 64),
@@ -161,6 +171,7 @@ class PathConfig:
     swa_model_path: str = "swa_model_weights.pth"
     scaler_path: str = "per_stock_scalers.pkl"
     global_scaler_path: str = "global_scaler.pkl"
+    label_thresholds_path: str = "label_thresholds.pkl"  # ★ 修复6: 保存训练集分位数阈值
     strategy_file: str = "optimized_strategies.json"
     portfolio_file: str = "my_portfolio.json"
     topk_checkpoint_dir: str = "checkpoints"
@@ -181,6 +192,7 @@ class PathConfig:
             swa_model_path=_env("SWA_MODEL_PATH", "swa_model_weights.pth"),
             scaler_path=_env("SCALER_PATH", "per_stock_scalers.pkl"),
             global_scaler_path=_env("GLOBAL_SCALER_PATH", "global_scaler.pkl"),
+            label_thresholds_path=_env("LABEL_THRESHOLDS_PATH", "label_thresholds.pkl"),
             strategy_file=_env("STRATEGY_FILE", "optimized_strategies.json"),
             portfolio_file=_env("PORTFOLIO_FILE", "my_portfolio.json"),
             topk_checkpoint_dir=_env("TOPK_CHECKPOINT_DIR", "checkpoints"),

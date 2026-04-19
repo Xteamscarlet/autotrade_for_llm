@@ -49,25 +49,31 @@ def init_worker(m_data, s_data):
 
 
 def _build_equity_curve(df: pd.DataFrame, trades_df: pd.DataFrame) -> pd.Series:
-    if trades_df is None or len(trades_df) == 0:
-        return pd.Series(100000.0, index=df.index)
+    """构建持仓策略的 equity 曲线（按日累乘）。
 
+    ★ 修复2: 原实现用单步乘法 `equity[mask] = equity[mask] * (1 + daily)`，
+    每天都从 initial_cash 出发，没有累积效应，导致 max_drawdown/sharpe/total_return 全部失真。
+    新实现：
+      1) 构造每日持仓收益序列 (持仓 * 当日涨跌)
+      2) cumprod 得到净值因子
+      3) 乘以初始资金得到 equity 曲线
+    """
     initial_cash = 100000.0
-    equity = pd.Series(initial_cash, index=df.index)
-    stock_daily_ret = df['Close'].pct_change()
-    position_status = pd.Series(0, index=df.index)
+    if trades_df is None or len(trades_df) == 0:
+        return pd.Series(initial_cash, index=df.index)
+
+    stock_daily_ret = df['Close'].pct_change().fillna(0)
+    position_status = pd.Series(0.0, index=df.index)
 
     for t in trades_df.itertuples():
         try:
             holding_dates = df.loc[t.buy_date: t.sell_date].index
-            position_status.loc[holding_dates] = 1
+            position_status.loc[holding_dates] = 1.0
         except KeyError:
             pass
 
-    holding_mask = position_status == 1
-    daily_change = stock_daily_ret.fillna(0)
-    equity[holding_mask] = equity[holding_mask] * (1 + daily_change[holding_mask])
-
+    daily_portfolio_ret = position_status * stock_daily_ret
+    equity = (1.0 + daily_portfolio_ret).cumprod() * initial_cash
     return equity
 
 
@@ -180,13 +186,28 @@ def process_single_stock(args):
 
         combined_trades = pd.concat(all_trades, ignore_index=True)
 
-        # 用最后一个 split 的测试集区间来构建 equity curve
-        last_split = validated_splits[-1]
-        test_start, test_end = last_split[4], last_split[5]
-        test_df_last = df.iloc[test_start:test_end]
+        # ★ 修复2: equity_curve 应覆盖所有 split 的 test 区间，而非只用最后一个 split
+        # 否则 trades(全 split) 和 equity(单 split) 时间不匹配，stats 全错
+        test_segments = []
+        for s in validated_splits:
+            seg_start, seg_end = s[4], s[5]
+            seg_df = df.iloc[seg_start:seg_end]
+            if len(seg_df) > 0:
+                test_segments.append(seg_df)
 
-        equity_curve = _build_equity_curve(test_df_last, combined_trades)
-        benchmark_returns = _build_benchmark_returns(_worker_market_data, test_df_last)
+        if test_segments:
+            combined_test_df = pd.concat(test_segments)
+            # 去重相邻 split 重叠日期（理论上 walk-forward + gap_days 不会重叠，但保险）
+            combined_test_df = combined_test_df[~combined_test_df.index.duplicated(keep='first')]
+        else:
+            combined_test_df = df.iloc[validated_splits[-1][4]:validated_splits[-1][5]]
+
+        equity_curve = _build_equity_curve(combined_test_df, combined_trades)
+        benchmark_returns = _build_benchmark_returns(_worker_market_data, combined_test_df)
+
+        # 给报告打印用：保留最后一个 split 的起止日期作为"测试区间"展示
+        last_split = validated_splits[-1]
+        test_df_last = df.iloc[last_split[4]:last_split[5]]
 
         full_stats = calculate_comprehensive_stats(
             trades_df=combined_trades,
@@ -294,8 +315,21 @@ if __name__ == "__main__":
         for name, code in clean_map.items()
     ]
 
-    # ★ GPU推理建议单进程，CPU推理可以多进程
-    use_processes = max(1, cpu_count() - 1)
+    # ★ 次要修复: GPU 推理多进程会让每个 worker 都把 ensemble 模型加载到同一张卡，
+    # 12GB 显存会爆。GPU 时强制最多 2 进程；CPU 推理才放开多进程
+    try:
+        import torch as _torch
+        gpu_available = _torch.cuda.is_available()
+    except Exception:
+        gpu_available = False
+
+    if gpu_available:
+        use_processes = min(2, max(1, cpu_count() - 1))
+        print(f"[多进程] 检测到 GPU，限制为 {use_processes} 进程以避免显存爆炸")
+    else:
+        use_processes = max(1, cpu_count() - 1)
+        print(f"[多进程] CPU 模式，使用 {use_processes} 进程")
+
     with Pool(processes=use_processes, initializer=init_worker, initargs=(market_data, stocks_data)) as pool:
         raw_results = list(tqdm(pool.imap(process_single_stock, stock_list), total=len(stock_list), desc="进度"))
 
